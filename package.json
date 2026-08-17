@@ -6,12 +6,31 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:guard": "node tests/auth/route-guard.spec.mjs",
+    "test:antd": "node tests/antd-v6/deprecation-clean.spec.mjs",
+    "test:dash-branch": "node tests/dashboard/branch-filter.spec.mjs",
+    "test:sidebar": "node tests/navigation/sidebar.spec.mjs",
+    "test:sidebar-sticky": "node tests/navigation/sidebar-sticky.spec.mjs",
+    "test:e2e": "node tests/e2e/full-flow.spec.mjs",
+    "test:landing": "node tests/landing/landing-page.spec.mjs && node tests/landing/header-layout.spec.mjs && node tests/landing/smooth-scroll.spec.mjs",
+    "test:branch": "node tests/branch/branch-reload.spec.mjs",
+    "test:icons": "node tests/accounting/icons-header.spec.mjs",
+    "test:accounting-branch": "node tests/accounting/accounting-branch-filter.spec.mjs",
+    "test:cms": "node tests/cms/landing-cms.spec.mjs",
+    "test:rbac": "node tests/rbac/pbac-roles.spec.mjs",
+    "test:all": "node tests/auth/route-guard.spec.mjs && node tests/antd-v6/deprecation-clean.spec.mjs && node tests/dashboard/branch-filter.spec.mjs && node tests/navigation/sidebar.spec.mjs && node tests/navigation/sidebar-sticky.spec.mjs && node tests/accounting/icons-header.spec.mjs && node tests/accounting/accounting-branch-filter.spec.mjs && node tests/cms/landing-cms.spec.mjs && node tests/rbac/pbac-roles.spec.mjs && node tests/e2e/full-flow.spec.mjs && node tests/landing/landing-page.spec.mjs && node tests/landing/header-layout.spec.mjs && node tests/landing/smooth-scroll.spec.mjs && node tests/branch/branch-reload.spec.mjs"
   },
   "dependencies": {
+    "@ant-design/icons": "^6.3.2",
+    "@ant-design/nextjs-registry": "^1.3.0",
+    "antd": "^6.6.0",
+    "axios": "^1.19.0",
+    "dayjs": "^1.11.22",
     "next": "16.3.1",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "recharts": "^3.10.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -20,6 +39,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
+    "playwright": "^1.62.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   },
