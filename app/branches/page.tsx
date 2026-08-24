@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   Table,
   Tag,
@@ -35,13 +34,12 @@ import {
   updateWarehouseStock,
 } from '@/lib/api';
 import { Branch, StockItem } from '@/lib/mock-data';
-import { getCurrentUser } from '@/lib/auth';
+import { usePageGuard } from '@/app/hooks/use-page-guard';
 import PageHeader from '@/app/components/page-header';
 import ReloadButton from '@/app/components/reload-button';
 import StatCard from '@/app/components/stat-card';
 
 export default function BranchesPage() {
-  const router = useRouter();
   const { message } = App.useApp();
   const [branches, setBranches] = useState<Branch[]>([]);
   const [stocks, setStocks] = useState<StockItem[]>([]);
@@ -65,12 +63,7 @@ export default function BranchesPage() {
   const [stockMinAlert, setStockMinAlert] = useState<number>(5);
   const [submittingStock, setSubmittingStock] = useState(false);
 
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      router.push('/login');
-    }
-  }, [router]);
+  usePageGuard();
 
   const loadData = async () => {
     setLoading(true);

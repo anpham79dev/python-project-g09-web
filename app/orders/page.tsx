@@ -23,7 +23,7 @@ import {
 import { getOrders } from '@/lib/api';
 import SearchInput from '@/app/components/search-input';
 import { Order } from '@/lib/mock-data';
-import { getCurrentUser } from '@/lib/auth';
+import { usePageGuard } from '@/app/hooks/use-page-guard';
 
 const { Title, Text } = Typography;
 
@@ -36,12 +36,7 @@ export default function OrdersPage() {
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
   const [selectedPayment, setSelectedPayment] = useState<string>('ALL');
 
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      router.push('/login');
-    }
-  }, [router]);
+  usePageGuard();
 
   const [activeBranchId, setActiveBranchId] = useState<string | null>(null);
 

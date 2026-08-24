@@ -21,8 +21,8 @@ import {
 } from '@ant-design/icons';
 import { createUser, getBranches, getRoles } from '@/lib/api';
 import { Branch, Role } from '@/lib/mock-data';
-import { getCurrentUser, hasPermission } from '@/lib/auth';
 import DetailHeader from '@/app/components/detail-header';
+import { usePageGuard } from '@/app/hooks/use-page-guard';
 
 export default function NewUserPage() {
   const router = useRouter();
@@ -33,16 +33,13 @@ export default function NewUserPage() {
   const [submitting, setSubmitting] = useState(false);
   const selectedRole = Form.useWatch('role', form);
 
-  // Check PBAC permission and load data
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      router.push('/login');
-    } else if (!hasPermission(user, 'users:manage') && user.role !== 'SUPER_ADMIN') {
-      message.error('Bạn không có quyền thêm tài khoản nhân viên mới!');
-      router.push('/users');
-    }
+  usePageGuard({
+    permission: 'users:manage',
+    deniedMessage: 'Bạn không có quyền thêm tài khoản nhân viên mới!',
+    fallbackPath: '/users',
+  });
 
+  useEffect(() => {
     Promise.all([getBranches(), getRoles()]).then(([branchList, roleList]) => {
       setBranches(branchList);
       setRoles(roleList);
@@ -54,7 +51,7 @@ export default function NewUserPage() {
         form.setFieldValue('role', staffRole.id);
       }
     });
-  }, [router, form, message]);
+  }, [form]);
 
   const handleSubmit = async (values: any) => {
     setSubmitting(true);

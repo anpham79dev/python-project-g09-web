@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   Table,
   Tag,
@@ -44,13 +43,12 @@ import {
   PnLReport,
   Branch,
 } from '@/lib/mock-data';
-import { getCurrentUser, hasPermission } from '@/lib/auth';
+import { usePageGuard } from '@/app/hooks/use-page-guard';
 import PageHeader from '@/app/components/page-header';
 import ReloadButton from '@/app/components/reload-button';
 import StatCard from '@/app/components/stat-card';
 
 export default function AccountingPage() {
-  const router = useRouter();
   const { message } = App.useApp();
   const [selectedBranchId, setSelectedBranchId] = useState<string>(() => {
     if (typeof window !== 'undefined') {
@@ -71,15 +69,7 @@ export default function AccountingPage() {
   const [voucherForm] = Form.useForm();
   const [submittingVoucher, setSubmittingVoucher] = useState(false);
 
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      router.push('/login');
-    } else if (!hasPermission(user, 'accounting:read') && user.role !== 'SUPER_ADMIN') {
-      message.error('Bạn không có quyền truy cập trang Sổ quỹ & Kế toán!');
-      router.push('/pos');
-    }
-  }, [router, message]);
+  usePageGuard({ permission: 'accounting:read', deniedMessage: 'Bạn không có quyền truy cập trang Sổ quỹ & Kế toán!' });
 
   const loadData = async () => {
     setLoading(true);

@@ -28,7 +28,7 @@ import {
 import dayjs from 'dayjs';
 import { getShifts, getShiftSummary, getUsers } from '@/lib/api';
 import { WorkShift, ShiftSummary, User } from '@/lib/mock-data';
-import { getCurrentUser } from '@/lib/auth';
+import { usePageGuard } from '@/app/hooks/use-page-guard';
 import PageLoading from '@/app/components/page-loading';
 import PageHeader from '@/app/components/page-header';
 import ReloadButton from '@/app/components/reload-button';
@@ -51,13 +51,7 @@ export default function ShiftsPage() {
   const [detailShift, setDetailShift] = useState<WorkShift | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Check Permission
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      router.push('/login');
-    }
-  }, [router]);
+  usePageGuard();
 
   const loadData = async (branchOverride?: string) => {
     setLoading(true);

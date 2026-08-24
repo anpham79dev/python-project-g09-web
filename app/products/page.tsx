@@ -23,7 +23,7 @@ import {
 import { getProducts, deleteProduct } from '@/lib/api';
 import SearchInput from '@/app/components/search-input';
 import { Product, CATEGORIES } from '@/lib/mock-data';
-import { getCurrentUser, hasPermission } from '@/lib/auth';
+import { usePageGuard } from '@/app/hooks/use-page-guard';
 
 const { Title, Text } = Typography;
 
@@ -36,16 +36,7 @@ export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('Tất cả');
   const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
 
-  // Check PBAC permission
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      router.push('/login');
-    } else if (!hasPermission(user, 'products:write') && user.role !== 'SUPER_ADMIN') {
-      message.error('Bạn không có quyền truy cập trang Quản lý Sản phẩm!');
-      router.push('/pos');
-    }
-  }, [router, message]);
+  usePageGuard({ permission: 'products:write', deniedMessage: 'Bạn không có quyền truy cập trang Quản lý Sản phẩm!' });
 
   const loadData = async () => {
     setLoading(true);

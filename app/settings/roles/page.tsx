@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   Card,
   Table,
@@ -37,12 +36,11 @@ import {
 } from '@ant-design/icons';
 import { getRoles, getPermissions, createRole, updateRole, deleteRole, getAuditLogs } from '@/lib/api';
 import { Role, Permission, AuditLog } from '@/lib/mock-data';
-import { getCurrentUser, hasPermission } from '@/lib/auth';
+import { usePageGuard } from '@/app/hooks/use-page-guard';
 
 const { Title, Text, Paragraph } = Typography;
 
 export default function RolesManagementPage() {
-  const router = useRouter();
   const { message } = App.useApp();
   const [roles, setRoles] = useState<Role[]>([]);
   const [permissions, setPermissions] = useState<Permission[]>([]);
@@ -83,15 +81,11 @@ export default function RolesManagementPage() {
     }
   };
 
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      router.push('/login');
-    } else if (!hasPermission(user, 'roles:manage') && user.role !== 'SUPER_ADMIN') {
-      message.error('Bạn không có quyền quản trị vai trò!');
-      router.push('/pos?reason=forbidden');
-    }
-  }, [router, message]);
+  usePageGuard({
+    permission: 'roles:manage',
+    deniedMessage: 'Bạn không có quyền quản trị vai trò!',
+    fallbackPath: '/pos?reason=forbidden',
+  });
 
   useEffect(() => {
     loadData();

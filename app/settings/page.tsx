@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import {
   Table,
   Tag,
@@ -40,10 +39,9 @@ import PageLoading from '@/app/components/page-loading';
 import PageHeader from '@/app/components/page-header';
 import ReloadButton from '@/app/components/reload-button';
 import { ShiftTemplate, SystemSettings } from '@/lib/mock-data';
-import { getCurrentUser, hasPermission } from '@/lib/auth';
+import { usePageGuard } from '@/app/hooks/use-page-guard';
 
 export default function SettingsPage() {
-  const router = useRouter();
   const { message } = App.useApp();
   const [settings, setSettings] = useState<SystemSettings | null>(null);
   const [templates, setTemplates] = useState<ShiftTemplate[]>([]);
@@ -57,15 +55,7 @@ export default function SettingsPage() {
   const [templateForm] = Form.useForm();
   const [submittingTemplate, setSubmittingTemplate] = useState(false);
 
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      router.push('/login');
-    } else if (!hasPermission(user, 'settings:manage') && user.role !== 'SUPER_ADMIN') {
-      message.error('Bạn không có quyền truy cập trang Cài đặt hệ thống!');
-      router.push('/pos');
-    }
-  }, [router, message]);
+  usePageGuard({ permission: 'settings:manage', deniedMessage: 'Bạn không có quyền truy cập trang Cài đặt hệ thống!' });
 
   const loadData = async () => {
     setLoading(true);

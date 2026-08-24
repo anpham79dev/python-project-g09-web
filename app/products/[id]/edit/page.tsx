@@ -16,9 +16,9 @@ import {
 import { SaveOutlined } from '@ant-design/icons';
 import { getProductById, updateProduct } from '@/lib/api';
 import { CATEGORIES } from '@/lib/mock-data';
-import { getCurrentUser, hasPermission } from '@/lib/auth';
 import PageLoading from '@/app/components/page-loading';
 import DetailHeader from '@/app/components/detail-header';
+import { usePageGuard } from '@/app/hooks/use-page-guard';
 
 const { TextArea } = Input;
 
@@ -33,16 +33,7 @@ export default function EditProductPage() {
   const [submitting, setSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>('');
 
-  // Check PBAC permission
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      router.push('/login');
-    } else if (!hasPermission(user, 'products:write') && user.role !== 'SUPER_ADMIN') {
-      message.error('Bạn không có quyền chỉnh sửa sản phẩm!');
-      router.push('/pos');
-    }
-  }, [router, message]);
+  usePageGuard({ permission: 'products:write', deniedMessage: 'Bạn không có quyền chỉnh sửa sản phẩm!' });
 
   useEffect(() => {
     if (!id) return;

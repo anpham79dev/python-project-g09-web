@@ -12,9 +12,9 @@ import {
 } from "@ant-design/icons";
 import { getOrderDetail } from "@/lib/api";
 import { Order, OrderItem } from "@/lib/mock-data";
-import { getCurrentUser } from "@/lib/auth";
 import PageLoading from "@/app/components/page-loading";
 import DetailHeader from "@/app/components/detail-header";
+import { usePageGuard } from "@/app/hooks/use-page-guard";
 
 export default function OrderDetailPage() {
   const router = useRouter();
@@ -25,12 +25,7 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      router.push("/login");
-    }
-  }, [router]);
+  usePageGuard();
 
   useEffect(() => {
     if (!id) return;

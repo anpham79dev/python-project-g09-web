@@ -61,7 +61,7 @@ import {
   SlowSellingProduct,
   Branch,
 } from '@/lib/mock-data';
-import { getCurrentUser, hasPermission } from '@/lib/auth';
+import { usePageGuard } from '@/app/hooks/use-page-guard';
 
 const { RangePicker } = DatePicker;
 
@@ -87,18 +87,11 @@ export default function DashboardPage() {
   const [customDates, setCustomDates] = useState<[Dayjs, Dayjs] | null>(null);
   const [activeTab, setActiveTab] = useState<string>('sales-trends');
 
-  // Check Admin permission and load branches
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      router.push('/login');
-    } else if (!hasPermission(user, 'dashboard:view') && user.role !== 'SUPER_ADMIN') {
-      message.error('Bạn không có quyền xem Báo cáo Dashboard!');
-      router.push('/pos');
-    }
+  usePageGuard({ permission: 'dashboard:view', deniedMessage: 'Bạn không có quyền xem Báo cáo Dashboard!' });
 
+  useEffect(() => {
     getBranches().then((list) => setBranches(list));
-  }, [router, message]);
+  }, []);
 
   const loadStats = async (rangeKey = selectedRange, dates = customDates, branchId = selectedBranchId) => {
     setLoading(true);

@@ -33,8 +33,9 @@ import {
 } from '@ant-design/icons';
 import { getUsers, updateUser, deleteUser, getBranches, getRoles } from '@/lib/api';
 import { User, Branch, Role } from '@/lib/mock-data';
-import { getCurrentUser, hasPermission } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/auth';
 import SearchInput from '@/app/components/search-input';
+import { usePageGuard } from '@/app/hooks/use-page-guard';
 
 const { Title, Text } = Typography;
 
@@ -54,16 +55,7 @@ export default function UsersPage() {
 
   const currentUser = getCurrentUser();
 
-  // Check PBAC permission
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      router.push('/login');
-    } else if (!hasPermission(user, 'users:read') && user.role !== 'SUPER_ADMIN') {
-      message.error('Bạn không có quyền truy cập trang Quản lý Nhân sự!');
-      router.push('/pos');
-    }
-  }, [router, message]);
+  usePageGuard({ permission: 'users:read', deniedMessage: 'Bạn không có quyền truy cập trang Quản lý Nhân sự!' });
 
   const loadData = async () => {
     setLoading(true);

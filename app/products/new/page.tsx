@@ -16,8 +16,8 @@ import {
 import { SaveOutlined } from '@ant-design/icons';
 import { createProduct, getBranches } from '@/lib/api';
 import { CATEGORIES, Branch } from '@/lib/mock-data';
-import { getCurrentUser, hasPermission } from '@/lib/auth';
 import DetailHeader from '@/app/components/detail-header';
+import { usePageGuard } from '@/app/hooks/use-page-guard';
 
 const { TextArea } = Input;
 
@@ -31,16 +31,9 @@ export default function NewProductPage() {
     'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600&q=80'
   );
 
-  // Check PBAC permission and load branches
-  useEffect(() => {
-    const user = getCurrentUser();
-    if (!user) {
-      router.push('/login');
-    } else if (!hasPermission(user, 'products:write') && user.role !== 'SUPER_ADMIN') {
-      message.error('Bạn không có quyền thêm sản phẩm mới!');
-      router.push('/pos');
-    }
+  usePageGuard({ permission: 'products:write', deniedMessage: 'Bạn không có quyền thêm sản phẩm mới!' });
 
+  useEffect(() => {
     getBranches().then((list) => {
       setBranches(list);
       const activeBranchId = typeof window !== 'undefined' ? localStorage.getItem('artisan_active_branch_id') : null;
@@ -49,7 +42,7 @@ export default function NewProductPage() {
         form.setFieldValue('warehouseId', matchedBranch.warehouses[0].id);
       }
     });
-  }, [router, form, message]);
+  }, [form]);
 
   const handleSubmit = async (values: any) => {
     setSubmitting(true);
