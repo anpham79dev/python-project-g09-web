@@ -8,7 +8,6 @@ import {
   Tag,
   Button,
   App,
-  Typography,
   DatePicker,
   Select,
   Modal,
@@ -33,8 +32,7 @@ import { getShifts, getShiftSummary, getUsers } from '@/lib/api';
 import { WorkShift, ShiftSummary, User } from '@/lib/mock-data';
 import { getCurrentUser } from '@/lib/auth';
 import PageLoading from '@/app/components/page-loading';
-
-const { Title, Text } = Typography;
+import PageHeader from '@/app/components/page-header';
 
 export default function ShiftsPage() {
   const router = useRouter();
@@ -268,69 +266,63 @@ export default function ShiftsPage() {
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto w-full space-y-6">
-      {/* Header & Actions */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs">
-        <div>
-          <Title level={3} className="!mb-0 text-[#111827] !font-bold">
-            Quản Lý Ca Làm Việc &amp; Báo Cáo Kết Ca
-          </Title>
-          <Text className="text-secondary text-xs mt-1 block">
-            Kiểm soát doanh thu bán hàng từng ca, đối soát tiền mặt két tiền và minh bạch tài chính
-          </Text>
-        </div>
+      <PageHeader
+        title="Quản Lý Ca Làm Việc & Báo Cáo Kết Ca"
+        subtitle="Kiểm soát doanh thu bán hàng từng ca, đối soát tiền mặt két tiền và minh bạch tài chính"
+        actionsClassName="flex flex-wrap items-center gap-2.5"
+        actions={
+          <>
+            <Select
+              placeholder="Lọc theo nhân viên"
+              allowClear
+              value={selectedStaffId}
+              onChange={setSelectedStaffId}
+              className="w-44 text-xs h-9"
+            >
+              {users.map((u) => (
+                <Select.Option key={u.id} value={u.id}>
+                  {u.fullName}
+                </Select.Option>
+              ))}
+            </Select>
 
-        {/* Toolbar */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <Select
-            placeholder="Lọc theo nhân viên"
-            allowClear
-            value={selectedStaffId}
-            onChange={setSelectedStaffId}
-            className="w-44 text-xs h-9"
-          >
-            {users.map((u) => (
-              <Select.Option key={u.id} value={u.id}>
-                {u.fullName}
-              </Select.Option>
-            ))}
-          </Select>
+            <Select
+              placeholder="Trạng thái ca"
+              allowClear
+              value={selectedStatus}
+              onChange={setSelectedStatus}
+              className="w-36 text-xs h-9"
+            >
+              <Select.Option value="OPEN">Đang mở ca</Select.Option>
+              <Select.Option value="CLOSED">Đã kết ca</Select.Option>
+            </Select>
 
-          <Select
-            placeholder="Trạng thái ca"
-            allowClear
-            value={selectedStatus}
-            onChange={setSelectedStatus}
-            className="w-36 text-xs h-9"
-          >
-            <Select.Option value="OPEN">Đang mở ca</Select.Option>
-            <Select.Option value="CLOSED">Đã kết ca</Select.Option>
-          </Select>
+            <DatePicker
+              format="DD/MM/YYYY"
+              placeholder="Lọc theo ngày"
+              onChange={(d) => setSelectedDate(d ? d.format('YYYY-MM-DD') : undefined)}
+              className="text-xs h-9 rounded-lg"
+            />
 
-          <DatePicker
-            format="DD/MM/YYYY"
-            placeholder="Lọc theo ngày"
-            onChange={(d) => setSelectedDate(d ? d.format('YYYY-MM-DD') : undefined)}
-            className="text-xs h-9 rounded-lg"
-          />
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={() => loadData()}
+              className="rounded-lg text-xs font-medium h-9 flex items-center"
+            >
+              Làm mới
+            </Button>
 
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={() => loadData()}
-            className="rounded-lg text-xs font-medium h-9 flex items-center"
-          >
-            Làm mới
-          </Button>
-
-          <Button
-            type="primary"
-            icon={<ShopOutlined />}
-            onClick={() => router.push('/pos')}
-            className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg text-xs shadow-xs h-9 flex items-center"
-          >
-            Mở quầy POS
-          </Button>
-        </div>
-      </div>
+            <Button
+              type="primary"
+              icon={<ShopOutlined />}
+              onClick={() => router.push('/pos')}
+              className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg text-xs shadow-xs h-9 flex items-center"
+            >
+              Mở quầy POS
+            </Button>
+          </>
+        }
+      />
 
       {loading ? (
         <PageLoading description="Đang tải dữ liệu ca làm việc..." />

@@ -8,7 +8,6 @@ import {
   Tag,
   Button,
   App,
-  Typography,
   Tabs,
   Modal,
   Form,
@@ -39,8 +38,7 @@ import {
 } from '@/lib/api';
 import { Branch, StockItem } from '@/lib/mock-data';
 import { getCurrentUser } from '@/lib/auth';
-
-const { Title, Text } = Typography;
+import PageHeader from '@/app/components/page-header';
 
 export default function BranchesPage() {
   const router = useRouter();
@@ -348,36 +346,30 @@ export default function BranchesPage() {
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto w-full space-y-6">
-      {/* Header Toolbar */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs">
-        <div>
-          <Title level={3} className="!mb-0 text-[#111827] !font-bold">
-            Quản Lý Đa Chi Nhánh &amp; Đa Kho Hàng
-          </Title>
-          <Text className="text-secondary text-xs mt-1 block">
-            Quản lý mạng lưới chi nhánh, kho lưu trữ tại quầy POS và đồng bộ số liệu tồn kho
-          </Text>
-        </div>
+      <PageHeader
+        title="Quản Lý Đa Chi Nhánh & Đa Kho Hàng"
+        subtitle="Quản lý mạng lưới chi nhánh, kho lưu trữ tại quầy POS và đồng bộ số liệu tồn kho"
+        actions={
+          <>
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={loadData}
+              className="rounded-lg text-xs font-medium h-9 flex items-center"
+            >
+              Làm mới
+            </Button>
 
-        <div className="flex items-center gap-2.5">
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={loadData}
-            className="rounded-lg text-xs font-medium h-9 flex items-center"
-          >
-            Làm mới
-          </Button>
-
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleOpenCreateBranch}
-            className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg text-xs shadow-xs h-9 flex items-center"
-          >
-            Thêm Chi Nhánh Mới
-          </Button>
-        </div>
-      </div>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={handleOpenCreateBranch}
+              className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg text-xs shadow-xs h-9 flex items-center"
+            >
+              Thêm Chi Nhánh Mới
+            </Button>
+          </>
+        }
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

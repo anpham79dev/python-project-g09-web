@@ -8,7 +8,6 @@ import {
   Tag,
   Button,
   App,
-  Typography,
   Tabs,
   Modal,
   Form,
@@ -48,8 +47,7 @@ import {
   Branch,
 } from '@/lib/mock-data';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
-
-const { Title, Text } = Typography;
+import PageHeader from '@/app/components/page-header';
 
 export default function AccountingPage() {
   const router = useRouter();
@@ -258,60 +256,55 @@ export default function AccountingPage() {
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto w-full space-y-6">
-      {/* Header Toolbar */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs">
-        <div>
-          <Title level={3} className="!mb-0 text-[#111827] !font-bold">
-            Sổ Quỹ Thu Chi &amp; Kế Toán Quản Trị
-          </Title>
-          <Text className="text-secondary text-xs mt-1 block">
-            Theo dõi dòng tiền thu chi, lập phiếu chi nguyên vật liệu, tiền mặt bằng và báo cáo lãi lỗ P&amp;L
-          </Text>
-        </div>
+      <PageHeader
+        title="Sổ Quỹ Thu Chi & Kế Toán Quản Trị"
+        subtitle="Theo dõi dòng tiền thu chi, lập phiếu chi nguyên vật liệu, tiền mặt bằng và báo cáo lãi lỗ P&L"
+        actionsClassName="flex flex-wrap items-center gap-3"
+        actions={
+          <>
+            {/* Branch Filter */}
+            <Select
+              value={selectedBranchId}
+              onChange={handleSelectBranch}
+              className="w-64 text-xs"
+              options={[
+                { label: 'Tất cả chi nhánh (Toàn chuỗi)', value: 'ALL' },
+                ...branches.map((b) => ({
+                  label: b.name,
+                  value: b.id,
+                })),
+              ]}
+            />
 
-        <div className="flex flex-wrap items-center gap-3">
-          {/* Branch Filter */}
-          <Select
-            value={selectedBranchId}
-            onChange={handleSelectBranch}
-            className="w-64 text-xs"
-            options={[
-              { label: 'Tất cả chi nhánh (Toàn chuỗi)', value: 'ALL' },
-              ...branches.map((b) => ({
-                label: b.name,
-                value: b.id,
-              })),
-            ]}
-          />
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={loadData}
+              className="rounded-lg text-xs font-medium h-9 flex items-center"
+            >
+              Làm mới
+            </Button>
 
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={loadData}
-            className="rounded-lg text-xs font-medium h-9 flex items-center"
-          >
-            Làm mới
-          </Button>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => handleOpenCreateVoucher('INCOME')}
+              className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg text-xs shadow-xs h-9 flex items-center"
+            >
+              + Lập Phiếu Thu
+            </Button>
 
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => handleOpenCreateVoucher('INCOME')}
-            className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg text-xs shadow-xs h-9 flex items-center"
-          >
-            + Lập Phiếu Thu
-          </Button>
-
-          <Button
-            type="primary"
-            danger
-            icon={<MinusOutlined />}
-            onClick={() => handleOpenCreateVoucher('EXPENSE')}
-            className="bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg text-xs shadow-xs h-9 flex items-center"
-          >
-            - Lập Phiếu Chi
-          </Button>
-        </div>
-      </div>
+            <Button
+              type="primary"
+              danger
+              icon={<MinusOutlined />}
+              onClick={() => handleOpenCreateVoucher('EXPENSE')}
+              className="bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg text-xs shadow-xs h-9 flex items-center"
+            >
+              - Lập Phiếu Chi
+            </Button>
+          </>
+        }
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

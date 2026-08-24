@@ -7,7 +7,6 @@ import {
   Tag,
   Button,
   App,
-  Typography,
   Tabs,
   Modal,
   Form,
@@ -39,10 +38,9 @@ import {
   deleteShiftTemplate,
 } from '@/lib/api';
 import PageLoading from '@/app/components/page-loading';
+import PageHeader from '@/app/components/page-header';
 import { ShiftTemplate, SystemSettings } from '@/lib/mock-data';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
-
-const { Title, Text } = Typography;
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -226,18 +224,10 @@ export default function SettingsPage() {
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto w-full space-y-6">
-      {/* Header Toolbar */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs">
-        <div>
-          <Title level={3} className="!mb-0 text-[#111827] !font-bold">
-            Cài Đặt Hệ Thống &amp; Cấu Hình Ca Làm Việc Động
-          </Title>
-          <Text className="text-secondary text-xs mt-1 block">
-            Tùy biến khung giờ ca làm việc, thông tin in phiếu thanh toán và các quy tắc kiểm soát kho
-          </Text>
-        </div>
-
-        <div className="flex items-center gap-2.5">
+      <PageHeader
+        title="Cài Đặt Hệ Thống & Cấu Hình Ca Làm Việc Động"
+        subtitle="Tùy biến khung giờ ca làm việc, thông tin in phiếu thanh toán và các quy tắc kiểm soát kho"
+        actions={
           <Button
             icon={<ReloadOutlined />}
             onClick={loadData}
@@ -245,8 +235,8 @@ export default function SettingsPage() {
           >
             Làm mới
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       {loading && !settings ? (
         <PageLoading description="Đang tải thông số cấu hình..." />

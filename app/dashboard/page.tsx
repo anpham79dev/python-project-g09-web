@@ -8,7 +8,6 @@ import {
   Tag,
   Button,
   App,
-  Typography,
   Tabs,
   Segmented,
   DatePicker,
@@ -54,6 +53,7 @@ import {
 import type { Dayjs } from 'dayjs';
 import { getDashboardStats, getBranches } from '@/lib/api';
 import PageLoading from '@/app/components/page-loading';
+import PageHeader from '@/app/components/page-header';
 import {
   DashboardStats,
   StaffPerformanceStat,
@@ -63,7 +63,6 @@ import {
 } from '@/lib/mock-data';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
 
-const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
 
 // Color Palette for Charts
@@ -416,19 +415,12 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto w-full space-y-6">
-      {/* Header & Date Range Toolbar */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs">
-        <div>
-          <Title level={3} className="!mb-0 text-[#111827] !font-bold">
-            Báo Cáo &amp; Thống Kê Hoạt Động Tiệm Bánh
-          </Title>
-          <Text className="text-secondary text-xs mt-1 block">
-            Phân tích số liệu tức thời theo khoảng thời gian thực tế so với kỳ trước liền kề
-          </Text>
-        </div>
-
-        {/* Date Filter, Branch Filter & Actions Toolbar */}
-        <div className="flex flex-wrap items-center gap-2.5">
+      <PageHeader
+        title="Báo Cáo & Thống Kê Hoạt Động Tiệm Bánh"
+        subtitle="Phân tích số liệu tức thời theo khoảng thời gian thực tế so với kỳ trước liền kề"
+        actionsClassName="flex flex-wrap items-center gap-2.5"
+        actions={
+          <>
           <div data-testid="dashboard-branch-filter" className="inline-block">
             <Select
               id="dashboard-branch-select"
@@ -530,8 +522,9 @@ export default function DashboardPage() {
           >
             Mở quầy POS
           </Button>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {loading && !stats ? (
         <PageLoading description="Đang tổng hợp báo cáo kinh doanh..." />
