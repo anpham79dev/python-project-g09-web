@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Input,
   Button,
@@ -12,7 +12,7 @@ import {
   Space,
   App,
   Typography,
-} from 'antd';
+} from "antd";
 import {
   ShoppingCartOutlined,
   PlusOutlined,
@@ -27,13 +27,18 @@ import {
   PhoneOutlined,
   ClearOutlined,
   ClockCircleOutlined,
-} from '@ant-design/icons';
-import { getProducts, createOrder, getCurrentShift, closeCurrentShift } from '@/lib/api';
-import { Product, CATEGORIES, Order, WorkShift } from '@/lib/mock-data';
-import { getCurrentUser } from '@/lib/auth';
-import PageLoading from '@/app/components/page-loading';
-import SearchInput from '@/app/components/search-input';
-import { useBranchChange } from '@/app/hooks/use-branch-change';
+} from "@ant-design/icons";
+import {
+  getProducts,
+  createOrder,
+  getCurrentShift,
+  closeCurrentShift,
+} from "@/lib/api";
+import { Product, CATEGORIES, Order, WorkShift } from "@/lib/mock-data";
+import { getCurrentUser } from "@/lib/auth";
+import PageLoading from "@/app/components/page-loading";
+import SearchInput from "@/app/components/search-input";
+import { useBranchChange } from "@/app/hooks/use-branch-change";
 
 const { Title, Text } = Typography;
 
@@ -46,24 +51,27 @@ export default function POSPage() {
   const { message } = App.useApp();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('Tất cả');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("Tất cả");
 
   // Shift State
   const [currentShift, setCurrentShift] = useState<WorkShift | null>(null);
   const [showShiftModal, setShowShiftModal] = useState(false);
   const [actualCashInput, setActualCashInput] = useState<number>(0);
-  const [shiftNote, setShiftNote] = useState('');
+  const [shiftNote, setShiftNote] = useState("");
   const [closingShift, setClosingShift] = useState(false);
-  const [closedShiftToPrint, setClosedShiftToPrint] = useState<WorkShift | null>(null);
+  const [closedShiftToPrint, setClosedShiftToPrint] =
+    useState<WorkShift | null>(null);
 
   // Cart state
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [customerName, setCustomerName] = useState('');
-  const [customerPhone, setCustomerPhone] = useState('');
-  const [orderNote, setOrderNote] = useState('');
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [orderNote, setOrderNote] = useState("");
   const [discount, setDiscount] = useState<number>(0);
-  const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'QR_TRANSFER' | 'CARD'>('QR_TRANSFER');
+  const [paymentMethod, setPaymentMethod] = useState<
+    "CASH" | "QR_TRANSFER" | "CARD"
+  >("QR_TRANSFER");
   const [submitting, setSubmitting] = useState(false);
 
   // Success Modal
@@ -76,7 +84,7 @@ export default function POSPage() {
       const data = await getProducts();
       setProducts(data);
     } catch {
-      message.error('Không thể tải danh sách sản phẩm');
+      message.error("Không thể tải danh sách sản phẩm");
     } finally {
       setLoading(false);
     }
@@ -110,7 +118,7 @@ export default function POSPage() {
       setActualCashInput(shift.expectedCash);
       setShowShiftModal(true);
     } catch {
-      message.error('Không thể tải thông tin ca làm việc');
+      message.error("Không thể tải thông tin ca làm việc");
     }
   };
 
@@ -122,15 +130,18 @@ export default function POSPage() {
         actualCash: actualCashInput,
         note: shiftNote || undefined,
       });
-      message.success('Kết ca làm việc thành công!');
+      message.success("Kết ca làm việc thành công!");
       setShowShiftModal(false);
-      setClosedShiftToPrint(closed);
+      setClosedShiftToPrint({
+        ...closed,
+        endTime: closed.endTime || new Date().toISOString(),
+      });
       setTimeout(() => {
         window.print();
       }, 300);
       fetchShift();
     } catch (err: any) {
-      message.error(err.message || 'Lỗi khi kết ca');
+      message.error(err.message || "Lỗi khi kết ca");
     } finally {
       setClosingShift(false);
     }
@@ -138,7 +149,8 @@ export default function POSPage() {
 
   // Filter products
   const filteredProducts = products.filter((p) => {
-    const matchesCategory = selectedCategory === 'Tất cả' || p.category === selectedCategory;
+    const matchesCategory =
+      selectedCategory === "Tất cả" || p.category === selectedCategory;
     const matchesSearch =
       p.name.toLowerCase().includes(searchQuery.toLowerCase().trim()) ||
       p.category.toLowerCase().includes(searchQuery.toLowerCase().trim());
@@ -165,7 +177,9 @@ export default function POSPage() {
           return prevCart;
         }
         return prevCart.map((item) =>
-          item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.product.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item,
         );
       }
       return [...prevCart, { product, quantity: 1 }];
@@ -185,44 +199,56 @@ export default function POSPage() {
     }
 
     setCart((prevCart) =>
-      prevCart.map((item) => (item.product.id === productId ? { ...item, quantity: newQuantity } : item))
+      prevCart.map((item) =>
+        item.product.id === productId
+          ? { ...item, quantity: newQuantity }
+          : item,
+      ),
     );
   };
 
   const removeFromCart = (productId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.product.id !== productId));
+    setCart((prevCart) =>
+      prevCart.filter((item) => item.product.id !== productId),
+    );
   };
 
   const clearCart = () => {
     setCart([]);
-    setCustomerName('');
-    setCustomerPhone('');
-    setOrderNote('');
+    setCustomerName("");
+    setCustomerPhone("");
+    setOrderNote("");
     setDiscount(0);
   };
 
   // Calculations
-  const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+  const subtotal = cart.reduce(
+    (sum, item) => sum + item.product.price * item.quantity,
+    0,
+  );
   const finalTotal = Math.max(0, subtotal - discount);
 
   // Submit Order
   const handleCheckout = async () => {
     if (cart.length === 0) {
-      message.warning('Giỏ hàng đang trống! Vui lòng chọn món.');
+      message.warning("Giỏ hàng đang trống! Vui lòng chọn món.");
       return;
     }
 
     const currentUser = getCurrentUser();
-    const activeBranchId = typeof window !== 'undefined' ? localStorage.getItem('artisan_active_branch_id') : undefined;
+    const activeBranchId =
+      typeof window !== "undefined"
+        ? localStorage.getItem("artisan_active_branch_id")
+        : undefined;
     setSubmitting(true);
 
     try {
       const orderPayload = {
-        customerName: customerName.trim() || 'Khách vãng lai',
+        customerName: customerName.trim() || "Khách vãng lai",
         customerPhone: customerPhone.trim() || undefined,
         branchId: activeBranchId || undefined,
-        staffId: currentUser?.id || 'user-002',
-        staffName: currentUser?.fullName || 'Thu Ngân',
+        staffId: currentUser?.id || "user-002",
+        staffName: currentUser?.fullName || "Thu Ngân",
         items: cart.map((item) => ({
           productId: item.product.id,
           productName: item.product.name,
@@ -235,19 +261,22 @@ export default function POSPage() {
         discount,
         totalAmount: finalTotal,
         paymentMethod,
-        status: 'COMPLETED' as const,
+        status: "COMPLETED" as const,
         note: orderNote.trim() || undefined,
       };
 
       const newOrder = await createOrder(orderPayload);
-      setCompletedOrder(newOrder);
+      setCompletedOrder({
+        ...newOrder,
+        createdAt: newOrder.createdAt || new Date().toISOString(),
+      });
       setShowSuccessModal(true);
       clearCart();
       // Re-fetch products to reflect decreased stock
       fetchProductList();
-      message.success('Thanh toán đơn hàng thành công!');
+      message.success("Thanh toán đơn hàng thành công!");
     } catch (err: any) {
-      message.error(err.message || 'Lỗi khi tạo đơn hàng');
+      message.error(err.message || "Lỗi khi tạo đơn hàng");
     } finally {
       setSubmitting(false);
     }
@@ -271,7 +300,7 @@ export default function POSPage() {
               {currentShift && (
                 <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
                   <ClockCircleOutlined className="text-[#006C49]" />
-                  <span>{currentShift.shiftName.split('-')[0]}</span>
+                  <span>{currentShift.shiftName.split("-")[0]}</span>
                 </div>
               )}
               <Button
@@ -282,7 +311,11 @@ export default function POSPage() {
                 Kết ca / Chốt két
               </Button>
               <div className="text-xs text-secondary font-medium">
-                Tìm thấy <strong className="text-[#10B981]">{filteredProducts.length}</strong> món
+                Tìm thấy{" "}
+                <strong className="text-[#10B981]">
+                  {filteredProducts.length}
+                </strong>{" "}
+                món
               </div>
             </div>
           </div>
@@ -296,8 +329,8 @@ export default function POSPage() {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border ${
                   selectedCategory === cat
-                    ? 'bg-[#006C49] text-white border-[#006C49] shadow-xs'
-                    : 'bg-[#F8F9FA] text-[#585F6C] border-[#E5E7EB] hover:bg-[#F3F4F5] hover:text-[#111827]'
+                    ? "bg-[#006C49] text-white border-[#006C49] shadow-xs"
+                    : "bg-[#F8F9FA] text-[#585F6C] border-[#E5E7EB] hover:bg-[#F3F4F5] hover:text-[#111827]"
                 }`}
               >
                 {cat}
@@ -309,18 +342,31 @@ export default function POSPage() {
         {/* Product Grid */}
         <div className="flex-1 p-4 overflow-y-auto">
           {loading ? (
-            <PageLoading description="Đang tải danh mục bánh..." className="flex flex-col items-center justify-center h-64" />
+            <PageLoading
+              description="Đang tải danh mục bánh..."
+              className="flex flex-col items-center justify-center h-64"
+            />
           ) : filteredProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-72 bg-white rounded-xl border border-dashed border-[#E5E7EB] p-8">
               <Empty
                 description={
                   <div className="text-center">
-                    <p className="text-base font-semibold text-text-main">Không tìm thấy sản phẩm nào</p>
-                    <p className="text-xs text-secondary">Thử thay đổi từ khóa tìm kiếm hoặc chọn danh mục khác</p>
+                    <p className="text-base font-semibold text-text-main">
+                      Không tìm thấy sản phẩm nào
+                    </p>
+                    <p className="text-xs text-secondary">
+                      Thử thay đổi từ khóa tìm kiếm hoặc chọn danh mục khác
+                    </p>
                   </div>
                 }
               />
-              <Button onClick={() => { setSearchQuery(''); setSelectedCategory('Tất cả'); }} className="mt-4">
+              <Button
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("Tất cả");
+                }}
+                className="mt-4"
+              >
                 Đặt lại bộ lọc
               </Button>
             </div>
@@ -328,7 +374,9 @@ export default function POSPage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3.5">
               {filteredProducts.map((product) => {
                 const isOutOfStock = product.stock <= 0;
-                const inCartItem = cart.find((item) => item.product.id === product.id);
+                const inCartItem = cart.find(
+                  (item) => item.product.id === product.id,
+                );
 
                 return (
                   <div
@@ -336,13 +384,16 @@ export default function POSPage() {
                     onClick={() => !isOutOfStock && addToCart(product)}
                     className={`group relative bg-white border border-[#E5E7EB] rounded-xl overflow-hidden p-3 flex flex-col justify-between transition-all select-none ${
                       isOutOfStock
-                        ? 'opacity-60 cursor-not-allowed bg-gray-50'
-                        : 'cursor-pointer hover:border-[#10B981] hover:shadow-md active:scale-[0.98]'
+                        ? "opacity-60 cursor-not-allowed bg-gray-50"
+                        : "cursor-pointer hover:border-[#10B981] hover:shadow-md active:scale-[0.98]"
                     }`}
                   >
                     {inCartItem && (
                       <div className="absolute top-2 right-2 z-10">
-                        <Badge count={inCartItem.quantity} style={{ backgroundColor: '#10B981' }} />
+                        <Badge
+                          count={inCartItem.quantity}
+                          style={{ backgroundColor: "#10B981" }}
+                        />
                       </div>
                     )}
 
@@ -373,9 +424,18 @@ export default function POSPage() {
 
                     <div className="pt-2 border-t border-dashed border-[#E5E7EB] flex items-center justify-between mt-2">
                       <span className="text-sm font-bold text-[#006C49] font-mono">
-                        {product.price.toLocaleString('vi-VN')} ₫
+                        {product.price.toLocaleString("vi-VN")} ₫
                       </span>
-                      <Tag color={product.stock > 10 ? 'default' : product.stock > 0 ? 'warning' : 'error'} className="m-0 text-[10px]">
+                      <Tag
+                        color={
+                          product.stock > 10
+                            ? "default"
+                            : product.stock > 0
+                              ? "warning"
+                              : "error"
+                        }
+                        className="m-0 text-[10px]"
+                      >
                         Kho: {product.stock}
                       </Tag>
                     </div>
@@ -425,7 +485,9 @@ export default function POSPage() {
               <div className="w-16 h-16 rounded-full bg-[#F8F9FA] border border-[#E5E7EB] flex items-center justify-center mb-3">
                 <ShoppingCartOutlined className="text-2xl text-gray-300" />
               </div>
-              <p className="font-semibold text-sm text-[#111827] m-0">Chưa có sản phẩm nào</p>
+              <p className="font-semibold text-sm text-[#111827] m-0">
+                Chưa có sản phẩm nào
+              </p>
               <p className="text-xs text-gray-400 mt-1 max-w-[220px]">
                 Nhấp vào các món bánh bên thực đơn để thêm vào đơn hàng
               </p>
@@ -447,7 +509,7 @@ export default function POSPage() {
                     {item.product.name}
                   </h5>
                   <p className="text-xs font-bold text-[#006C49] font-mono mt-0.5 m-0">
-                    {item.product.price.toLocaleString('vi-VN')} ₫
+                    {item.product.price.toLocaleString("vi-VN")} ₫
                   </p>
                 </div>
 
@@ -457,15 +519,21 @@ export default function POSPage() {
                     type="text"
                     size="small"
                     icon={<MinusOutlined className="text-[10px]" />}
-                    onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                    onClick={() =>
+                      updateQuantity(item.product.id, item.quantity - 1)
+                    }
                     className="w-6 h-6 flex items-center justify-center p-0"
                   />
-                  <span className="font-bold text-xs w-6 text-center">{item.quantity}</span>
+                  <span className="font-bold text-xs w-6 text-center">
+                    {item.quantity}
+                  </span>
                   <Button
                     type="text"
                     size="small"
                     icon={<PlusOutlined className="text-[10px]" />}
-                    onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                    onClick={() =>
+                      updateQuantity(item.product.id, item.quantity + 1)
+                    }
                     className="w-6 h-6 flex items-center justify-center p-0"
                   />
                 </div>
@@ -523,33 +591,33 @@ export default function POSPage() {
             <div className="grid grid-cols-3 gap-2 w-full">
               <button
                 type="button"
-                onClick={() => setPaymentMethod('QR_TRANSFER')}
+                onClick={() => setPaymentMethod("QR_TRANSFER")}
                 className={`w-full py-2 px-1 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
-                  paymentMethod === 'QR_TRANSFER'
-                    ? 'bg-emerald-50 text-[#006C49] border-[#10B981] shadow-xs'
-                    : 'bg-[#F8F9FA] text-[#585F6C] border-[#E5E7EB] hover:bg-[#F3F4F5]'
+                  paymentMethod === "QR_TRANSFER"
+                    ? "bg-emerald-50 text-[#006C49] border-[#10B981] shadow-xs"
+                    : "bg-[#F8F9FA] text-[#585F6C] border-[#E5E7EB] hover:bg-[#F3F4F5]"
                 }`}
               >
                 <QrcodeOutlined /> Chuyển khoản
               </button>
               <button
                 type="button"
-                onClick={() => setPaymentMethod('CASH')}
+                onClick={() => setPaymentMethod("CASH")}
                 className={`w-full py-2 px-1 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
-                  paymentMethod === 'CASH'
-                    ? 'bg-emerald-50 text-[#006C49] border-[#10B981] shadow-xs'
-                    : 'bg-[#F8F9FA] text-[#585F6C] border-[#E5E7EB] hover:bg-[#F3F4F5]'
+                  paymentMethod === "CASH"
+                    ? "bg-emerald-50 text-[#006C49] border-[#10B981] shadow-xs"
+                    : "bg-[#F8F9FA] text-[#585F6C] border-[#E5E7EB] hover:bg-[#F3F4F5]"
                 }`}
               >
                 <DollarOutlined /> Tiền mặt
               </button>
               <button
                 type="button"
-                onClick={() => setPaymentMethod('CARD')}
+                onClick={() => setPaymentMethod("CARD")}
                 className={`w-full py-2 px-1 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
-                  paymentMethod === 'CARD'
-                    ? 'bg-emerald-50 text-[#006C49] border-[#10B981] shadow-xs'
-                    : 'bg-[#F8F9FA] text-[#585F6C] border-[#E5E7EB] hover:bg-[#F3F4F5]'
+                  paymentMethod === "CARD"
+                    ? "bg-emerald-50 text-[#006C49] border-[#10B981] shadow-xs"
+                    : "bg-[#F8F9FA] text-[#585F6C] border-[#E5E7EB] hover:bg-[#F3F4F5]"
                 }`}
               >
                 <CreditCardOutlined /> Quẹt thẻ
@@ -560,8 +628,12 @@ export default function POSPage() {
           {/* Financial Summary Box */}
           <div className="w-full bg-[#F8F9FA] rounded-xl p-3 border border-[#E5E7EB] space-y-1.5 text-xs">
             <div className="flex justify-between text-secondary">
-              <span>Tạm tính ({cart.reduce((s, i) => s + i.quantity, 0)} món):</span>
-              <span className="font-mono font-medium text-[#111827]">{subtotal.toLocaleString('vi-VN')} ₫</span>
+              <span>
+                Tạm tính ({cart.reduce((s, i) => s + i.quantity, 0)} món):
+              </span>
+              <span className="font-mono font-medium text-[#111827]">
+                {subtotal.toLocaleString("vi-VN")} ₫
+              </span>
             </div>
             <div className="flex justify-between items-center text-secondary">
               <span>Giảm giá khuyến mãi:</span>
@@ -573,16 +645,26 @@ export default function POSPage() {
                   step={5000}
                   value={discount}
                   onChange={(val) => setDiscount(val || 0)}
-                  formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  formatter={(val) =>
+                    `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                  }
                   className="w-full"
                 />
-                <Button disabled size="small" className="!bg-gray-100 !text-gray-600 !px-2">₫</Button>
+                <Button
+                  disabled
+                  size="small"
+                  className="!bg-gray-100 !text-gray-600 !px-2"
+                >
+                  ₫
+                </Button>
               </Space.Compact>
             </div>
             <div className="flex justify-between items-baseline pt-2 border-t border-[#E5E7EB]">
-              <span className="font-bold text-xs uppercase tracking-wider text-[#111827]">Tổng thanh toán:</span>
+              <span className="font-bold text-xs uppercase tracking-wider text-[#111827]">
+                Tổng thanh toán:
+              </span>
               <span className="text-xl font-bold text-[#006C49] font-mono">
-                {finalTotal.toLocaleString('vi-VN')} ₫
+                {finalTotal.toLocaleString("vi-VN")} ₫
               </span>
             </div>
           </div>
@@ -598,7 +680,7 @@ export default function POSPage() {
             icon={<CheckCircleOutlined />}
             className="w-full bg-[#10B981] hover:bg-[#059669] text-white font-bold h-12 rounded-xl text-base shadow-sm"
           >
-            Thanh toán ({finalTotal.toLocaleString('vi-VN')} ₫)
+            Thanh toán ({finalTotal.toLocaleString("vi-VN")} ₫)
           </Button>
         </div>
       </div>
@@ -621,38 +703,49 @@ export default function POSPage() {
               Thanh toán thành công!
             </Title>
             <Text className="text-secondary text-xs">
-              Mã hóa đơn: <strong className="text-[#006C49] font-mono">{completedOrder.code}</strong>
+              Mã hóa đơn:{" "}
+              <strong className="text-[#006C49] font-mono">
+                {completedOrder.code}
+              </strong>
             </Text>
 
             <div className="mt-4 p-4 bg-[#F8F9FA] rounded-xl border border-[#E5E7EB] text-left text-xs space-y-2">
               <div className="flex justify-between pb-2 border-b border-[#E5E7EB]">
                 <span className="text-secondary">Khách hàng:</span>
-                <span className="font-semibold">{completedOrder.customerName}</span>
+                <span className="font-semibold">
+                  {completedOrder.customerName}
+                </span>
               </div>
               <div className="flex justify-between pb-2 border-b border-[#E5E7EB]">
                 <span className="text-secondary">Thu ngân:</span>
-                <span className="font-semibold">{completedOrder.staffName}</span>
+                <span className="font-semibold">
+                  {completedOrder.staffName}
+                </span>
               </div>
               <div className="flex justify-between pb-2 border-b border-[#E5E7EB]">
                 <span className="text-secondary">Phương thức:</span>
                 <Tag color="green">
-                  {completedOrder.paymentMethod === 'QR_TRANSFER'
-                    ? 'Chuyển khoản QR'
-                    : completedOrder.paymentMethod === 'CASH'
-                    ? 'Tiền mặt'
-                    : 'Quẹt thẻ'}
+                  {completedOrder.paymentMethod === "QR_TRANSFER"
+                    ? "Chuyển khoản QR"
+                    : completedOrder.paymentMethod === "CASH"
+                      ? "Tiền mặt"
+                      : "Quẹt thẻ"}
                 </Tag>
               </div>
 
               <div className="py-2">
-                <span className="font-semibold text-secondary block mb-1">Món đã mua:</span>
+                <span className="font-semibold text-secondary block mb-1">
+                  Món đã mua:
+                </span>
                 <div className="space-y-1 max-h-32 overflow-y-auto">
                   {completedOrder.items.map((i, idx) => (
                     <div key={idx} className="flex justify-between text-[11px]">
                       <span>
                         {i.quantity}x {i.productName}
                       </span>
-                      <span className="font-mono">{i.subtotal.toLocaleString('vi-VN')} ₫</span>
+                      <span className="font-mono">
+                        {i.subtotal.toLocaleString("vi-VN")} ₫
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -660,7 +753,9 @@ export default function POSPage() {
 
               <div className="flex justify-between pt-2 border-t border-[#E5E7EB] font-bold text-sm text-[#006C49]">
                 <span>Tổng tiền:</span>
-                <span className="font-mono text-base">{completedOrder.totalAmount.toLocaleString('vi-VN')} ₫</span>
+                <span className="font-mono text-base">
+                  {completedOrder.totalAmount.toLocaleString("vi-VN")} ₫
+                </span>
               </div>
             </div>
 
@@ -689,21 +784,31 @@ export default function POSPage() {
       {completedOrder && (
         <div id="pos-printable-receipt" className="hidden font-mono text-black">
           <div className="text-center pb-2 border-b border-dashed border-black">
-            <h2 className="text-base font-bold uppercase tracking-wider mb-0.5">ARTISAN BAKERY</h2>
-            <p className="text-[10px] mb-0.5">Tiệm Bánh Thủ Công &amp; Cà Phê Nghệ Nhân</p>
-            <p className="text-[10px] mb-0.5">Đ/c: 123 Đường Bánh Mì, Quận 1, TP. HCM</p>
+            <h2 className="text-base font-bold uppercase tracking-wider mb-0.5">
+              ARTISAN BAKERY
+            </h2>
+            <p className="text-[10px] mb-0.5">
+              Tiệm Bánh Thủ Công &amp; Cà Phê Nghệ Nhân
+            </p>
+            <p className="text-[10px] mb-0.5">
+              Đ/c: 123 Đường Bánh Mì, Quận 1, TP. HCM
+            </p>
             <p className="text-[10px]">Hotline: 0901 234 567</p>
           </div>
 
           <div className="text-center my-2">
-            <h3 className="text-xs font-bold uppercase tracking-wide">HÓA ĐƠN BÁN LẺ</h3>
+            <h3 className="text-xs font-bold uppercase tracking-wide">
+              HÓA ĐƠN BÁN LẺ
+            </h3>
             <p className="text-[11px] font-bold">Số: {completedOrder.code}</p>
           </div>
 
           <div className="text-[10px] space-y-0.5 pb-2 border-b border-dashed border-black">
             <div className="flex justify-between">
               <span>Thời gian:</span>
-              <span>{new Date(completedOrder.createdAt || Date.now()).toLocaleString('vi-VN')}</span>
+              <span>
+                {new Date(completedOrder.createdAt).toLocaleString("vi-VN")}
+              </span>
             </div>
             <div className="flex justify-between">
               <span>Thu ngân:</span>
@@ -711,16 +816,21 @@ export default function POSPage() {
             </div>
             <div className="flex justify-between">
               <span>Khách hàng:</span>
-              <span>{completedOrder.customerName} {completedOrder.customerPhone ? `(${completedOrder.customerPhone})` : ''}</span>
+              <span>
+                {completedOrder.customerName}{" "}
+                {completedOrder.customerPhone
+                  ? `(${completedOrder.customerPhone})`
+                  : ""}
+              </span>
             </div>
             <div className="flex justify-between">
               <span>Thanh toán:</span>
               <span>
-                {completedOrder.paymentMethod === 'QR_TRANSFER'
-                  ? 'Chuyển khoản QR'
-                  : completedOrder.paymentMethod === 'CASH'
-                  ? 'Tiền mặt'
-                  : 'Quẹt thẻ POS'}
+                {completedOrder.paymentMethod === "QR_TRANSFER"
+                  ? "Chuyển khoản QR"
+                  : completedOrder.paymentMethod === "CASH"
+                    ? "Tiền mặt"
+                    : "Quẹt thẻ POS"}
               </span>
             </div>
             {completedOrder.note && (
@@ -740,11 +850,20 @@ export default function POSPage() {
             </div>
             <div className="space-y-1">
               {completedOrder.items.map((item, idx) => (
-                <div key={idx} className="flex justify-between text-[10px] items-start">
-                  <span className="w-1/2 pr-1 break-words">{item.productName}</span>
+                <div
+                  key={idx}
+                  className="flex justify-between text-[10px] items-start"
+                >
+                  <span className="w-1/2 pr-1 break-words">
+                    {item.productName}
+                  </span>
                   <span className="w-12 text-center">{item.quantity}</span>
-                  <span className="w-16 text-right">{item.price.toLocaleString('vi-VN')}</span>
-                  <span className="w-20 text-right font-bold">{item.subtotal.toLocaleString('vi-VN')}</span>
+                  <span className="w-16 text-right">
+                    {item.price.toLocaleString("vi-VN")}
+                  </span>
+                  <span className="w-20 text-right font-bold">
+                    {item.subtotal.toLocaleString("vi-VN")}
+                  </span>
                 </div>
               ))}
             </div>
@@ -753,24 +872,34 @@ export default function POSPage() {
           <div className="pt-2 pb-2 text-[10px] space-y-1 border-b border-dashed border-black">
             <div className="flex justify-between">
               <span>Tạm tính tiền hàng:</span>
-              <span>{completedOrder.subtotal.toLocaleString('vi-VN')} ₫</span>
+              <span>{completedOrder.subtotal.toLocaleString("vi-VN")} ₫</span>
             </div>
             {completedOrder.discount > 0 && (
               <div className="flex justify-between">
                 <span>Giảm giá khuyến mãi:</span>
-                <span>-{completedOrder.discount.toLocaleString('vi-VN')} ₫</span>
+                <span>
+                  -{completedOrder.discount.toLocaleString("vi-VN")} ₫
+                </span>
               </div>
             )}
             <div className="flex justify-between text-xs font-bold pt-1 border-t border-black">
               <span>TỔNG CỘNG:</span>
-              <span>{completedOrder.totalAmount.toLocaleString('vi-VN')} ₫</span>
+              <span>
+                {completedOrder.totalAmount.toLocaleString("vi-VN")} ₫
+              </span>
             </div>
           </div>
 
           <div className="text-center pt-3 text-[10px] space-y-0.5">
-            <p className="font-bold uppercase">CẢM ƠN QUÝ KHÁCH &amp; HẸN GẶP LẠI!</p>
-            <p className="text-[9px] text-gray-700">Wifi: Artisan_Bakery | Pass: artisan2026</p>
-            <p className="text-[8px] text-gray-500 mt-1">Hóa đơn điện tử khởi tạo từ hệ thống POS</p>
+            <p className="font-bold uppercase">
+              CẢM ƠN QUÝ KHÁCH &amp; HẸN GẶP LẠI!
+            </p>
+            <p className="text-[9px] text-gray-700">
+              Wifi: Artisan_Bakery | Pass: artisan2026
+            </p>
+            <p className="text-[8px] text-gray-500 mt-1">
+              Hóa đơn điện tử khởi tạo từ hệ thống POS
+            </p>
           </div>
         </div>
       )}
@@ -808,15 +937,23 @@ export default function POSPage() {
             <div className="p-3 bg-[#F8F9FA] rounded-xl border border-[#E5E7EB] space-y-1.5">
               <div className="flex justify-between">
                 <span className="text-secondary">Ca làm:</span>
-                <span className="font-bold text-[#111827]">{currentShift.shiftName}</span>
+                <span className="font-bold text-[#111827]">
+                  {currentShift.shiftName}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-secondary">Thu ngân:</span>
-                <span className="font-semibold text-[#111827]">{currentShift.staffName}</span>
+                <span className="font-semibold text-[#111827]">
+                  {currentShift.staffName}
+                </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-secondary">Số đơn hoàn tất trong ca:</span>
-                <span className="font-bold text-blue-700">{currentShift.ordersCount} hóa đơn</span>
+                <span className="text-secondary">
+                  Số đơn hoàn tất trong ca:
+                </span>
+                <span className="font-bold text-blue-700">
+                  {currentShift.ordersCount} hóa đơn
+                </span>
               </div>
             </div>
 
@@ -824,19 +961,33 @@ export default function POSPage() {
             <div className="p-3 bg-white rounded-xl border border-[#E5E7EB] space-y-2">
               <div className="font-bold text-xs text-[#111827] pb-1 border-b border-gray-100 flex items-center justify-between">
                 <span>DOANH SỐ PHÁT SINH TRONG CA</span>
-                <span className="text-[#006C49] font-mono">{currentShift.totalRevenue.toLocaleString('vi-VN')} ₫</span>
+                <span className="text-[#006C49] font-mono">
+                  {currentShift.totalRevenue.toLocaleString("vi-VN")} ₫
+                </span>
               </div>
               <div className="flex justify-between text-secondary">
-                <span className="flex items-center gap-1"><DollarOutlined className="text-emerald-600" /> Tiền mặt:</span>
-                <span className="font-mono font-semibold text-[#111827]">{currentShift.cashRevenue.toLocaleString('vi-VN')} ₫</span>
+                <span className="flex items-center gap-1">
+                  <DollarOutlined className="text-emerald-600" /> Tiền mặt:
+                </span>
+                <span className="font-mono font-semibold text-[#111827]">
+                  {currentShift.cashRevenue.toLocaleString("vi-VN")} ₫
+                </span>
               </div>
               <div className="flex justify-between text-secondary">
-                <span className="flex items-center gap-1"><CreditCardOutlined className="text-blue-600" /> Quẹt thẻ POS:</span>
-                <span className="font-mono font-semibold text-[#111827]">{currentShift.cardRevenue.toLocaleString('vi-VN')} ₫</span>
+                <span className="flex items-center gap-1">
+                  <CreditCardOutlined className="text-blue-600" /> Quẹt thẻ POS:
+                </span>
+                <span className="font-mono font-semibold text-[#111827]">
+                  {currentShift.cardRevenue.toLocaleString("vi-VN")} ₫
+                </span>
               </div>
               <div className="flex justify-between text-secondary">
-                <span className="flex items-center gap-1"><QrcodeOutlined className="text-cyan-600" /> Chuyển khoản QR:</span>
-                <span className="font-mono font-semibold text-[#111827]">{currentShift.qrRevenue.toLocaleString('vi-VN')} ₫</span>
+                <span className="flex items-center gap-1">
+                  <QrcodeOutlined className="text-cyan-600" /> Chuyển khoản QR:
+                </span>
+                <span className="font-mono font-semibold text-[#111827]">
+                  {currentShift.qrRevenue.toLocaleString("vi-VN")} ₫
+                </span>
               </div>
             </div>
 
@@ -847,15 +998,21 @@ export default function POSPage() {
               </div>
               <div className="flex justify-between text-secondary">
                 <span>1. Tiền mặt đầu ca (tiền thối):</span>
-                <span className="font-mono font-semibold text-[#111827]">{currentShift.initialCash.toLocaleString('vi-VN')} ₫</span>
+                <span className="font-mono font-semibold text-[#111827]">
+                  {currentShift.initialCash.toLocaleString("vi-VN")} ₫
+                </span>
               </div>
               <div className="flex justify-between text-secondary">
                 <span>2. Tiền mặt bán hàng trong ca:</span>
-                <span className="font-mono font-semibold text-[#111827]">+{currentShift.cashRevenue.toLocaleString('vi-VN')} ₫</span>
+                <span className="font-mono font-semibold text-[#111827]">
+                  +{currentShift.cashRevenue.toLocaleString("vi-VN")} ₫
+                </span>
               </div>
               <div className="flex justify-between text-[#111827] font-bold pt-1 border-t border-amber-200">
                 <span>3. Tiền mặt lý thuyết trong két (1+2):</span>
-                <span className="font-mono text-sm text-[#006C49]">{currentShift.expectedCash.toLocaleString('vi-VN')} ₫</span>
+                <span className="font-mono text-sm text-[#006C49]">
+                  {currentShift.expectedCash.toLocaleString("vi-VN")} ₫
+                </span>
               </div>
 
               {/* Actual Cash Input */}
@@ -869,26 +1026,47 @@ export default function POSPage() {
                     className="w-full font-mono text-base font-bold"
                     value={actualCashInput}
                     onChange={(val) => setActualCashInput(val || 0)}
-                    formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    formatter={(val) =>
+                      `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    }
                   />
-                  <Button disabled size="large" className="!bg-gray-100 !text-gray-600 font-bold !px-3">₫</Button>
+                  <Button
+                    disabled
+                    size="large"
+                    className="!bg-gray-100 !text-gray-600 font-bold !px-3"
+                  >
+                    ₫
+                  </Button>
                 </Space.Compact>
               </div>
 
               {/* Difference Status */}
               <div className="p-2.5 rounded-lg bg-white border border-amber-200 flex justify-between items-center">
-                <span className="font-bold text-xs text-[#111827]">Chênh lệch két (4 - 3):</span>
+                <span className="font-bold text-xs text-[#111827]">
+                  Chênh lệch két (4 - 3):
+                </span>
                 {actualCashInput - currentShift.expectedCash === 0 ? (
-                  <Tag color="success" className="font-bold text-xs mr-0 inline-flex items-center">
+                  <Tag
+                    color="success"
+                    className="font-bold text-xs mr-0 inline-flex items-center"
+                  >
                     <CheckCircleOutlined className="mr-1" /> Khớp chuẩn (0 ₫)
                   </Tag>
                 ) : actualCashInput - currentShift.expectedCash > 0 ? (
                   <Tag color="warning" className="font-bold text-xs mr-0">
-                    + {(actualCashInput - currentShift.expectedCash).toLocaleString('vi-VN')} ₫ (Thừa tiền)
+                    +{" "}
+                    {(
+                      actualCashInput - currentShift.expectedCash
+                    ).toLocaleString("vi-VN")}{" "}
+                    ₫ (Thừa tiền)
                   </Tag>
                 ) : (
                   <Tag color="error" className="font-bold text-xs mr-0">
-                    - {Math.abs(actualCashInput - currentShift.expectedCash).toLocaleString('vi-VN')} ₫ (Thiếu tiền)
+                    -{" "}
+                    {Math.abs(
+                      actualCashInput - currentShift.expectedCash,
+                    ).toLocaleString("vi-VN")}{" "}
+                    ₫ (Thiếu tiền)
                   </Tag>
                 )}
               </div>
@@ -939,11 +1117,19 @@ export default function POSPage() {
               </div>
               <div className="receipt-row">
                 <span>Bắt đầu:</span>
-                <span>{new Date(closedShiftToPrint.startTime).toLocaleString('vi-VN')}</span>
+                <span>
+                  {new Date(closedShiftToPrint.startTime).toLocaleString(
+                    "vi-VN",
+                  )}
+                </span>
               </div>
               <div className="receipt-row">
                 <span>Kết thúc:</span>
-                <span>{new Date(closedShiftToPrint.endTime || Date.now()).toLocaleString('vi-VN')}</span>
+                <span>
+                  {new Date(
+                    closedShiftToPrint.endTime as string,
+                  ).toLocaleString("vi-VN")}
+                </span>
               </div>
               <div className="receipt-row">
                 <span>Tổng đơn bán:</span>
@@ -953,42 +1139,61 @@ export default function POSPage() {
               <div className="divider">--------------------------------</div>
               <div className="receipt-row bold">
                 <span>TỔNG DOANH THU:</span>
-                <span>{closedShiftToPrint.totalRevenue.toLocaleString('vi-VN')} đ</span>
+                <span>
+                  {closedShiftToPrint.totalRevenue.toLocaleString("vi-VN")} đ
+                </span>
               </div>
               <div className="receipt-row">
                 <span>- Tiền mặt:</span>
-                <span>{closedShiftToPrint.cashRevenue.toLocaleString('vi-VN')} đ</span>
+                <span>
+                  {closedShiftToPrint.cashRevenue.toLocaleString("vi-VN")} đ
+                </span>
               </div>
               <div className="receipt-row">
                 <span>- Quẹt thẻ:</span>
-                <span>{closedShiftToPrint.cardRevenue.toLocaleString('vi-VN')} đ</span>
+                <span>
+                  {closedShiftToPrint.cardRevenue.toLocaleString("vi-VN")} đ
+                </span>
               </div>
               <div className="receipt-row">
                 <span>- Chuyển khoản QR:</span>
-                <span>{closedShiftToPrint.qrRevenue.toLocaleString('vi-VN')} đ</span>
+                <span>
+                  {closedShiftToPrint.qrRevenue.toLocaleString("vi-VN")} đ
+                </span>
               </div>
 
               <div className="divider">--------------------------------</div>
               <div className="receipt-row">
                 <span>Tiền đầu ca:</span>
-                <span>{closedShiftToPrint.initialCash.toLocaleString('vi-VN')} đ</span>
+                <span>
+                  {closedShiftToPrint.initialCash.toLocaleString("vi-VN")} đ
+                </span>
               </div>
               <div className="receipt-row bold">
                 <span>Tiền lý thuyết két:</span>
-                <span>{closedShiftToPrint.expectedCash.toLocaleString('vi-VN')} đ</span>
+                <span>
+                  {closedShiftToPrint.expectedCash.toLocaleString("vi-VN")} đ
+                </span>
               </div>
               <div className="receipt-row bold">
                 <span>Tiền thực đếm nộp:</span>
-                <span>{closedShiftToPrint.actualCash.toLocaleString('vi-VN')} đ</span>
+                <span>
+                  {closedShiftToPrint.actualCash.toLocaleString("vi-VN")} đ
+                </span>
               </div>
               <div className="receipt-row bold">
                 <span>Chênh lệch bàn giao:</span>
-                <span>{closedShiftToPrint.difference > 0 ? '+' : ''}{closedShiftToPrint.difference.toLocaleString('vi-VN')} đ</span>
+                <span>
+                  {closedShiftToPrint.difference > 0 ? "+" : ""}
+                  {closedShiftToPrint.difference.toLocaleString("vi-VN")} đ
+                </span>
               </div>
 
               {closedShiftToPrint.note && (
                 <>
-                  <div className="divider">--------------------------------</div>
+                  <div className="divider">
+                    --------------------------------
+                  </div>
                   <div className="receipt-row">
                     <span>Ghi chú:</span>
                     <span>{closedShiftToPrint.note}</span>
@@ -1000,12 +1205,14 @@ export default function POSPage() {
               <div className="receipt-signatures">
                 <div>
                   <p>Thu ngân bàn giao</p>
-                  <br /><br />
+                  <br />
+                  <br />
                   <p>{closedShiftToPrint.staffName}</p>
                 </div>
                 <div>
                   <p>Quản lý nhận ca</p>
-                  <br /><br />
+                  <br />
+                  <br />
                   <p>(Ký nhận)</p>
                 </div>
               </div>
@@ -1015,7 +1222,9 @@ export default function POSPage() {
       )}
 
       {/* Global Print Styles */}
-      <style dangerouslySetInnerHTML={{__html: `
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
         @media print {
           @page {
             margin: 5mm;
@@ -1093,7 +1302,9 @@ export default function POSPage() {
             margin: 0 !important;
           }
         }
-      `}} />
+      `,
+        }}
+      />
     </div>
   );
 }
