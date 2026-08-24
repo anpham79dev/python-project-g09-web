@@ -6,7 +6,6 @@ import {
   Table,
   Tag,
   Button,
-  Spin,
   App,
   Typography,
   Tabs,
@@ -39,6 +38,7 @@ import {
   updateShiftTemplate,
   deleteShiftTemplate,
 } from '@/lib/api';
+import PageLoading from '@/app/components/page-loading';
 import { ShiftTemplate, SystemSettings } from '@/lib/mock-data';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
 
@@ -249,9 +249,7 @@ export default function SettingsPage() {
       </div>
 
       {loading && !settings ? (
-        <div className="flex flex-col items-center justify-center h-80">
-          <Spin size="large" description="Đang tải thông số cấu hình..." />
-        </div>
+        <PageLoading description="Đang tải thông số cấu hình..." />
       ) : settings ? (
         <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-xs">
           <Tabs

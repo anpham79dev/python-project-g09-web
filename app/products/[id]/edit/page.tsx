@@ -13,7 +13,6 @@ import {
   App,
   Typography,
   Divider,
-  Spin,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -22,6 +21,7 @@ import {
 import { getProductById, updateProduct } from '@/lib/api';
 import { CATEGORIES } from '@/lib/mock-data';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
+import PageLoading from '@/app/components/page-loading';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -94,11 +94,7 @@ export default function EditProductPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center min-h-[60vh]">
-        <Spin size="large" description="Đang tải thông tin sản phẩm..." />
-      </div>
-    );
+    return <PageLoading description="Đang tải thông tin sản phẩm..." className="flex-1 flex flex-col items-center justify-center min-h-[60vh]" />;
   }
 
   return (

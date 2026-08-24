@@ -8,7 +8,6 @@ import {
   App,
   Dropdown,
   MenuProps,
-  Spin,
   Layout,
   Menu,
   Button,
@@ -34,6 +33,7 @@ import {
 import { getCurrentUser, clearAuthSession, AuthUser, hasPermission, canAccessRoute } from '@/lib/auth';
 import { getBranches, updateUserActiveBranch } from '@/lib/api';
 import { Branch } from '@/lib/mock-data';
+import PageLoading from '@/app/components/page-loading';
 
 const { Sider, Header, Content } = Layout;
 
@@ -682,9 +682,7 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
           {isPublicPage || (mounted && isAuthorized) ? (
             children
           ) : (
-            <div className="min-h-[75vh] flex flex-col items-center justify-center gap-3">
-              <Spin size="large" description="Đang kiểm tra quyền truy cập..." />
-            </div>
+            <PageLoading description="Đang kiểm tra quyền truy cập..." className="min-h-[75vh] flex flex-col items-center justify-center gap-3" />
           )}
         </Content>
       </Layout>

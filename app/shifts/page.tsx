@@ -7,7 +7,6 @@ import {
   Table,
   Tag,
   Button,
-  Spin,
   App,
   Typography,
   DatePicker,
@@ -33,6 +32,7 @@ import dayjs from 'dayjs';
 import { getShifts, getShiftSummary, getUsers } from '@/lib/api';
 import { WorkShift, ShiftSummary, User } from '@/lib/mock-data';
 import { getCurrentUser } from '@/lib/auth';
+import PageLoading from '@/app/components/page-loading';
 
 const { Title, Text } = Typography;
 
@@ -333,9 +333,7 @@ export default function ShiftsPage() {
       </div>
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center h-80">
-          <Spin size="large" description="Đang tải dữ liệu ca làm việc..." />
-        </div>
+        <PageLoading description="Đang tải dữ liệu ca làm việc..." />
       ) : summary ? (
         <>
           {/* 4 Executive KPI Stat Cards */}

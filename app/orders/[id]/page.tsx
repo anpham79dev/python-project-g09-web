@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Card, Button, Tag, Table, Divider, Spin, App, Typography } from "antd";
+import { Card, Button, Tag, Table, Divider, App, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import {
   ArrowLeftOutlined,
@@ -14,6 +14,7 @@ import {
 import { getOrderDetail } from "@/lib/api";
 import { Order, OrderItem } from "@/lib/mock-data";
 import { getCurrentUser } from "@/lib/auth";
+import PageLoading from "@/app/components/page-loading";
 
 const { Title, Text } = Typography;
 
@@ -111,11 +112,7 @@ export default function OrderDetailPage() {
   ];
 
   if (loading) {
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center min-h-[60vh]">
-        <Spin size="large" description="Đang tải chi tiết đơn hàng..." />
-      </div>
-    );
+    return <PageLoading description="Đang tải chi tiết đơn hàng..." className="flex-1 flex flex-col items-center justify-center min-h-[60vh]" />;
   }
 
   if (!order) return null;

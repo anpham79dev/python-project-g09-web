@@ -7,7 +7,6 @@ import {
   Tag,
   Modal,
   Empty,
-  Spin,
   Badge,
   InputNumber,
   Space,
@@ -33,6 +32,7 @@ import {
 import { getProducts, createOrder, getCurrentShift, closeCurrentShift } from '@/lib/api';
 import { Product, CATEGORIES, Order, WorkShift } from '@/lib/mock-data';
 import { getCurrentUser } from '@/lib/auth';
+import PageLoading from '@/app/components/page-loading';
 
 const { Title, Text } = Typography;
 
@@ -312,9 +312,7 @@ export default function POSPage() {
         {/* Product Grid */}
         <div className="flex-1 p-4 overflow-y-auto">
           {loading ? (
-            <div className="flex flex-col items-center justify-center h-64">
-              <Spin size="large" description="Đang tải danh mục bánh..." />
-            </div>
+            <PageLoading description="Đang tải danh mục bánh..." className="flex flex-col items-center justify-center h-64" />
           ) : filteredProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-72 bg-white rounded-xl border border-dashed border-[#E5E7EB] p-8">
               <Empty

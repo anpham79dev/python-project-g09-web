@@ -7,7 +7,6 @@ import {
   Table,
   Tag,
   Button,
-  Spin,
   App,
   Typography,
   Tabs,
@@ -54,6 +53,7 @@ import {
 } from 'recharts';
 import type { Dayjs } from 'dayjs';
 import { getDashboardStats, getBranches } from '@/lib/api';
+import PageLoading from '@/app/components/page-loading';
 import {
   DashboardStats,
   StaffPerformanceStat,
@@ -534,9 +534,7 @@ export default function DashboardPage() {
       </div>
 
       {loading && !stats ? (
-        <div className="flex flex-col items-center justify-center h-80">
-          <Spin size="large" description="Đang tổng hợp báo cáo kinh doanh..." />
-        </div>
+        <PageLoading description="Đang tổng hợp báo cáo kinh doanh..." />
       ) : stats ? (
         <>
           {/* Top 4 KPI Executive Stat Cards */}
