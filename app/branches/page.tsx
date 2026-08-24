@@ -7,7 +7,6 @@ import {
   Table,
   Tag,
   Button,
-  Spin,
   App,
   Typography,
   Tabs,
@@ -18,7 +17,6 @@ import {
   InputNumber,
   Space,
   Tooltip,
-  Badge,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -30,8 +28,6 @@ import {
   EnvironmentOutlined,
   PhoneOutlined,
   UserOutlined,
-  CheckCircleOutlined,
-  WarningOutlined,
   InboxOutlined,
 } from '@ant-design/icons';
 import {
@@ -41,7 +37,7 @@ import {
   getWarehouseStocks,
   updateWarehouseStock,
 } from '@/lib/api';
-import { Branch, Warehouse, StockItem } from '@/lib/mock-data';
+import { Branch, StockItem } from '@/lib/mock-data';
 import { getCurrentUser } from '@/lib/auth';
 
 const { Title, Text } = Typography;

@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Card,
   Table,
   Tag,
   Button,
@@ -19,21 +18,18 @@ import {
   Switch,
   Space,
   Popconfirm,
-  Tooltip,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
   SettingOutlined,
   ClockCircleOutlined,
   ShopOutlined,
-  DollarOutlined,
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   SaveOutlined,
   ReloadOutlined,
   QrcodeOutlined,
-  SafetyCertificateOutlined,
 } from '@ant-design/icons';
 import {
   getSystemSettings,

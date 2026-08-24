@@ -10,7 +10,6 @@ import {
   WorkShift,
   ShiftSummary,
   Branch,
-  Warehouse,
   StockItem,
   ShiftTemplate,
   SystemSettings,
@@ -29,7 +28,6 @@ import {
   INITIAL_SYSTEM_SETTINGS,
   INITIAL_TRANSACTIONS,
 } from './mock-data';
-import { ALL_PERMISSION_CODES } from './rbac-config';
 
 // Kiểm tra biến môi trường chuyển đổi mock <-> API thật
 const isMockMode = (): boolean => {
@@ -1206,76 +1204,6 @@ export const getPnLReport = async (params?: { branchId?: string }): Promise<PnLR
     queryParams.branchId = params.branchId;
   }
   const response = await apiClient.get('/accounting/pnl', { params: queryParams });
-  return response.data;
-};
-
-// ==========================================
-// 8. LANDING PAGE CMS APIs (SUPER_ADMIN)
-// ==========================================
-import { LandingPageConfig, DEFAULT_LANDING_CONFIG } from './landing-config';
-
-const LS_LANDING_CONFIG_KEY = 'artisan_landing_page_config';
-
-export const getLandingPageConfig = async (): Promise<LandingPageConfig> => {
-  if (isMockMode()) {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(LS_LANDING_CONFIG_KEY);
-      if (stored) {
-        try {
-          return JSON.parse(stored);
-        } catch {
-          // fallback
-        }
-      }
-    }
-    return simulateDelay(DEFAULT_LANDING_CONFIG);
-  }
-  try {
-    const response = await apiClient.get('/landing-page-config');
-    return response.data;
-  } catch (err) {
-    console.warn('Failed to fetch public landing config from API, using fallback:', err);
-    return DEFAULT_LANDING_CONFIG;
-  }
-};
-
-export const getAdminLandingPageConfig = async (): Promise<LandingPageConfig> => {
-  if (isMockMode()) {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(LS_LANDING_CONFIG_KEY);
-      if (stored) {
-        try {
-          return JSON.parse(stored);
-        } catch {
-          // fallback
-        }
-      }
-    }
-    return simulateDelay(DEFAULT_LANDING_CONFIG);
-  }
-  const response = await apiClient.get('/admin/landing-page-config');
-  return response.data;
-};
-
-export const updateAdminLandingPageConfig = async (payload: LandingPageConfig): Promise<LandingPageConfig> => {
-  if (isMockMode()) {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(LS_LANDING_CONFIG_KEY, JSON.stringify(payload));
-    }
-    return simulateDelay(payload);
-  }
-  const response = await apiClient.put('/admin/landing-page-config', payload);
-  return response.data;
-};
-
-export const resetAdminLandingPageConfig = async (): Promise<LandingPageConfig> => {
-  if (isMockMode()) {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(LS_LANDING_CONFIG_KEY, JSON.stringify(DEFAULT_LANDING_CONFIG));
-    }
-    return simulateDelay(DEFAULT_LANDING_CONFIG);
-  }
-  const response = await apiClient.post('/admin/landing-page-config/reset');
   return response.data;
 };
 

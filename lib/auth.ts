@@ -149,44 +149,6 @@ export const hasPermission = (user: AuthUser | null | undefined, permissionCode:
 };
 
 /**
- * PBAC: Check if user has AT LEAST ONE of the requested permissions.
- */
-export const hasAnyPermission = (user: AuthUser | null | undefined, permissionCodes: string[]): boolean => {
-  if (!user) return false;
-  if (user.role === 'SUPER_ADMIN') return true;
-  return permissionCodes.some((code) => hasPermission(user, code));
-};
-
-/**
- * PBAC: Check if user has ALL of the requested permissions.
- */
-export const hasAllPermissions = (user: AuthUser | null | undefined, permissionCodes: string[]): boolean => {
-  if (!user) return false;
-  if (user.role === 'SUPER_ADMIN') return true;
-  return permissionCodes.every((code) => hasPermission(user, code));
-};
-
-/**
- * Legacy compatibility helper: check if user is Admin or SuperAdmin.
- */
-export const hasAdminAccess = (user?: AuthUser | null | string): boolean => {
-  if (!user) return false;
-  if (typeof user === 'string') {
-    return user === 'SUPER_ADMIN' || user === 'ADMIN';
-  }
-  return user.role === 'SUPER_ADMIN' || user.role === 'ADMIN' || hasPermission(user, 'dashboard:view');
-};
-
-/**
- * Check if user is specifically SUPER_ADMIN.
- */
-export const isSuperAdmin = (user?: AuthUser | null | string): boolean => {
-  if (!user) return false;
-  const role = typeof user === 'string' ? user : user.role;
-  return role === 'SUPER_ADMIN';
-};
-
-/**
  * Helper to determine if a user can access a specific route pathname.
  */
 export const canAccessRoute = (pathname: string, user?: AuthUser | null): boolean => {
@@ -197,11 +159,4 @@ export const canAccessRoute = (pathname: string, user?: AuthUser | null): boolea
   if (!requiredPerm) return true; // Public or unconstrained authenticated route
 
   return hasPermission(user, requiredPerm);
-};
-
-export const hasRole = (allowedRoles: string[]): boolean => {
-  const user = getCurrentUser();
-  if (!user) return false;
-  if (user.role === 'SUPER_ADMIN') return true;
-  return allowedRoles.includes(user.role);
 };

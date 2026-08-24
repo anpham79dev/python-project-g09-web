@@ -10,31 +10,23 @@ import {
   Spin,
   App,
   Typography,
-  Tabs,
   DatePicker,
   Select,
   Modal,
   Avatar,
-  Statistic,
-  Input,
   Tooltip,
-  Empty,
   Space,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
   ClockCircleOutlined,
   DollarOutlined,
-  ShoppingOutlined,
   CheckCircleOutlined,
-  WarningOutlined,
   PrinterOutlined,
   ReloadOutlined,
   ShopOutlined,
-  UserOutlined,
   CreditCardOutlined,
   QrcodeOutlined,
-  FileTextOutlined,
   EyeOutlined,
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -69,13 +61,10 @@ export default function ShiftsPage() {
     }
   }, [router]);
 
-  const [activeBranchId, setActiveBranchId] = useState<string | null>(null);
-
   const loadData = async (branchOverride?: string) => {
     setLoading(true);
     try {
       const curBranch = branchOverride !== undefined ? branchOverride : (typeof window !== 'undefined' ? localStorage.getItem('artisan_active_branch_id') : null);
-      setActiveBranchId(curBranch);
 
       const [sumData, shiftList, userList] = await Promise.all([
         getShiftSummary(selectedDate ? { date: selectedDate, branchId: curBranch && curBranch !== 'ALL' ? curBranch : undefined } : (curBranch && curBranch !== 'ALL' ? { branchId: curBranch } : undefined)),
@@ -90,7 +79,7 @@ export default function ShiftsPage() {
       setSummary(sumData);
       setShifts(shiftList);
       setUsers(userList);
-    } catch (err: any) {
+    } catch {
       message.error('Lỗi khi tải danh sách ca làm việc');
     } finally {
       setLoading(false);

@@ -74,7 +74,7 @@ export default function POSPage() {
     try {
       const data = await getProducts();
       setProducts(data);
-    } catch (err) {
+    } catch {
       message.error('Không thể tải danh sách sản phẩm');
     } finally {
       setLoading(false);
@@ -110,7 +110,7 @@ export default function POSPage() {
       setCurrentShift(shift);
       setActualCashInput(shift.expectedCash);
       setShowShiftModal(true);
-    } catch (err: any) {
+    } catch {
       message.error('Không thể tải thông tin ca làm việc');
     }
   };

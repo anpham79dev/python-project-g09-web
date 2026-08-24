@@ -27,7 +27,7 @@ export interface RoutePermissionRule {
   label: string;
 }
 
-// 21 atomic permissions across 8 modules
+// 20 atomic permissions across 10 modules
 export const ALL_PERMISSIONS: PermissionDef[] = [
   // 1. Tổng Quan & Dashboard
   {
@@ -159,13 +159,6 @@ export const ALL_PERMISSIONS: PermissionDef[] = [
     module: 'Hệ Thống',
     description: 'Cập nhật thông tin tiệm bánh, cấu hình thanh toán VietQR và ca mẫu',
   },
-  // 11. Landing Page CMS
-  {
-    code: 'landing_page:edit',
-    name: 'Quản Trị Nội Dung Landing Page',
-    module: 'Landing CMS',
-    description: 'Chỉnh sửa nội dung thương hiệu, hero, bảng giá và xuất bản Landing Page',
-  },
 ];
 
 export const ALL_PERMISSION_CODES: string[] = ALL_PERMISSIONS.map((p) => p.code);
@@ -176,10 +169,10 @@ export const SYSTEM_ROLES: Record<string, RoleDef> = {
     id: 'role-superadmin',
     code: 'SUPER_ADMIN',
     name: 'Tổng Quản Trị Hệ Thống',
-    description: 'Toàn quyền truy cập và quản trị toàn bộ hệ thống ERP SaaS và Landing Page CMS.',
+    description: 'Toàn quyền truy cập và quản trị toàn bộ hệ thống ERP SaaS.',
     is_system: true,
     permissions_version: 1,
-    permissions: ALL_PERMISSION_CODES, // 21/21
+    permissions: ALL_PERMISSION_CODES, // 20/20
   },
   ADMIN: {
     id: 'role-admin',
@@ -188,7 +181,7 @@ export const SYSTEM_ROLES: Record<string, RoleDef> = {
     description: 'Toàn quyền quản trị nghiệp vụ chuỗi tiệm bánh (Bán hàng, Kho, Đơn, Sổ quỹ, Nhân sự, Cài đặt).',
     is_system: true,
     permissions_version: 1,
-    permissions: ALL_PERMISSION_CODES.filter((code) => code !== 'landing_page:edit'), // 20/21
+    permissions: ALL_PERMISSION_CODES, // 20/20
   },
   STAFF: {
     id: 'role-staff',
@@ -203,7 +196,7 @@ export const SYSTEM_ROLES: Record<string, RoleDef> = {
       'products:read',
       'orders:read',
       'shifts:read',
-    ], // 5/21
+    ], // 5/20
   },
 };
 
@@ -221,7 +214,6 @@ export const ROUTE_PERMISSIONS: RoutePermissionRule[] = [
   { pathname: '/users/new', requiredPermission: 'users:manage', module: 'Nhân Sự', label: 'Thêm Nhân Viên Mới' },
   { pathname: '/settings', exact: true, requiredPermission: 'settings:manage', module: 'Hệ Thống', label: 'Cài Đặt Cửa Hàng' },
   { pathname: '/settings/roles', requiredPermission: 'roles:manage', module: 'Hệ Thống', label: 'Quản Lý Vai Trò & Quyền' },
-  { pathname: '/settings/landing-page', requiredPermission: 'landing_page:edit', module: 'Landing CMS', label: 'Quản Trị Landing Page' },
 ];
 
 /**

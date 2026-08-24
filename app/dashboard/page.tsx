@@ -30,15 +30,12 @@ import {
   ReloadOutlined,
   FireOutlined,
   CreditCardOutlined,
-  QrcodeOutlined,
   TeamOutlined,
   PieChartOutlined,
   BarChartOutlined,
   EditOutlined,
   ShopOutlined,
   InboxOutlined,
-  UserOutlined,
-  FieldTimeOutlined,
   AppstoreOutlined,
 } from '@ant-design/icons';
 import {
@@ -54,15 +51,11 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip as RechartsTooltip,
-  Legend,
 } from 'recharts';
-import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import { getDashboardStats, getBranches } from '@/lib/api';
 import {
   DashboardStats,
-  PaymentMethodStat,
-  CategoryStat,
   StaffPerformanceStat,
   LowStockDetailItem,
   SlowSellingProduct,
@@ -111,7 +104,7 @@ export default function DashboardPage() {
   const loadStats = async (rangeKey = selectedRange, dates = customDates, branchId = selectedBranchId) => {
     setLoading(true);
     try {
-      let params: { range: string; startDate?: string; endDate?: string; branchId?: string } = {
+      const params: { range: string; startDate?: string; endDate?: string; branchId?: string } = {
         range: rangeKey,
         branchId: branchId !== 'ALL' ? branchId : undefined,
       };
@@ -123,7 +116,7 @@ export default function DashboardPage() {
 
       const data = await getDashboardStats(params);
       setStats(data);
-    } catch (err: any) {
+    } catch {
       message.error('Lỗi khi tải dữ liệu thống kê');
     } finally {
       setLoading(false);

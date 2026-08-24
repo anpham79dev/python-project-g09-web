@@ -38,13 +38,13 @@ async function runAntdV6DeprecationTest() {
     }
   });
 
-  // 1. Kiểm tra Landing Page
-  console.log('[1/8] 🌐 Kiểm tra trang chủ Landing Page (/)');
+  // 1. Kiểm tra route gốc "/" tự động chuyển hướng về /login khi chưa đăng nhập
+  console.log('[1/7] 🌐 Kiểm tra route gốc (/) chuyển hướng về /login...');
   await page.goto(`${BASE_URL}/`, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(500);
 
   // 2. Đăng nhập Admin
-  console.log('[2/8] 🔐 Đăng nhập tài khoản Admin...');
+  console.log('[2/7] 🔐 Đăng nhập tài khoản Admin...');
   await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' });
   const adminBtn = page.getByRole('button', { name: /Quản trị viên/i });
   if (await adminBtn.isVisible()) {
@@ -54,12 +54,12 @@ async function runAntdV6DeprecationTest() {
   }
 
   // 3. Kiểm tra Dashboard
-  console.log('[3/8] 📊 Kiểm tra trang Dashboard (/dashboard)...');
+  console.log('[3/7] 📊 Kiểm tra trang Dashboard (/dashboard)...');
   await page.goto(`${BASE_URL}/dashboard`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
 
   // 4. Kiểm tra POS & Modals
-  console.log('[4/8] 🛒 Kiểm tra trang Bán Hàng POS & Modals (/pos)...');
+  console.log('[4/7] 🛒 Kiểm tra trang Bán Hàng POS & Modals (/pos)...');
   await page.goto(`${BASE_URL}/pos`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
   // Bấm thử sản phẩm vào giỏ để kích hoạt state
@@ -70,14 +70,14 @@ async function runAntdV6DeprecationTest() {
   await page.waitForTimeout(500);
 
   // 5. Kiểm tra Quản lý Sản phẩm & Form Thêm mới / Chỉnh sửa
-  console.log('[5/8] 🥐 Kiểm tra trang Sản Phẩm (/products & /products/new)...');
+  console.log('[5/7] 🥐 Kiểm tra trang Sản Phẩm (/products & /products/new)...');
   await page.goto(`${BASE_URL}/products`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
   await page.goto(`${BASE_URL}/products/new`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
 
   // 6. Kiểm tra Chi Nhánh, Ca Làm Việc & Kế Toán
-  console.log('[6/8] 🏢 Kiểm tra Chi Nhánh (/branches), Ca Làm (/shifts) & Kế Toán (/accounting)...');
+  console.log('[6/7] 🏢 Kiểm tra Chi Nhánh (/branches), Ca Làm (/shifts) & Kế Toán (/accounting)...');
   await page.goto(`${BASE_URL}/branches`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
   await page.goto(`${BASE_URL}/shifts`, { waitUntil: 'networkidle' });
@@ -86,25 +86,13 @@ async function runAntdV6DeprecationTest() {
   await page.waitForTimeout(1000);
 
   // 7. Kiểm tra Quản lý Nhân sự, Cài đặt & Vai trò
-  console.log('[7/8] 👥 Kiểm tra Quản Lý Nhân Sự (/users), Cài Đặt (/settings) & Vai Trò (/settings/roles)...');
+  console.log('[7/7] 👥 Kiểm tra Quản Lý Nhân Sự (/users), Cài Đặt (/settings) & Vai Trò (/settings/roles)...');
   await page.goto(`${BASE_URL}/users`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
   await page.goto(`${BASE_URL}/settings`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
   await page.goto(`${BASE_URL}/settings/roles`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
-
-  // 8. Đăng nhập SuperAdmin & Kiểm tra CMS Landing Page
-  console.log('[8/8] 👑 Kiểm tra Quản trị Landing Page (/settings/landing-page)...');
-  await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' });
-  const superAdminBtn = page.getByRole('button', { name: /SuperAdmin/i });
-  if (await superAdminBtn.isVisible()) {
-    await superAdminBtn.click();
-    await page.getByRole('button', { name: /Đăng nhập hệ thống/i }).click();
-    await page.waitForTimeout(1000);
-  }
-  await page.goto(`${BASE_URL}/settings/landing-page`, { waitUntil: 'networkidle' });
-  await page.waitForTimeout(1500);
 
   await browser.close();
 

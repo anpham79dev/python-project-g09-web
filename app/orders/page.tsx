@@ -53,7 +53,7 @@ export default function OrdersPage() {
       setOrders(data);
       const curBranchId = typeof window !== 'undefined' ? localStorage.getItem('artisan_active_branch_id') : null;
       setActiveBranchId(curBranchId);
-    } catch (err: any) {
+    } catch {
       message.error('Lỗi khi tải lịch sử đơn hàng');
     } finally {
       setLoading(false);

@@ -12,7 +12,6 @@ import {
   Typography,
   Divider,
   Select,
-  Tooltip,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -21,9 +20,6 @@ import {
   LockOutlined,
   MailOutlined,
   PhoneOutlined,
-  SafetyCertificateOutlined,
-  ShopOutlined,
-  KeyOutlined,
 } from '@ant-design/icons';
 import { createUser, getBranches, getRoles } from '@/lib/api';
 import { Branch, Role } from '@/lib/mock-data';

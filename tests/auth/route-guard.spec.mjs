@@ -29,7 +29,6 @@ async function runRouteGuardTests() {
 
     // Xác nhận KHÔNG có bất kỳ phần tử nào của trang POS bị lọt ra
     const posCheckoutBtn = await guestPage.locator('button:has-text("Thanh toán")').count();
-    const posCart = await guestPage.locator('.ant-empty').count();
     if (posCheckoutBtn > 0) {
       throw new Error('CẢNH BÁO RÒ RỈ: Nút thanh toán POS đã bị render trước khi chặn!');
     }

@@ -53,7 +53,7 @@ export default function ProductsPage() {
     try {
       const data = await getProducts();
       setProducts(data);
-    } catch (err: any) {
+    } catch {
       message.error('Lỗi khi tải danh sách sản phẩm');
     } finally {
       setLoading(false);

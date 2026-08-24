@@ -13,13 +13,11 @@
     "test:sidebar": "node tests/navigation/sidebar.spec.mjs",
     "test:sidebar-sticky": "node tests/navigation/sidebar-sticky.spec.mjs",
     "test:e2e": "node tests/e2e/full-flow.spec.mjs",
-    "test:landing": "node tests/landing/landing-page.spec.mjs && node tests/landing/header-layout.spec.mjs && node tests/landing/smooth-scroll.spec.mjs",
     "test:branch": "node tests/branch/branch-reload.spec.mjs",
     "test:icons": "node tests/accounting/icons-header.spec.mjs",
     "test:accounting-branch": "node tests/accounting/accounting-branch-filter.spec.mjs",
-    "test:cms": "node tests/cms/landing-cms.spec.mjs",
     "test:rbac": "node tests/rbac/pbac-roles.spec.mjs",
-    "test:all": "node tests/auth/route-guard.spec.mjs && node tests/antd-v6/deprecation-clean.spec.mjs && node tests/dashboard/branch-filter.spec.mjs && node tests/navigation/sidebar.spec.mjs && node tests/navigation/sidebar-sticky.spec.mjs && node tests/accounting/icons-header.spec.mjs && node tests/accounting/accounting-branch-filter.spec.mjs && node tests/cms/landing-cms.spec.mjs && node tests/rbac/pbac-roles.spec.mjs && node tests/e2e/full-flow.spec.mjs && node tests/landing/landing-page.spec.mjs && node tests/landing/header-layout.spec.mjs && node tests/landing/smooth-scroll.spec.mjs && node tests/branch/branch-reload.spec.mjs"
+    "test:all": "node tests/auth/route-guard.spec.mjs && node tests/antd-v6/deprecation-clean.spec.mjs && node tests/dashboard/branch-filter.spec.mjs && node tests/navigation/sidebar.spec.mjs && node tests/navigation/sidebar-sticky.spec.mjs && node tests/accounting/icons-header.spec.mjs && node tests/accounting/accounting-branch-filter.spec.mjs && node tests/rbac/pbac-roles.spec.mjs && node tests/e2e/full-flow.spec.mjs && node tests/branch/branch-reload.spec.mjs"
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.2",

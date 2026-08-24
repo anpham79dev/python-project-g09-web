@@ -67,6 +67,19 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/pos', request.url));
   }
 
+  // 2b. Root path always redirects: to /login when unauthenticated, otherwise to the user's home
+  if (pathname === '/') {
+    if (!token) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('reason', 'unauthenticated');
+      return NextResponse.redirect(loginUrl);
+    }
+    if (role === 'SUPER_ADMIN' || permissions.includes('dashboard:view')) {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    }
+    return NextResponse.redirect(new URL('/pos', request.url));
+  }
+
   // 3. PBAC Route Access Evaluation
   if (isProtectedRoute && token) {
     if (role === 'SUPER_ADMIN') {

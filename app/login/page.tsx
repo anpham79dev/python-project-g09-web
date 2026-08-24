@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Form, Input, Button, Card, Alert, Typography, Divider } from 'antd';
 import { UserOutlined, LockOutlined, ShoppingOutlined, ArrowRightOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { login } from '@/lib/api';
@@ -10,7 +9,6 @@ import { setAuthSession } from '@/lib/auth';
 const { Title, Text } = Typography;
 
 export default function LoginPage() {
-  const router = useRouter();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

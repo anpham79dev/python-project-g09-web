@@ -14,7 +14,6 @@ import {
   Space,
   Tooltip,
   Typography,
-  Divider,
   Alert,
   App,
   Popconfirm,
@@ -23,7 +22,6 @@ import {
   Row,
   Col,
   Statistic,
-  Spin,
 } from 'antd';
 import {
   SafetyCertificateOutlined,
@@ -33,7 +31,6 @@ import {
   HistoryOutlined,
   LockOutlined,
   CheckCircleOutlined,
-  InfoCircleOutlined,
   UserOutlined,
   ReloadOutlined,
   ApartmentOutlined,
@@ -43,7 +40,6 @@ import { Role, Permission, AuditLog } from '@/lib/mock-data';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
 
 const { Title, Text, Paragraph } = Typography;
-const { TextArea } = Input;
 
 export default function RolesManagementPage() {
   const router = useRouter();
@@ -64,9 +60,6 @@ export default function RolesManagementPage() {
   const [createForm] = Form.useForm();
   const [editForm] = Form.useForm();
   const [selectedPermIds, setSelectedPermIds] = useState<string[]>([]);
-
-  const currentUser = getCurrentUser();
-  const canManageRoles = hasPermission(currentUser, 'roles:manage');
 
   const loadData = async () => {
     setLoading(true);
@@ -365,7 +358,7 @@ export default function RolesManagementPage() {
                 Quản Lý Vai Trò & Phân Quyền (PBAC)
               </Title>
               <Text type="secondary" className="text-sm">
-                Kiểm soát quyền truy cập nguyên tử (Permission-Based Access Control) theo 21 quyền hạn và 8 phân hệ
+                Kiểm soát quyền truy cập nguyên tử (Permission-Based Access Control) theo 20 quyền hạn và 10 phân hệ
               </Text>
             </div>
           </div>
@@ -514,7 +507,7 @@ export default function RolesManagementPage() {
             </div>
             <Space size="small">
               <Button size="small" onClick={selectAllPermissions}>
-                Chọn tất cả (21/21)
+                Chọn tất cả (20/20)
               </Button>
               <Button size="small" onClick={deselectAllPermissions}>
                 Bỏ chọn tất cả
@@ -686,7 +679,7 @@ export default function RolesManagementPage() {
             <Button
               size="small"
               onClick={() => {
-                setSelectedPermIds(permissions.filter((p) => p.code !== 'landing_page:edit').map((p) => p.id));
+                setSelectedPermIds(permissions.map((p) => p.id));
               }}
             >
               Mẫu Quản Trị Viên (20 quyền)

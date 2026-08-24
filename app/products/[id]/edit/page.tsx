@@ -56,7 +56,7 @@ export default function EditProductPage() {
         const data = await getProductById(id);
         form.setFieldsValue(data);
         setPreviewImage(data.image);
-      } catch (err: any) {
+      } catch {
         message.error('Không tìm thấy sản phẩm cần sửa!');
         router.push('/products');
       } finally {

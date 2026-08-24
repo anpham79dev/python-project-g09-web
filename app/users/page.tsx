@@ -15,7 +15,6 @@ import {
   Select,
   Popconfirm,
   Divider,
-  Radio,
   Tooltip,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
@@ -52,10 +51,8 @@ export default function UsersPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [form] = Form.useForm();
   const [submitLoading, setSubmitLoading] = useState(false);
-  const roleValue = Form.useWatch('role', form);
 
   const currentUser = getCurrentUser();
-  const canManageUsers = hasPermission(currentUser, 'users:manage');
 
   // Check PBAC permission
   useEffect(() => {
@@ -79,7 +76,7 @@ export default function UsersPage() {
       setUsers(usersData);
       setBranches(branchesData);
       setRoles(rolesData);
-    } catch (err: any) {
+    } catch {
       message.error('Lỗi khi tải dữ liệu người dùng!');
     } finally {
       setLoading(false);
