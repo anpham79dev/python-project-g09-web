@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Card,
   Table,
   Tag,
   Button,
@@ -33,6 +32,7 @@ import { getCurrentUser } from '@/lib/auth';
 import PageLoading from '@/app/components/page-loading';
 import PageHeader from '@/app/components/page-header';
 import ReloadButton from '@/app/components/reload-button';
+import StatCard from '@/app/components/stat-card';
 
 export default function ShiftsPage() {
   const router = useRouter();
@@ -325,82 +325,47 @@ export default function ShiftsPage() {
           {/* 4 Executive KPI Stat Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Total Shifts */}
-            <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-                  Tổng ca làm việc
-                </span>
-                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                  <ClockCircleOutlined className="text-base" />
-                </div>
-              </div>
-              <div className="mt-2.5">
-                <div className="text-2xl font-bold font-mono text-[#111827]">
-                  {summary.totalShiftsCount} <span className="text-sm font-normal text-secondary">ca</span>
-                </div>
+            <StatCard
+              label="Tổng ca làm việc"
+              icon={<ClockCircleOutlined className="text-base" />}
+              iconClassName="bg-blue-50 text-blue-600"
+              value={<>{summary.totalShiftsCount} <span className="text-sm font-normal text-secondary">ca</span></>}
+              footer={
                 <div className="mt-1 flex items-center gap-2 text-xs">
                   <Tag color="success" className="text-[11px] font-semibold">{summary.closedShiftsCount} đã chốt</Tag>
                   {summary.openShiftsCount > 0 && (
                     <Tag color="processing" className="text-[11px] font-semibold">{summary.openShiftsCount} đang mở</Tag>
                   )}
                 </div>
-              </div>
-            </Card>
+              }
+            />
 
-            {/* Total Revenue */}
-            <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-                  Tổng doanh thu các ca
-                </span>
-                <div className="w-8 h-8 rounded-lg bg-emerald-50 text-[#006C49] flex items-center justify-center">
-                  <DollarOutlined className="text-base" />
-                </div>
-              </div>
-              <div className="mt-2.5">
-                <div className="text-2xl font-bold font-mono text-[#111827]">
-                  {summary.totalRevenue.toLocaleString('vi-VN')} ₫
-                </div>
-                <div className="mt-1 text-[11px] text-secondary">
-                  Doanh số hoàn tất trong các phiên làm việc
-                </div>
-              </div>
-            </Card>
+            <StatCard
+              label="Tổng doanh thu các ca"
+              icon={<DollarOutlined className="text-base" />}
+              value={`${summary.totalRevenue.toLocaleString('vi-VN')} ₫`}
+              footer={<div className="mt-1 text-[11px] text-secondary">Doanh số hoàn tất trong các phiên làm việc</div>}
+            />
 
-            {/* Cash Revenue */}
-            <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-                  Tiền mặt thực thu (Két)
-                </span>
-                <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                  <DollarOutlined className="text-base" />
-                </div>
-              </div>
-              <div className="mt-2.5">
-                <div className="text-2xl font-bold font-mono text-[#111827]">
-                  {summary.totalCash.toLocaleString('vi-VN')} ₫
-                </div>
+            <StatCard
+              label="Tiền mặt thực thu (Két)"
+              icon={<DollarOutlined className="text-base" />}
+              iconClassName="bg-amber-50 text-amber-600"
+              value={`${summary.totalCash.toLocaleString('vi-VN')} ₫`}
+              footer={
                 <div className="mt-1 text-[11px] text-secondary">
                   QR: {summary.totalQr.toLocaleString('vi-VN')} ₫ • Thẻ: {summary.totalCard.toLocaleString('vi-VN')} ₫
                 </div>
-              </div>
-            </Card>
+              }
+            />
 
-            {/* Total Discrepancy */}
-            <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-                  Tổng chênh lệch két
-                </span>
-                <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
-                  <CheckCircleOutlined className="text-base" />
-                </div>
-              </div>
-              <div className="mt-2.5">
-                <div className={`text-2xl font-bold font-mono ${summary.totalDifference === 0 ? 'text-[#006C49]' : summary.totalDifference > 0 ? 'text-amber-600' : 'text-red-600'}`}>
-                  {summary.totalDifference > 0 ? '+' : ''}{summary.totalDifference.toLocaleString('vi-VN')} ₫
-                </div>
+            <StatCard
+              label="Tổng chênh lệch két"
+              icon={<CheckCircleOutlined className="text-base" />}
+              iconClassName="bg-purple-50 text-purple-600"
+              valueClassName={summary.totalDifference === 0 ? 'text-[#006C49]' : summary.totalDifference > 0 ? 'text-amber-600' : 'text-red-600'}
+              value={`${summary.totalDifference > 0 ? '+' : ''}${summary.totalDifference.toLocaleString('vi-VN')} ₫`}
+              footer={
                 <div className="mt-1 text-[11px]">
                   {summary.totalDifference === 0 ? (
                     <span className="text-emerald-700 font-semibold inline-flex items-center gap-1">
@@ -410,8 +375,8 @@ export default function ShiftsPage() {
                     <span className="text-secondary">Có phát sinh lệch tiền mặt khi bàn giao</span>
                   )}
                 </div>
-              </div>
-            </Card>
+              }
+            />
           </div>
 
           {/* Main Table Container */}

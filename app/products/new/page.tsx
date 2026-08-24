@@ -11,18 +11,14 @@ import {
   Card,
   Space,
   App,
-  Typography,
   Divider,
 } from 'antd';
-import {
-  ArrowLeftOutlined,
-  SaveOutlined,
-} from '@ant-design/icons';
+import { SaveOutlined } from '@ant-design/icons';
 import { createProduct, getBranches } from '@/lib/api';
 import { CATEGORIES, Branch } from '@/lib/mock-data';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
+import DetailHeader from '@/app/components/detail-header';
 
-const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 export default function NewProductPage() {
@@ -94,26 +90,11 @@ export default function NewProductPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto w-full space-y-6">
-      {/* Top Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={() => router.push('/products')}
-            className="rounded-lg"
-          >
-            Quay lại
-          </Button>
-          <div>
-            <Title level={3} className="!mb-0 text-[#111827]">
-              Thêm Sản Phẩm Mới
-            </Title>
-            <Text className="text-secondary text-xs">
-              Nhập các thông tin chi tiết của bánh hoặc thức uống vào kho hàng
-            </Text>
-          </div>
-        </div>
-      </div>
+      <DetailHeader
+        title="Thêm Sản Phẩm Mới"
+        subtitle="Nhập các thông tin chi tiết của bánh hoặc thức uống vào kho hàng"
+        onBack={() => router.push('/products')}
+      />
 
       {/* Form Card */}
       <Card className="border border-[#E5E7EB] shadow-xs rounded-xl" styles={{ body: { padding: '28px 32px' } }}>

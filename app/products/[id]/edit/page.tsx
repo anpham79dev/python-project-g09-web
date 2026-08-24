@@ -11,19 +11,15 @@ import {
   Card,
   Space,
   App,
-  Typography,
   Divider,
 } from 'antd';
-import {
-  ArrowLeftOutlined,
-  SaveOutlined,
-} from '@ant-design/icons';
+import { SaveOutlined } from '@ant-design/icons';
 import { getProductById, updateProduct } from '@/lib/api';
 import { CATEGORIES } from '@/lib/mock-data';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
 import PageLoading from '@/app/components/page-loading';
+import DetailHeader from '@/app/components/detail-header';
 
-const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 export default function EditProductPage() {
@@ -99,26 +95,15 @@ export default function EditProductPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto w-full space-y-6">
-      {/* Top Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={() => router.push('/products')}
-            className="rounded-lg"
-          >
-            Quay lại
-          </Button>
-          <div>
-            <Title level={3} className="!mb-0 text-[#111827]">
-              Chỉnh Sửa Sản Phẩm
-            </Title>
-            <Text className="text-secondary text-xs">
-              Mã sản phẩm: <span className="font-mono font-bold text-[#006C49]">{id}</span>
-            </Text>
-          </div>
-        </div>
-      </div>
+      <DetailHeader
+        title="Chỉnh Sửa Sản Phẩm"
+        subtitle={
+          <>
+            Mã sản phẩm: <span className="font-mono font-bold text-[#006C49]">{id}</span>
+          </>
+        }
+        onBack={() => router.push('/products')}
+      />
 
       {/* Form Card */}
       <Card className="border border-[#E5E7EB] shadow-xs rounded-xl" styles={{ body: { padding: '28px 32px' } }}>

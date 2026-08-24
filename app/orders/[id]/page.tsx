@@ -2,10 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { Card, Button, Tag, Table, Divider, App, Typography } from "antd";
+import { Card, Button, Tag, Table, Divider, App } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import {
-  ArrowLeftOutlined,
   PrinterOutlined,
   ClockCircleOutlined,
   UserOutlined,
@@ -15,8 +14,7 @@ import { getOrderDetail } from "@/lib/api";
 import { Order, OrderItem } from "@/lib/mock-data";
 import { getCurrentUser } from "@/lib/auth";
 import PageLoading from "@/app/components/page-loading";
-
-const { Title, Text } = Typography;
+import DetailHeader from "@/app/components/detail-header";
 
 export default function OrderDetailPage() {
   const router = useRouter();
@@ -121,41 +119,31 @@ export default function OrderDetailPage() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto w-full space-y-6">
-      {/* Top Bar Navigation & Actions */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <DetailHeader
+        title="Chi Tiết Đơn Hàng"
+        badge={
+          <Tag color="success" className="text-xs px-2 py-0.5">
+            {order.status === "COMPLETED" ? "Đã hoàn thành" : order.status}
+          </Tag>
+        }
+        subtitle={
+          <span className="font-mono">
+            Mã hóa đơn:{" "}
+            <strong className="text-[#006C49]">{order.code}</strong>
+          </span>
+        }
+        onBack={() => router.push("/orders")}
+        actions={
           <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={() => router.push("/orders")}
-            className="rounded-lg"
+            type="primary"
+            icon={<PrinterOutlined />}
+            onClick={() => window.print()}
+            className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg shadow-xs"
           >
-            Quay lại
+            In hóa đơn
           </Button>
-          <div>
-            <div className="flex items-center gap-2">
-              <Title level={3} className="!mb-0 text-[#111827]">
-                Chi Tiết Đơn Hàng
-              </Title>
-              <Tag color="success" className="text-xs px-2 py-0.5">
-                {order.status === "COMPLETED" ? "Đã hoàn thành" : order.status}
-              </Tag>
-            </div>
-            <Text className="text-secondary text-xs font-mono">
-              Mã hóa đơn:{" "}
-              <strong className="text-[#006C49]">{order.code}</strong>
-            </Text>
-          </div>
-        </div>
-
-        <Button
-          type="primary"
-          icon={<PrinterOutlined />}
-          onClick={() => window.print()}
-          className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg shadow-xs"
-        >
-          In hóa đơn
-        </Button>
-      </div>
+        }
+      />
 
       {/* Main Order Container */}
       <Card

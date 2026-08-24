@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Card,
   Table,
   Tag,
   Button,
@@ -48,6 +47,7 @@ import {
 import { getCurrentUser, hasPermission } from '@/lib/auth';
 import PageHeader from '@/app/components/page-header';
 import ReloadButton from '@/app/components/reload-button';
+import StatCard from '@/app/components/stat-card';
 
 export default function AccountingPage() {
   const router = useRouter();
@@ -302,81 +302,42 @@ export default function AccountingPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-              Tổng Thu Vào Trong Kỳ
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-[#006C49] flex items-center justify-center">
-              <ArrowUpOutlined className="text-base" />
-            </div>
-          </div>
-          <div className="mt-2.5">
-            <div className="text-2xl font-bold font-mono text-[#10B981]">
-              {(summary?.totalIncome || 0).toLocaleString('vi-VN')} ₫
-            </div>
-            <div className="mt-1 text-xs text-secondary">
-              Doanh thu bán POS &amp; thu khác
-            </div>
-          </div>
-        </Card>
+        <StatCard
+          label="Tổng Thu Vào Trong Kỳ"
+          icon={<ArrowUpOutlined className="text-base" />}
+          valueClassName="text-[#10B981]"
+          value={`${(summary?.totalIncome || 0).toLocaleString('vi-VN')} ₫`}
+          footer={<div className="mt-1 text-xs text-secondary">Doanh thu bán POS &amp; thu khác</div>}
+        />
 
-        <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-red-300 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-              Tổng Chi Ra Trong Kỳ
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
-              <ArrowDownOutlined className="text-base" />
-            </div>
-          </div>
-          <div className="mt-2.5">
-            <div className="text-2xl font-bold font-mono text-red-600">
-              {(summary?.totalExpense || 0).toLocaleString('vi-VN')} ₫
-            </div>
-            <div className="mt-1 text-xs text-secondary">
-              Nguyên vật liệu, mặt bằng, điện nước
-            </div>
-          </div>
-        </Card>
+        <StatCard
+          label="Tổng Chi Ra Trong Kỳ"
+          icon={<ArrowDownOutlined className="text-base" />}
+          iconClassName="bg-red-50 text-red-600"
+          hoverBorderClassName="hover:border-red-300"
+          valueClassName="text-red-600"
+          value={`${(summary?.totalExpense || 0).toLocaleString('vi-VN')} ₫`}
+          footer={<div className="mt-1 text-xs text-secondary">Nguyên vật liệu, mặt bằng, điện nước</div>}
+        />
 
-        <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-blue-300 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-              Dòng Tiền Ròng (Net Cash)
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-              <WalletOutlined className="text-base" />
-            </div>
-          </div>
-          <div className="mt-2.5">
-            <div className="text-2xl font-bold font-mono text-[#111827]">
-              {(summary?.netCashFlow || 0).toLocaleString('vi-VN')} ₫
-            </div>
-            <div className="mt-1 text-xs text-secondary">
-              Chênh lệch Thu - Chi thực tế
-            </div>
-          </div>
-        </Card>
+        <StatCard
+          label="Dòng Tiền Ròng (Net Cash)"
+          icon={<WalletOutlined className="text-base" />}
+          iconClassName="bg-blue-50 text-blue-600"
+          hoverBorderClassName="hover:border-blue-300"
+          value={`${(summary?.netCashFlow || 0).toLocaleString('vi-VN')} ₫`}
+          footer={<div className="mt-1 text-xs text-secondary">Chênh lệch Thu - Chi thực tế</div>}
+        />
 
-        <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-purple-300 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-              Lợi Nhuận Ròng Ước Tính
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
-              <PieChartOutlined className="text-base" />
-            </div>
-          </div>
-          <div className="mt-2.5">
-            <div className="text-2xl font-bold font-mono text-purple-700">
-              {(pnl?.netProfit || 0).toLocaleString('vi-VN')} ₫
-            </div>
-            <div className="mt-1 text-xs text-purple-800 font-semibold">
-              Tỷ suất lợi nhuận ròng: {pnl?.netMarginPercent || 0}%
-            </div>
-          </div>
-        </Card>
+        <StatCard
+          label="Lợi Nhuận Ròng Ước Tính"
+          icon={<PieChartOutlined className="text-base" />}
+          iconClassName="bg-purple-50 text-purple-600"
+          hoverBorderClassName="hover:border-purple-300"
+          valueClassName="text-purple-700"
+          value={`${(pnl?.netProfit || 0).toLocaleString('vi-VN')} ₫`}
+          footer={<div className="mt-1 text-xs text-purple-800 font-semibold">Tỷ suất lợi nhuận ròng: {pnl?.netMarginPercent || 0}%</div>}
+        />
       </div>
 
       {/* Main Tabs Container */}

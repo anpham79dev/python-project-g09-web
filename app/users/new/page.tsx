@@ -9,12 +9,10 @@ import {
   Button,
   Card,
   App,
-  Typography,
   Divider,
   Select,
 } from 'antd';
 import {
-  ArrowLeftOutlined,
   SaveOutlined,
   UserOutlined,
   LockOutlined,
@@ -24,8 +22,7 @@ import {
 import { createUser, getBranches, getRoles } from '@/lib/api';
 import { Branch, Role } from '@/lib/mock-data';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
-
-const { Title, Text } = Typography;
+import DetailHeader from '@/app/components/detail-header';
 
 export default function NewUserPage() {
   const router = useRouter();
@@ -94,26 +91,11 @@ export default function NewUserPage() {
 
   return (
     <div className="p-6 max-w-4xl mx-auto w-full space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Button
-            icon={<ArrowLeftOutlined />}
-            onClick={() => router.push('/users')}
-            className="rounded-lg"
-          >
-            Quay lại
-          </Button>
-          <div>
-            <Title level={3} className="!mb-0 text-[#111827]">
-              Tạo Tài Khoản Nhân Sự Mới (PBAC)
-            </Title>
-            <Text className="text-secondary text-xs">
-              Cấp tài khoản đăng nhập và chỉ định vai trò phân quyền nguyên tử
-            </Text>
-          </div>
-        </div>
-      </div>
+      <DetailHeader
+        title="Tạo Tài Khoản Nhân Sự Mới (PBAC)"
+        subtitle="Cấp tài khoản đăng nhập và chỉ định vai trò phân quyền nguyên tử"
+        onBack={() => router.push('/users')}
+      />
 
       {/* Form Card */}
       <Card className="border border-[#E5E7EB] shadow-xs rounded-xl" styles={{ body: { padding: '28px 32px' } }}>

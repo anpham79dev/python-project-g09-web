@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Card,
   Table,
   Tag,
   Button,
@@ -39,6 +38,7 @@ import { Branch, StockItem } from '@/lib/mock-data';
 import { getCurrentUser } from '@/lib/auth';
 import PageHeader from '@/app/components/page-header';
 import ReloadButton from '@/app/components/reload-button';
+import StatCard from '@/app/components/stat-card';
 
 export default function BranchesPage() {
   const router = useRouter();
@@ -367,62 +367,28 @@ export default function BranchesPage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-              Tổng số chi nhánh
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-[#006C49] flex items-center justify-center">
-              <ShopOutlined className="text-base" />
-            </div>
-          </div>
-          <div className="mt-2.5">
-            <div className="text-2xl font-bold font-mono text-[#111827]">
-              {branches.length} <span className="text-sm font-normal text-secondary">chi nhánh</span>
-            </div>
-            <div className="mt-1 text-xs text-emerald-700 font-medium">
-              Đang hoạt động trong chuỗi cửa hàng
-            </div>
-          </div>
-        </Card>
+        <StatCard
+          label="Tổng số chi nhánh"
+          icon={<ShopOutlined className="text-base" />}
+          value={<>{branches.length} <span className="text-sm font-normal text-secondary">chi nhánh</span></>}
+          footer={<div className="mt-1 text-xs text-emerald-700 font-medium">Đang hoạt động trong chuỗi cửa hàng</div>}
+        />
 
-        <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-              Tổng số kho hàng
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-              <InboxOutlined className="text-base" />
-            </div>
-          </div>
-          <div className="mt-2.5">
-            <div className="text-2xl font-bold font-mono text-[#111827]">
-              {totalWarehousesCount} <span className="text-sm font-normal text-secondary">kho</span>
-            </div>
-            <div className="mt-1 text-xs text-secondary">
-              Bao gồm kho quầy bán lẻ &amp; kho lạnh
-            </div>
-          </div>
-        </Card>
+        <StatCard
+          label="Tổng số kho hàng"
+          icon={<InboxOutlined className="text-base" />}
+          iconClassName="bg-blue-50 text-blue-600"
+          value={<>{totalWarehousesCount} <span className="text-sm font-normal text-secondary">kho</span></>}
+          footer={<div className="mt-1 text-xs text-secondary">Bao gồm kho quầy bán lẻ &amp; kho lạnh</div>}
+        />
 
-        <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all">
-          <div className="flex items-center justify-between">
-            <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-              Mặt hàng quản lý kho
-            </span>
-            <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
-              <AppstoreOutlined className="text-base" />
-            </div>
-          </div>
-          <div className="mt-2.5">
-            <div className="text-2xl font-bold font-mono text-[#111827]">
-              {stocks.length} <span className="text-sm font-normal text-secondary">mục kho</span>
-            </div>
-            <div className="mt-1 text-xs text-secondary">
-              Được theo dõi số lượng tồn kho độc lập
-            </div>
-          </div>
-        </Card>
+        <StatCard
+          label="Mặt hàng quản lý kho"
+          icon={<AppstoreOutlined className="text-base" />}
+          iconClassName="bg-purple-50 text-purple-600"
+          value={<>{stocks.length} <span className="text-sm font-normal text-secondary">mục kho</span></>}
+          footer={<div className="mt-1 text-xs text-secondary">Được theo dõi số lượng tồn kho độc lập</div>}
+        />
       </div>
 
       {/* Main Tabs Container */}

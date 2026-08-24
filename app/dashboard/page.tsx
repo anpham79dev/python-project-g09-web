@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Card,
   Table,
   Tag,
   Button,
@@ -54,6 +53,7 @@ import { getDashboardStats, getBranches } from '@/lib/api';
 import PageLoading from '@/app/components/page-loading';
 import PageHeader from '@/app/components/page-header';
 import ReloadButton from '@/app/components/reload-button';
+import StatCard from '@/app/components/stat-card';
 import {
   DashboardStats,
   StaffPerformanceStat,
@@ -526,20 +526,11 @@ export default function DashboardPage() {
         <>
           {/* Top 4 KPI Executive Stat Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* 1. Revenue Card */}
-            <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-                  Doanh thu ({stats.periodLabel})
-                </span>
-                <div className="w-8 h-8 rounded-lg bg-emerald-50 text-[#006C49] flex items-center justify-center">
-                  <DollarOutlined className="text-base" />
-                </div>
-              </div>
-              <div className="mt-2.5">
-                <div className="text-2xl font-bold font-mono text-[#111827]">
-                  {stats.todayRevenue.toLocaleString('vi-VN')} ₫
-                </div>
+            <StatCard
+              label={`Doanh thu (${stats.periodLabel})`}
+              icon={<DollarOutlined className="text-base" />}
+              value={`${stats.todayRevenue.toLocaleString('vi-VN')} ₫`}
+              footer={
                 <div className="mt-1 flex items-center text-xs">
                   {stats.revenueGrowth >= 0 ? (
                     <span className="text-[#10B981] font-semibold flex items-center gap-1">
@@ -552,24 +543,15 @@ export default function DashboardPage() {
                   )}
                   <span className="text-secondary ml-1.5">{stats.previousPeriodLabel}</span>
                 </div>
-              </div>
-            </Card>
+              }
+            />
 
-            {/* 2. Orders Count Card */}
-            <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-                  Tổng số đơn hàng
-                </span>
-                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                  <ShoppingOutlined className="text-base" />
-                </div>
-              </div>
-              <div className="mt-2.5">
-                <div className="text-2xl font-bold font-mono text-[#111827]">
-                  {stats.todayOrdersCount}{' '}
-                  <span className="text-sm font-normal text-secondary">hóa đơn</span>
-                </div>
+            <StatCard
+              label="Tổng số đơn hàng"
+              icon={<ShoppingOutlined className="text-base" />}
+              iconClassName="bg-blue-50 text-blue-600"
+              value={<>{stats.todayOrdersCount}{' '}<span className="text-sm font-normal text-secondary">hóa đơn</span></>}
+              footer={
                 <div className="mt-1 flex items-center text-xs">
                   {stats.ordersGrowth >= 0 ? (
                     <span className="text-[#10B981] font-semibold flex items-center gap-1">
@@ -582,52 +564,27 @@ export default function DashboardPage() {
                   )}
                   <span className="text-secondary ml-1.5">{stats.previousPeriodLabel}</span>
                 </div>
-              </div>
-            </Card>
+              }
+            />
 
-            {/* 3. Average Order Value (AOV) Card */}
-            <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-                  Giá trị TB / Đơn (AOV)
-                </span>
-                <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
-                  <RiseOutlined className="text-base" />
-                </div>
-              </div>
-              <div className="mt-2.5">
-                <div className="text-2xl font-bold font-mono text-[#111827]">
-                  {stats.averageOrderValue.toLocaleString('vi-VN')} ₫
-                </div>
-                <div className="mt-1 text-xs text-secondary">
-                  Sức mua trung bình mỗi lượt khách mua hàng
-                </div>
-              </div>
-            </Card>
+            <StatCard
+              label="Giá trị TB / Đơn (AOV)"
+              icon={<RiseOutlined className="text-base" />}
+              iconClassName="bg-purple-50 text-purple-600"
+              value={`${stats.averageOrderValue.toLocaleString('vi-VN')} ₫`}
+              footer={<div className="mt-1 text-xs text-secondary">Sức mua trung bình mỗi lượt khách mua hàng</div>}
+            />
 
-            {/* 4. Low Stock Inventory Card */}
-            <Card
+            <StatCard
+              label="Cảnh báo tồn kho"
+              icon={<WarningOutlined className="text-base" />}
+              iconClassName="bg-amber-50 text-amber-600"
+              valueClassName="text-amber-600"
+              value={<>{stats.lowStockCount}{' '}<span className="text-sm font-normal text-secondary">mặt hàng (≤ 5)</span></>}
+              footer={<div className="mt-1 text-xs text-amber-700 font-medium hover:underline">Xem danh sách &amp; nhập hàng ngay →</div>}
               onClick={() => setActiveTab('inventory-slow')}
               className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-amber-400 cursor-pointer transition-all bg-gradient-to-br from-white to-amber-50/30"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-                  Cảnh báo tồn kho
-                </span>
-                <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                  <WarningOutlined className="text-base" />
-                </div>
-              </div>
-              <div className="mt-2.5">
-                <div className="text-2xl font-bold font-mono text-amber-600">
-                  {stats.lowStockCount}{' '}
-                  <span className="text-sm font-normal text-secondary">mặt hàng (≤ 5)</span>
-                </div>
-                <div className="mt-1 text-xs text-amber-700 font-medium hover:underline">
-                  Xem danh sách &amp; nhập hàng ngay →
-                </div>
-              </div>
-            </Card>
+            />
           </div>
 
           {/* Organized Report Tabs */}
