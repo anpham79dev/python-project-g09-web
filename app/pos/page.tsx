@@ -33,6 +33,7 @@ import { Product, CATEGORIES, Order, WorkShift } from '@/lib/mock-data';
 import { getCurrentUser } from '@/lib/auth';
 import PageLoading from '@/app/components/page-loading';
 import SearchInput from '@/app/components/search-input';
+import { useBranchChange } from '@/app/hooks/use-branch-change';
 
 const { Title, Text } = Typography;
 
@@ -94,15 +95,13 @@ export default function POSPage() {
   useEffect(() => {
     fetchProductList();
     fetchShift();
-
-    const handleBranchChange = () => {
-      fetchProductList();
-      fetchShift();
-      setCart([]);
-    };
-    window.addEventListener('artisan_branch_changed', handleBranchChange);
-    return () => window.removeEventListener('artisan_branch_changed', handleBranchChange);
   }, []);
+
+  useBranchChange(() => {
+    fetchProductList();
+    fetchShift();
+    setCart([]);
+  });
 
   const handleOpenShiftModal = async () => {
     try {

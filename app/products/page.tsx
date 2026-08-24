@@ -24,6 +24,7 @@ import { getProducts, deleteProduct } from '@/lib/api';
 import SearchInput from '@/app/components/search-input';
 import { Product, CATEGORIES } from '@/lib/mock-data';
 import { usePageGuard } from '@/app/hooks/use-page-guard';
+import { useBranchChange } from '@/app/hooks/use-branch-change';
 
 const { Title, Text } = Typography;
 
@@ -52,13 +53,11 @@ export default function ProductsPage() {
 
   useEffect(() => {
     loadData();
-
-    const handleBranchChange = () => {
-      loadData();
-    };
-    window.addEventListener('artisan_branch_changed', handleBranchChange);
-    return () => window.removeEventListener('artisan_branch_changed', handleBranchChange);
   }, []);
+
+  useBranchChange(() => {
+    loadData();
+  });
 
   // Filter list
   const filteredProducts = products.filter((p) => {

@@ -29,6 +29,7 @@ import dayjs from 'dayjs';
 import { getShifts, getShiftSummary, getUsers } from '@/lib/api';
 import { WorkShift, ShiftSummary, User } from '@/lib/mock-data';
 import { usePageGuard } from '@/app/hooks/use-page-guard';
+import { useBranchChange } from '@/app/hooks/use-branch-change';
 import PageLoading from '@/app/components/page-loading';
 import PageHeader from '@/app/components/page-header';
 import ReloadButton from '@/app/components/reload-button';
@@ -80,14 +81,11 @@ export default function ShiftsPage() {
 
   useEffect(() => {
     loadData();
-
-    const handleBranchChange = (e: any) => {
-      const newBranchId = e.detail || localStorage.getItem('artisan_active_branch_id');
-      loadData(newBranchId);
-    };
-    window.addEventListener('artisan_branch_changed', handleBranchChange);
-    return () => window.removeEventListener('artisan_branch_changed', handleBranchChange);
   }, [selectedStaffId, selectedStatus, selectedDate]);
+
+  useBranchChange((branchId) => {
+    loadData(branchId ?? undefined);
+  });
 
   const handleOpenDetail = (shift: WorkShift) => {
     setDetailShift(shift);

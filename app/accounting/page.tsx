@@ -44,6 +44,7 @@ import {
   Branch,
 } from '@/lib/mock-data';
 import { usePageGuard } from '@/app/hooks/use-page-guard';
+import { useBranchChange } from '@/app/hooks/use-branch-change';
 import PageHeader from '@/app/components/page-header';
 import ReloadButton from '@/app/components/reload-button';
 import StatCard from '@/app/components/stat-card';
@@ -97,14 +98,11 @@ export default function AccountingPage() {
 
   useEffect(() => {
     loadData();
-
-    const handleBranchChange = (e: any) => {
-      const newBranchId = e.detail || (typeof window !== 'undefined' ? localStorage.getItem('artisan_active_branch_id') : 'ALL') || 'ALL';
-      setSelectedBranchId(newBranchId);
-    };
-    window.addEventListener('artisan_branch_changed', handleBranchChange);
-    return () => window.removeEventListener('artisan_branch_changed', handleBranchChange);
   }, [selectedBranchId, typeFilter]);
+
+  useBranchChange((branchId) => {
+    setSelectedBranchId(branchId || 'ALL');
+  });
 
   const handleSelectBranch = (val: string) => {
     setSelectedBranchId(val);

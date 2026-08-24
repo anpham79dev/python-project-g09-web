@@ -24,6 +24,7 @@ import { getOrders } from '@/lib/api';
 import SearchInput from '@/app/components/search-input';
 import { Order } from '@/lib/mock-data';
 import { usePageGuard } from '@/app/hooks/use-page-guard';
+import { useBranchChange } from '@/app/hooks/use-branch-change';
 
 const { Title, Text } = Typography;
 
@@ -56,13 +57,11 @@ export default function OrdersPage() {
 
   useEffect(() => {
     loadData();
-
-    const handleBranchChange = (e: any) => {
-      setActiveBranchId(e.detail || localStorage.getItem('artisan_active_branch_id'));
-    };
-    window.addEventListener('artisan_branch_changed', handleBranchChange);
-    return () => window.removeEventListener('artisan_branch_changed', handleBranchChange);
   }, []);
+
+  useBranchChange((branchId) => {
+    setActiveBranchId(branchId);
+  });
 
   // Filter logic
   const filteredOrders = orders.filter((o) => {
