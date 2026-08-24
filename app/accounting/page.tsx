@@ -24,7 +24,6 @@ import {
   FileTextOutlined,
   PlusOutlined,
   MinusOutlined,
-  ReloadOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,
   PieChartOutlined,
@@ -48,6 +47,7 @@ import {
 } from '@/lib/mock-data';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
 import PageHeader from '@/app/components/page-header';
+import ReloadButton from '@/app/components/reload-button';
 
 export default function AccountingPage() {
   const router = useRouter();
@@ -276,13 +276,7 @@ export default function AccountingPage() {
               ]}
             />
 
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={loadData}
-              className="rounded-lg text-xs font-medium h-9 flex items-center"
-            >
-              Làm mới
-            </Button>
+            <ReloadButton onClick={loadData} />
 
             <Button
               type="primary"

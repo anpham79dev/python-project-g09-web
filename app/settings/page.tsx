@@ -26,7 +26,6 @@ import {
   EditOutlined,
   DeleteOutlined,
   SaveOutlined,
-  ReloadOutlined,
   QrcodeOutlined,
 } from '@ant-design/icons';
 import {
@@ -39,6 +38,7 @@ import {
 } from '@/lib/api';
 import PageLoading from '@/app/components/page-loading';
 import PageHeader from '@/app/components/page-header';
+import ReloadButton from '@/app/components/reload-button';
 import { ShiftTemplate, SystemSettings } from '@/lib/mock-data';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
 
@@ -227,15 +227,7 @@ export default function SettingsPage() {
       <PageHeader
         title="Cài Đặt Hệ Thống & Cấu Hình Ca Làm Việc Động"
         subtitle="Tùy biến khung giờ ca làm việc, thông tin in phiếu thanh toán và các quy tắc kiểm soát kho"
-        actions={
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={loadData}
-            className="rounded-lg text-xs font-medium h-9 flex items-center"
-          >
-            Làm mới
-          </Button>
-        }
+        actions={<ReloadButton onClick={loadData} />}
       />
 
       {loading && !settings ? (

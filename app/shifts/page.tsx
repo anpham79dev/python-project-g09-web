@@ -21,7 +21,6 @@ import {
   DollarOutlined,
   CheckCircleOutlined,
   PrinterOutlined,
-  ReloadOutlined,
   ShopOutlined,
   CreditCardOutlined,
   QrcodeOutlined,
@@ -33,6 +32,7 @@ import { WorkShift, ShiftSummary, User } from '@/lib/mock-data';
 import { getCurrentUser } from '@/lib/auth';
 import PageLoading from '@/app/components/page-loading';
 import PageHeader from '@/app/components/page-header';
+import ReloadButton from '@/app/components/reload-button';
 
 export default function ShiftsPage() {
   const router = useRouter();
@@ -304,13 +304,7 @@ export default function ShiftsPage() {
               className="text-xs h-9 rounded-lg"
             />
 
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={() => loadData()}
-              className="rounded-lg text-xs font-medium h-9 flex items-center"
-            >
-              Làm mới
-            </Button>
+            <ReloadButton onClick={() => loadData()} />
 
             <Button
               type="primary"

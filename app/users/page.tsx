@@ -20,7 +20,6 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import {
   PlusOutlined,
-  SearchOutlined,
   UserOutlined,
   SafetyCertificateOutlined,
   MailOutlined,
@@ -35,6 +34,7 @@ import {
 import { getUsers, updateUser, deleteUser, getBranches, getRoles } from '@/lib/api';
 import { User, Branch, Role } from '@/lib/mock-data';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
+import SearchInput from '@/app/components/search-input';
 
 const { Title, Text } = Typography;
 
@@ -348,13 +348,11 @@ export default function UsersPage() {
       {/* Main Content Card */}
       <Card className="border border-[#E5E7EB] shadow-xs rounded-xl" styles={{ body: { padding: '20px' } }}>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-          <Input
+          <SearchInput
             placeholder="Tìm theo tên, username, email, số điện thoại..."
-            prefix={<SearchOutlined className="text-gray-400 mr-1" />}
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={setSearchQuery}
             className="max-w-md rounded-lg"
-            allowClear
           />
           <div className="text-xs text-secondary">
             Tổng cộng: <strong className="text-gray-900">{filteredUsers.length}</strong> nhân viên

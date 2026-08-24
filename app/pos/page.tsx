@@ -14,7 +14,6 @@ import {
   Typography,
 } from 'antd';
 import {
-  SearchOutlined,
   ShoppingCartOutlined,
   PlusOutlined,
   MinusOutlined,
@@ -33,6 +32,7 @@ import { getProducts, createOrder, getCurrentShift, closeCurrentShift } from '@/
 import { Product, CATEGORIES, Order, WorkShift } from '@/lib/mock-data';
 import { getCurrentUser } from '@/lib/auth';
 import PageLoading from '@/app/components/page-loading';
+import SearchInput from '@/app/components/search-input';
 
 const { Title, Text } = Typography;
 
@@ -261,13 +261,11 @@ export default function POSPage() {
         {/* Header Bộ lọc & Tìm kiếm */}
         <div className="p-4 bg-white border-b border-[#E5E7EB] space-y-3 shrink-0">
           <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
-            <Input
-              prefix={<SearchOutlined className="text-gray-400 mr-1" />}
+            <SearchInput
               placeholder="Tìm kiếm theo tên bánh, danh mục hoặc mã..."
               size="large"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              allowClear
+              onChange={setSearchQuery}
               className="w-full sm:max-w-md rounded-lg"
             />
             <div className="flex items-center gap-3">

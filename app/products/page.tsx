@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import {
   Table,
   Button,
-  Input,
   Select,
   Tag,
   Space,
@@ -17,12 +16,12 @@ import {
 import type { ColumnsType } from 'antd/es/table';
 import {
   PlusOutlined,
-  SearchOutlined,
   EditOutlined,
   DeleteOutlined,
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { getProducts, deleteProduct } from '@/lib/api';
+import SearchInput from '@/app/components/search-input';
 import { Product, CATEGORIES } from '@/lib/mock-data';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
 
@@ -242,13 +241,10 @@ export default function ProductsPage() {
       <Card className="border border-[#E5E7EB] shadow-xs rounded-xl" styles={{ body: { padding: '16px 20px' } }}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
           <div className="md:col-span-2">
-            <Input
-              prefix={<SearchOutlined className="text-gray-400 mr-1" />}
+            <SearchInput
               placeholder="Tìm kiếm sản phẩm theo tên, danh mục hoặc mã SKU..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              allowClear
-              className="rounded-lg"
+              onChange={setSearchQuery}
             />
           </div>
 

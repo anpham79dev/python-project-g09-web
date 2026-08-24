@@ -25,7 +25,6 @@ import {
   FallOutlined,
   WarningOutlined,
   CalendarOutlined,
-  ReloadOutlined,
   FireOutlined,
   CreditCardOutlined,
   TeamOutlined,
@@ -54,6 +53,7 @@ import type { Dayjs } from 'dayjs';
 import { getDashboardStats, getBranches } from '@/lib/api';
 import PageLoading from '@/app/components/page-loading';
 import PageHeader from '@/app/components/page-header';
+import ReloadButton from '@/app/components/reload-button';
 import {
   DashboardStats,
   StaffPerformanceStat,
@@ -506,13 +506,7 @@ export default function DashboardPage() {
             />
           )}
 
-          <Button
-            icon={<ReloadOutlined />}
-            onClick={() => loadStats(selectedRange, customDates, selectedBranchId)}
-            className="rounded-lg text-xs font-medium h-9 flex items-center"
-          >
-            Làm mới
-          </Button>
+          <ReloadButton onClick={() => loadStats(selectedRange, customDates, selectedBranchId)} />
 
           <Button
             type="primary"

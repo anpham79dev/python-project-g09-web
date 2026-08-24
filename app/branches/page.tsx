@@ -23,7 +23,6 @@ import {
   AppstoreOutlined,
   PlusOutlined,
   EditOutlined,
-  ReloadOutlined,
   EnvironmentOutlined,
   PhoneOutlined,
   UserOutlined,
@@ -39,6 +38,7 @@ import {
 import { Branch, StockItem } from '@/lib/mock-data';
 import { getCurrentUser } from '@/lib/auth';
 import PageHeader from '@/app/components/page-header';
+import ReloadButton from '@/app/components/reload-button';
 
 export default function BranchesPage() {
   const router = useRouter();
@@ -351,13 +351,7 @@ export default function BranchesPage() {
         subtitle="Quản lý mạng lưới chi nhánh, kho lưu trữ tại quầy POS và đồng bộ số liệu tồn kho"
         actions={
           <>
-            <Button
-              icon={<ReloadOutlined />}
-              onClick={loadData}
-              className="rounded-lg text-xs font-medium h-9 flex items-center"
-            >
-              Làm mới
-            </Button>
+            <ReloadButton onClick={loadData} />
 
             <Button
               type="primary"

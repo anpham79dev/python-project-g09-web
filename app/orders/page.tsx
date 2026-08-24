@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import {
   Table,
   Button,
-  Input,
   Select,
   Tag,
   Card,
@@ -15,7 +14,6 @@ import {
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
-  SearchOutlined,
   EyeOutlined,
   QrcodeOutlined,
   DollarOutlined,
@@ -23,6 +21,7 @@ import {
   ShoppingOutlined,
 } from '@ant-design/icons';
 import { getOrders } from '@/lib/api';
+import SearchInput from '@/app/components/search-input';
 import { Order } from '@/lib/mock-data';
 import { getCurrentUser } from '@/lib/auth';
 
@@ -240,13 +239,10 @@ export default function OrdersPage() {
       <Card className="border border-[#E5E7EB] shadow-xs rounded-xl" styles={{ body: { padding: '16px 20px' } }}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3 items-center">
           <div className="md:col-span-2">
-            <Input
-              prefix={<SearchOutlined className="text-gray-400 mr-1" />}
+            <SearchInput
               placeholder="Tìm theo mã đơn (HD-...), tên khách hàng hoặc thu ngân..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              allowClear
-              className="rounded-lg"
+              onChange={setSearchQuery}
             />
           </div>
 
