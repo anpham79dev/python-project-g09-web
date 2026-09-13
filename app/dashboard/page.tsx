@@ -770,6 +770,7 @@ export default function DashboardPage() {
                           rowKey="id"
                           pagination={false}
                           size="small"
+                          scroll={{ x: 'max-content' }}
                           className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden"
                         />
                       </div>
@@ -1015,6 +1016,7 @@ export default function DashboardPage() {
                         dataSource={stats.staffPerformances}
                         rowKey="staffId"
                         pagination={false}
+                        scroll={{ x: 'max-content' }}
                         className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden"
                       />
                     </div>
@@ -1054,6 +1056,7 @@ export default function DashboardPage() {
                             dataSource={stats.lowStockDetails}
                             rowKey="id"
                             pagination={false}
+                            scroll={{ x: 'max-content' }}
                             className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden"
                           />
                         )}
@@ -1079,6 +1082,7 @@ export default function DashboardPage() {
                           dataSource={stats.slowSellingProducts}
                           rowKey="id"
                           pagination={false}
+                          scroll={{ x: 'max-content' }}
                           className="bg-white rounded-xl border border-[#E5E7EB] overflow-hidden"
                         />
                       </div>

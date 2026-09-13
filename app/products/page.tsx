@@ -275,6 +275,7 @@ export default function ProductsPage() {
             showTotal: (total, range) => `${range[0]}-${range[1]} trong tổng số ${total} sản phẩm`,
             showSizeChanger: false,
           }}
+          scroll={{ x: 'max-content' }}
         />
       </Card>
     </div>

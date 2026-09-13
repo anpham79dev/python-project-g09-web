@@ -9,13 +9,12 @@ import {
   Select,
   Button,
   Card,
-  Space,
   App,
   Divider,
 } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 import { getProductById, updateProduct } from '@/lib/api';
-import { CATEGORIES } from '@/lib/mock-data';
+import { CATEGORIES, Product } from '@/lib/mock-data';
 import PageLoading from '@/app/components/page-loading';
 import DetailHeader from '@/app/components/detail-header';
 import { usePageGuard } from '@/app/hooks/use-page-guard';
@@ -32,6 +31,7 @@ export default function EditProductPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>('');
+  const [product, setProduct] = useState<Product | null>(null);
 
   usePageGuard({ permission: 'products:write', deniedMessage: 'Bạn không có quyền chỉnh sửa sản phẩm!' });
 
@@ -41,7 +41,7 @@ export default function EditProductPage() {
       setLoading(true);
       try {
         const data = await getProductById(id);
-        form.setFieldsValue(data);
+        setProduct(data);
         setPreviewImage(data.image);
       } catch {
         message.error('Không tìm thấy sản phẩm cần sửa!');
@@ -51,7 +51,16 @@ export default function EditProductPage() {
       }
     };
     fetchProduct();
-  }, [id, form, router]);
+  }, [id, router]);
+
+  // `loading` gates whether the Form below is mounted at all, so field values must be
+  // applied in an effect keyed on the loaded product rather than right after the fetch —
+  // calling setFieldsValue before the Form exists silently does nothing.
+  useEffect(() => {
+    if (product) {
+      form.setFieldsValue(product);
+    }
+  }, [product, form]);
 
   const handleSubmit = async (values: any) => {
     setSubmitting(true);
@@ -135,16 +144,15 @@ export default function EditProductPage() {
                   name="price"
                   rules={[{ required: true, message: 'Vui lòng nhập đơn giá!' }]}
                 >
-                  <Space.Compact size="large" className="w-full">
-                    <InputNumber
-                      size="large"
-                      min={1000}
-                      step={1000}
-                      formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                      className="w-full rounded-l-lg"
-                    />
-                    <Button disabled size="large" className="!bg-gray-100 !text-gray-600 font-medium !px-3">₫</Button>
-                  </Space.Compact>
+                  <InputNumber<number>
+                    size="large"
+                    min={1000}
+                    step={1000}
+                    formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    parser={(val) => Number(val ? val.replace(/,/g, '') : 0)}
+                    addonAfter="₫"
+                    className="w-full"
+                  />
                 </Form.Item>
               </div>
 

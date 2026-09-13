@@ -12,7 +12,6 @@ import {
   Input,
   Select,
   InputNumber,
-  Space,
   Radio,
   Progress,
 } from "antd";
@@ -410,6 +409,7 @@ export default function AccountingPage() {
                     rowKey="id"
                     loading={loading}
                     pagination={{ pageSize: 8 }}
+                    scroll={{ x: 'max-content' }}
                     className="rounded-xl border border-[#E5E7EB] overflow-hidden"
                   />
                 </div>
@@ -625,22 +625,16 @@ export default function AccountingPage() {
               }
               rules={[{ required: true, message: "Vui lòng nhập số tiền" }]}
             >
-              <Space.Compact className="w-full">
-                <InputNumber
-                  min={1000}
-                  step={10000}
-                  formatter={(val) =>
-                    `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                  }
-                  className="w-full font-mono text-xs font-bold"
-                />
-                <Button
-                  disabled
-                  className="!bg-gray-100 !text-gray-600 font-medium !px-3 text-xs"
-                >
-                  ₫
-                </Button>
-              </Space.Compact>
+              <InputNumber<number>
+                min={1000}
+                step={10000}
+                formatter={(val) =>
+                  `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                }
+                parser={(val) => Number(val ? val.replace(/,/g, "") : 0)}
+                addonAfter="₫"
+                className="w-full font-mono text-xs font-bold"
+              />
             </Form.Item>
 
             <Form.Item

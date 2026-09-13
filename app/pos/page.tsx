@@ -288,29 +288,36 @@ export default function POSPage() {
       <div className="flex-1 flex flex-col h-full border-r border-[#E5E7EB] overflow-hidden">
         {/* Header Bộ lọc & Tìm kiếm */}
         <div className="p-4 bg-white border-b border-[#E5E7EB] space-y-3 shrink-0">
-          <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+          <div className="flex flex-wrap gap-3 items-center justify-between">
             <SearchInput
               placeholder="Tìm kiếm theo tên bánh, danh mục hoặc mã..."
               size="large"
               value={searchQuery}
               onChange={setSearchQuery}
-              className="w-full sm:max-w-md rounded-lg"
+              className="w-full sm:max-w-md sm:min-w-[220px] rounded-lg"
             />
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               {currentShift && (
-                <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 whitespace-nowrap shrink-0">
                   <ClockCircleOutlined className="text-[#006C49]" />
-                  <span>{currentShift.shiftName.split("-")[0]}</span>
+                  <span>
+                    {(() => {
+                      const parts = currentShift.shiftName.split(") -");
+                      return parts.length > 1
+                        ? `${parts[0]})`
+                        : currentShift.shiftName;
+                    })()}
+                  </span>
                 </div>
               )}
               <Button
                 icon={<ClockCircleOutlined />}
                 onClick={handleOpenShiftModal}
-                className="text-xs font-semibold text-[#006C49] border-[#10B981] hover:bg-emerald-50 h-9 flex items-center"
+                className="text-xs font-semibold text-[#006C49] border-[#10B981] hover:bg-emerald-50 h-9 flex items-center shrink-0"
               >
                 Kết ca / Chốt két
               </Button>
-              <div className="text-xs text-secondary font-medium">
+              <div className="text-xs text-secondary font-medium whitespace-nowrap shrink-0">
                 Tìm thấy{" "}
                 <strong className="text-[#10B981]">
                   {filteredProducts.length}
@@ -648,6 +655,7 @@ export default function POSPage() {
                   formatter={(val) =>
                     `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                   }
+                  parser={(val) => Number(val ? val.replace(/,/g, "") : 0)}
                   className="w-full"
                 />
                 <Button
@@ -1029,6 +1037,7 @@ export default function POSPage() {
                     formatter={(val) =>
                       `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     }
+                    parser={(val) => Number(val ? val.replace(/,/g, "") : 0)}
                   />
                   <Button
                     disabled

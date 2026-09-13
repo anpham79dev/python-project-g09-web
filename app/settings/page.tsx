@@ -66,7 +66,6 @@ export default function SettingsPage() {
       ]);
       setSettings(stData);
       setTemplates(tmplData);
-      settingsForm.setFieldsValue(stData);
     } catch {
       message.error('Lỗi khi tải dữ liệu cấu hình hệ thống');
     } finally {
@@ -77,6 +76,15 @@ export default function SettingsPage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // `settings` gates whether the Form/Tabs subtree is mounted at all, so the Form
+  // must exist first before its instance can accept field values — hence a separate
+  // effect keyed on `settings` rather than calling setFieldsValue right after setSettings().
+  useEffect(() => {
+    if (settings) {
+      settingsForm.setFieldsValue(settings);
+    }
+  }, [settings, settingsForm]);
 
   const handleSaveSettings = async () => {
     try {
@@ -224,6 +232,7 @@ export default function SettingsPage() {
         <PageLoading description="Đang tải thông số cấu hình..." />
       ) : settings ? (
         <div className="bg-white p-6 rounded-2xl border border-[#E5E7EB] shadow-xs">
+          <Form form={settingsForm} layout="vertical" component="div">
           <Tabs
             defaultActiveKey="shifts"
             items={[
@@ -255,6 +264,7 @@ export default function SettingsPage() {
                       dataSource={templates}
                       rowKey="id"
                       pagination={false}
+                      scroll={{ x: 'max-content' }}
                       className="rounded-xl border border-[#E5E7EB] overflow-hidden"
                     />
                   </div>
@@ -269,7 +279,7 @@ export default function SettingsPage() {
                   </span>
                 ),
                 children: (
-                  <Form form={settingsForm} layout="vertical" className="max-w-3xl pt-2 space-y-4">
+                  <div className="max-w-3xl pt-2 space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Form.Item
                         name="storeName"
@@ -352,28 +362,26 @@ export default function SettingsPage() {
                     >
                       Lưu Thay Đổi Thông Tin
                     </Button>
-                  </Form>
+                  </div>
                 ),
               },
               {
                 key: 'rules',
+                forceRender: true,
                 label: (
                   <span className="font-semibold text-xs flex items-center gap-1.5">
                     <SettingOutlined /> 3. Quy Tắc POS &amp; Tồn Kho
                   </span>
                 ),
                 children: (
-                  <Form form={settingsForm} layout="vertical" className="max-w-2xl pt-2 space-y-4">
+                  <div className="max-w-2xl pt-2 space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Form.Item
                         name="lowStockThreshold"
                         label={<span className="text-xs font-semibold text-[#111827]">NGƯỠNG CẢNH BÁO TỒN KHO THẤP</span>}
                         help="Khi tồn kho bằng hoặc nhỏ hơn số này, hệ thống sẽ đánh dấu màu cam (Sắp hết)"
                       >
-                        <Space.Compact className="w-full">
-                          <InputNumber min={1} max={100} className="w-full text-xs font-mono" />
-                          <Button disabled className="!bg-gray-100 !text-gray-600 font-medium !px-2.5 text-xs">cái</Button>
-                        </Space.Compact>
+                        <InputNumber min={1} max={100} addonAfter="cái" className="w-full text-xs font-mono" />
                       </Form.Item>
 
                       <Form.Item
@@ -427,11 +435,12 @@ export default function SettingsPage() {
                     >
                       Lưu Quy Tắc Vận Hành
                     </Button>
-                  </Form>
+                  </div>
                 ),
               },
             ]}
           />
+          </Form>
         </div>
       ) : null}
 
@@ -450,6 +459,7 @@ export default function SettingsPage() {
         okText={editingTemplate ? 'Cập nhật' : 'Tạo mới'}
         cancelText="Hủy"
         width={480}
+        forceRender
       >
         <Form form={templateForm} layout="vertical" className="pt-3">
           <Form.Item
@@ -483,13 +493,12 @@ export default function SettingsPage() {
             label={<span className="text-xs font-semibold text-[#111827]">TIỀN LẺ ĐẦU CA GỢI Ý</span>}
             rules={[{ required: true, message: 'Nhập số tiền đầu ca' }]}
           >
-            <Space.Compact className="w-full">
-              <InputNumber
-                className="w-full font-mono text-xs font-bold"
-                formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-              />
-              <Button disabled className="!bg-gray-100 !text-gray-600 font-medium !px-3 text-xs">₫</Button>
-            </Space.Compact>
+            <InputNumber
+              className="w-full font-mono text-xs font-bold"
+              formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={(val) => Number(val ? val.replace(/,/g, '') : 0)}
+              addonAfter="₫"
+            />
           </Form.Item>
 
           <Form.Item

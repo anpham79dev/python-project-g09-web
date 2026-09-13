@@ -281,6 +281,7 @@ export default function OrdersPage() {
             onClick: () => router.push(`/orders/${record.id}`),
             className: 'cursor-pointer hover:bg-[#F9FAFB]',
           })}
+          scroll={{ x: 'max-content' }}
           pagination={{
             pageSize: 8,
             showTotal: (total, range) => `${range[0]}-${range[1]} trong tổng số ${total} đơn hàng`,

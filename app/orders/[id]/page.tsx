@@ -226,6 +226,7 @@ export default function OrderDetailPage() {
             rowKey="productId"
             pagination={false}
             bordered
+            scroll={{ x: 'max-content' }}
             className="rounded-lg overflow-hidden"
           />
         </div>

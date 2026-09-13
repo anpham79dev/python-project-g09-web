@@ -467,6 +467,7 @@ export default function BranchesPage() {
                   rowKey="id"
                   loading={loading}
                   pagination={{ pageSize: 6 }}
+                  scroll={{ x: 'max-content' }}
                   className="rounded-xl border border-[#E5E7EB] overflow-hidden mt-2"
                 />
               ),
@@ -528,6 +529,7 @@ export default function BranchesPage() {
                       pageSize: 8,
                       showTotal: (t) => `Tổng cộng ${t} mục hàng tồn kho`,
                     }}
+                    scroll={{ x: 'max-content' }}
                     className="rounded-xl border border-[#E5E7EB] overflow-hidden"
                   />
                 </div>

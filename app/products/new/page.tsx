@@ -9,7 +9,6 @@ import {
   Select,
   Button,
   Card,
-  Space,
   App,
   Divider,
 } from "antd";
@@ -170,24 +169,17 @@ export default function NewProductPage() {
                     { required: true, message: "Vui lòng nhập đơn giá!" },
                   ]}
                 >
-                  <Space.Compact size="large" className="w-full">
-                    <InputNumber
-                      size="large"
-                      min={1000}
-                      step={1000}
-                      formatter={(val) =>
-                        `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                      }
-                      className="w-full rounded-l-lg"
-                    />
-                    <Button
-                      disabled
-                      size="large"
-                      className="!bg-gray-100 !text-gray-600 font-medium !px-3"
-                    >
-                      ₫
-                    </Button>
-                  </Space.Compact>
+                  <InputNumber<number>
+                    size="large"
+                    min={1000}
+                    step={1000}
+                    formatter={(val) =>
+                      `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                    }
+                    parser={(val) => Number(val ? val.replace(/,/g, "") : 0)}
+                    addonAfter="₫"
+                    className="w-full"
+                  />
                 </Form.Item>
               </div>
 
@@ -205,21 +197,13 @@ export default function NewProductPage() {
                   },
                 ]}
               >
-                <Space.Compact size="large" className="w-full sm:w-1/2">
-                  <InputNumber
-                    size="large"
-                    min={0}
-                    step={1}
-                    className="w-full rounded-l-lg"
-                  />
-                  <Button
-                    disabled
-                    size="large"
-                    className="!bg-gray-100 !text-gray-600 font-medium !px-3"
-                  >
-                    cái
-                  </Button>
-                </Space.Compact>
+                <InputNumber
+                  size="large"
+                  min={0}
+                  step={1}
+                  addonAfter="cái"
+                  className="w-full sm:w-1/2"
+                />
               </Form.Item>
 
               <Form.Item

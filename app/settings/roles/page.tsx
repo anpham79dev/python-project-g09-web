@@ -434,6 +434,7 @@ export default function RolesManagementPage() {
           rowKey="id"
           loading={loading}
           pagination={false}
+          scroll={{ x: 'max-content' }}
         />
       </Card>
 

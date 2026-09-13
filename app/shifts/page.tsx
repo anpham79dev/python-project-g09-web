@@ -392,6 +392,7 @@ export default function ShiftsPage() {
               dataSource={shifts}
               rowKey="id"
               pagination={{ pageSize: 8, showTotal: (t) => `Tổng cộng ${t} ca làm việc` }}
+              scroll={{ x: 'max-content' }}
               className="rounded-xl border border-[#E5E7EB] overflow-hidden"
             />
           </div>

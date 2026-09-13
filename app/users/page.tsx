@@ -361,6 +361,7 @@ export default function UsersPage() {
             showSizeChanger: true,
             showTotal: (total) => `Tổng ${total} nhân viên`,
           }}
+          scroll={{ x: 'max-content' }}
           className="artisan-table"
         />
       </Card>
