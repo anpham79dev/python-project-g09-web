@@ -14,11 +14,11 @@ import {
   INITIAL_ROLES,
   INITIAL_AUDIT_LOGS,
   INITIAL_BRANCHES,
-} from '../mock-data';
+} from "../mock-data";
 
 // Kiểm tra biến môi trường chuyển đổi mock <-> API thật
 export const isMockMode = (): boolean => {
-  return process.env.NEXT_PUBLIC_USE_MOCK !== 'false';
+  return process.env.NEXT_PUBLIC_USE_MOCK !== "false";
 };
 
 // Giả lập độ trễ mạng khi dùng mock data (~300ms)
@@ -28,142 +28,92 @@ export const simulateDelay = <T>(data: T, delay = 300): Promise<T> => {
 
 // Key LocalStorage cho Stateful Mocking
 export const LS_KEYS = {
-  PRODUCTS: 'artisan_mock_products',
-  ORDERS: 'artisan_mock_orders',
-  USERS: 'artisan_mock_users',
-  ROLES: 'artisan_mock_roles',
-  PERMISSIONS: 'artisan_mock_permissions',
-  AUDIT_LOGS: 'artisan_mock_audit_logs',
-  SHIFTS: 'artisan_mock_shifts',
-  BRANCHES: 'artisan_mock_branches',
-  TEMPLATES: 'artisan_mock_shift_templates',
-  SETTINGS: 'artisan_mock_system_settings',
-  STOCKS: 'artisan_mock_warehouse_stocks',
-  TRANSACTIONS: 'artisan_mock_transactions',
+  PRODUCTS: "artisan_mock_products",
+  ORDERS: "artisan_mock_orders",
+  USERS: "artisan_mock_users",
+  ROLES: "artisan_mock_roles",
+  PERMISSIONS: "artisan_mock_permissions",
+  AUDIT_LOGS: "artisan_mock_audit_logs",
+  SHIFTS: "artisan_mock_shifts",
+  BRANCHES: "artisan_mock_branches",
+  TEMPLATES: "artisan_mock_shift_templates",
+  SETTINGS: "artisan_mock_system_settings",
+  STOCKS: "artisan_mock_warehouse_stocks",
+  TRANSACTIONS: "artisan_mock_transactions",
 };
 
-// Helpers lấy/lưu mock data trong browser session
-export const getStoredProducts = (): Product[] => {
-  if (typeof window === 'undefined') return INITIAL_PRODUCTS;
-  const stored = localStorage.getItem(LS_KEYS.PRODUCTS);
+export const getStoredList = <T>(
+  key: string,
+  initial: T[],
+  rejectEmptyArray = false,
+): T[] => {
+  if (typeof window === "undefined") return initial;
+  const stored = localStorage.getItem(key);
   if (!stored) {
-    localStorage.setItem(LS_KEYS.PRODUCTS, JSON.stringify(INITIAL_PRODUCTS));
-    return INITIAL_PRODUCTS;
-  }
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return INITIAL_PRODUCTS;
-  }
-};
-
-export const saveStoredProducts = (products: Product[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LS_KEYS.PRODUCTS, JSON.stringify(products));
-  }
-};
-
-export const getStoredOrders = (): Order[] => {
-  if (typeof window === 'undefined') return INITIAL_ORDERS;
-  const stored = localStorage.getItem(LS_KEYS.ORDERS);
-  if (!stored) {
-    localStorage.setItem(LS_KEYS.ORDERS, JSON.stringify(INITIAL_ORDERS));
-    return INITIAL_ORDERS;
-  }
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return INITIAL_ORDERS;
-  }
-};
-
-export const saveStoredOrders = (orders: Order[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LS_KEYS.ORDERS, JSON.stringify(orders));
-  }
-};
-
-export const getStoredUsers = (): User[] => {
-  if (typeof window === 'undefined') return INITIAL_USERS;
-  const stored = localStorage.getItem(LS_KEYS.USERS);
-  if (!stored) {
-    localStorage.setItem(LS_KEYS.USERS, JSON.stringify(INITIAL_USERS));
-    return INITIAL_USERS;
-  }
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return INITIAL_USERS;
-  }
-};
-
-export const saveStoredUsers = (users: User[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LS_KEYS.USERS, JSON.stringify(users));
-  }
-};
-
-export const getStoredRoles = (): Role[] => {
-  if (typeof window === 'undefined') return INITIAL_ROLES;
-  const stored = localStorage.getItem(LS_KEYS.ROLES);
-  if (!stored) {
-    localStorage.setItem(LS_KEYS.ROLES, JSON.stringify(INITIAL_ROLES));
-    return INITIAL_ROLES;
+    localStorage.setItem(key, JSON.stringify(initial));
+    return initial;
   }
   try {
     const parsed = JSON.parse(stored);
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      localStorage.setItem(LS_KEYS.ROLES, JSON.stringify(INITIAL_ROLES));
-      return INITIAL_ROLES;
+    if (!Array.isArray(parsed) || (rejectEmptyArray && parsed.length === 0)) {
+      localStorage.setItem(key, JSON.stringify(initial));
+      return initial;
     }
     return parsed;
   } catch {
-    return INITIAL_ROLES;
+    return initial;
   }
 };
 
-export const saveStoredRoles = (roles: Role[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LS_KEYS.ROLES, JSON.stringify(roles));
+export const saveStoredList = <T>(key: string, data: T[]): void => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(key, JSON.stringify(data));
   }
 };
 
-export const getStoredAuditLogs = (): AuditLog[] => {
-  if (typeof window === 'undefined') return INITIAL_AUDIT_LOGS;
-  const stored = localStorage.getItem(LS_KEYS.AUDIT_LOGS);
-  if (!stored) {
-    localStorage.setItem(LS_KEYS.AUDIT_LOGS, JSON.stringify(INITIAL_AUDIT_LOGS));
-    return INITIAL_AUDIT_LOGS;
-  }
+// Helpers lấy/lưu mock data trong browser session
+export const getStoredProducts = (): Product[] =>
+  getStoredList(LS_KEYS.PRODUCTS, INITIAL_PRODUCTS);
+export const saveStoredProducts = (products: Product[]) =>
+  saveStoredList(LS_KEYS.PRODUCTS, products);
+
+export const getStoredOrders = (): Order[] =>
+  getStoredList(LS_KEYS.ORDERS, INITIAL_ORDERS);
+export const saveStoredOrders = (orders: Order[]) =>
+  saveStoredList(LS_KEYS.ORDERS, orders);
+
+export const getStoredUsers = (): User[] =>
+  getStoredList(LS_KEYS.USERS, INITIAL_USERS);
+export const saveStoredUsers = (users: User[]) =>
+  saveStoredList(LS_KEYS.USERS, users);
+
+export const getStoredRoles = (): Role[] =>
+  getStoredList(LS_KEYS.ROLES, INITIAL_ROLES, true);
+export const saveStoredRoles = (roles: Role[]) =>
+  saveStoredList(LS_KEYS.ROLES, roles);
+
+export const getStoredAuditLogs = (): AuditLog[] =>
+  getStoredList(LS_KEYS.AUDIT_LOGS, INITIAL_AUDIT_LOGS);
+export const saveStoredAuditLogs = (logs: AuditLog[]) =>
+  saveStoredList(LS_KEYS.AUDIT_LOGS, logs);
+
+export const getStoredBranches = (): Branch[] =>
+  getStoredList(LS_KEYS.BRANCHES, INITIAL_BRANCHES);
+export const saveStoredBranches = (branches: Branch[]) =>
+  saveStoredList(LS_KEYS.BRANCHES, branches);
+
+export const getStoredStockOverrides = (): Record<string, number> => {
+  if (typeof window === "undefined") return {};
   try {
-    return JSON.parse(stored);
+    return JSON.parse(localStorage.getItem(LS_KEYS.STOCKS) || "{}");
   } catch {
-    return INITIAL_AUDIT_LOGS;
+    return {};
   }
 };
-
-export const saveStoredAuditLogs = (logs: AuditLog[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LS_KEYS.AUDIT_LOGS, JSON.stringify(logs));
-  }
-};
-
-export const getStoredBranches = (): Branch[] => {
-  if (typeof window === 'undefined') return INITIAL_BRANCHES;
-  const stored = localStorage.getItem(LS_KEYS.BRANCHES);
-  if (!stored) {
-    localStorage.setItem(LS_KEYS.BRANCHES, JSON.stringify(INITIAL_BRANCHES));
-    return INITIAL_BRANCHES;
-  }
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return INITIAL_BRANCHES;
-  }
-};
-
-export const saveStoredBranches = (branches: Branch[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LS_KEYS.BRANCHES, JSON.stringify(branches));
+export const saveStoredStockOverrides = (
+  overrides: Record<string, number>,
+): void => {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(LS_KEYS.STOCKS, JSON.stringify(overrides));
   }
 };

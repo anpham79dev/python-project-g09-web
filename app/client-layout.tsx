@@ -371,11 +371,6 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
             <p className="font-semibold text-xs text-[#111827] m-0">{b.name}</p>
             <p className="text-[10px] text-[#585F6C] m-0">{b.address}</p>
           </div>
-          {b.isMain && (
-            <span className="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full font-bold">
-              Trụ sở
-            </span>
-          )}
         </div>
       ),
       onClick: () => handleBranchChange(b),

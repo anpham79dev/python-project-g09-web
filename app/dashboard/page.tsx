@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   Table,
   Tag,
@@ -15,8 +15,8 @@ import {
   Tooltip,
   Empty,
   Select,
-} from 'antd';
-import type { ColumnsType } from 'antd/es/table';
+} from "antd";
+import type { ColumnsType } from "antd/es/table";
 import {
   DollarOutlined,
   ShoppingOutlined,
@@ -33,7 +33,7 @@ import {
   ShopOutlined,
   InboxOutlined,
   AppstoreOutlined,
-} from '@ant-design/icons';
+} from "@ant-design/icons";
 import {
   ResponsiveContainer,
   AreaChart,
@@ -47,70 +47,89 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip as RechartsTooltip,
-} from 'recharts';
-import type { Dayjs } from 'dayjs';
-import { getDashboardStats, getBranches } from '@/lib/api';
-import PageLoading from '@/app/components/page-loading';
-import PageHeader from '@/app/components/page-header';
-import ReloadButton from '@/app/components/reload-button';
-import StatCard from '@/app/components/stat-card';
+} from "recharts";
+import type { Dayjs } from "dayjs";
+import { getDashboardStats, getBranches } from "@/lib/api";
+import PageLoading from "@/app/components/page-loading";
+import PageHeader from "@/app/components/page-header";
+import ReloadButton from "@/app/components/reload-button";
+import StatCard from "@/app/components/stat-card";
 import {
   DashboardStats,
   StaffPerformanceStat,
   LowStockDetailItem,
   SlowSellingProduct,
   Branch,
-} from '@/lib/mock-data';
-import { usePageGuard } from '@/app/hooks/use-page-guard';
-import { useBranchChange } from '@/app/hooks/use-branch-change';
+} from "@/lib/mock-data";
+import { usePageGuard } from "@/app/hooks/use-page-guard";
+import { useBranchChange } from "@/app/hooks/use-branch-change";
 
 const { RangePicker } = DatePicker;
 
 // Color Palette for Charts
 const PAYMENT_COLORS: Record<string, string> = {
-  QR_TRANSFER: '#06B6D4',
-  CASH: '#10B981',
-  CARD: '#3B82F6',
+  QR_TRANSFER: "#06B6D4",
+  CASH: "#10B981",
+  CARD: "#3B82F6",
 };
 
-const CATEGORY_COLORS = ['#10B981', '#F59E0B', '#EC4899', '#8B5CF6', '#3B82F6', '#64748B'];
+const CATEGORY_COLORS = [
+  "#10B981",
+  "#F59E0B",
+  "#EC4899",
+  "#8B5CF6",
+  "#3B82F6",
+  "#64748B",
+];
 
 export default function DashboardPage() {
   const router = useRouter();
   const { message } = App.useApp();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [branches, setBranches] = useState<Branch[]>([]);
-  const [selectedBranchId, setSelectedBranchId] = useState<string>('ALL');
+  const [selectedBranchId, setSelectedBranchId] = useState<string>("ALL");
   const [loading, setLoading] = useState(true);
 
   // Time Range Filter State
-  const [selectedRange, setSelectedRange] = useState<string>('today');
+  const [selectedRange, setSelectedRange] = useState<string>("today");
   const [customDates, setCustomDates] = useState<[Dayjs, Dayjs] | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('sales-trends');
+  const [activeTab, setActiveTab] = useState<string>("sales-trends");
 
-  usePageGuard({ permission: 'dashboard:view', deniedMessage: 'Bạn không có quyền xem Báo cáo Dashboard!' });
+  usePageGuard({
+    permission: "dashboard:view",
+    deniedMessage: "Bạn không có quyền xem Báo cáo Dashboard!",
+  });
 
   useEffect(() => {
     getBranches().then((list) => setBranches(list));
   }, []);
 
-  const loadStats = async (rangeKey = selectedRange, dates = customDates, branchId = selectedBranchId) => {
+  const loadStats = async (
+    rangeKey = selectedRange,
+    dates = customDates,
+    branchId = selectedBranchId,
+  ) => {
     setLoading(true);
     try {
-      const params: { range: string; startDate?: string; endDate?: string; branchId?: string } = {
+      const params: {
+        range: string;
+        startDate?: string;
+        endDate?: string;
+        branchId?: string;
+      } = {
         range: rangeKey,
-        branchId: branchId !== 'ALL' ? branchId : undefined,
+        branchId: branchId !== "ALL" ? branchId : undefined,
       };
 
-      if (rangeKey === 'custom' && dates && dates[0] && dates[1]) {
-        params.startDate = dates[0].format('YYYY-MM-DD');
-        params.endDate = dates[1].format('YYYY-MM-DD');
+      if (rangeKey === "custom" && dates && dates[0] && dates[1]) {
+        params.startDate = dates[0].format("YYYY-MM-DD");
+        params.endDate = dates[1].format("YYYY-MM-DD");
       }
 
       const data = await getDashboardStats(params);
       setStats(data);
     } catch {
-      message.error('Lỗi khi tải dữ liệu thống kê');
+      message.error("Lỗi khi tải dữ liệu thống kê");
     } finally {
       setLoading(false);
     }
@@ -121,13 +140,13 @@ export default function DashboardPage() {
   }, [selectedRange, selectedBranchId]);
 
   useBranchChange((branchId) => {
-    setSelectedBranchId(branchId || 'ALL');
+    setSelectedBranchId(branchId || "ALL");
   });
 
   const handleCustomRangeChange = (dates: any) => {
     setCustomDates(dates);
     if (dates && dates[0] && dates[1]) {
-      loadStats('custom', dates, selectedBranchId);
+      loadStats("custom", dates, selectedBranchId);
     }
   };
 
@@ -138,29 +157,31 @@ export default function DashboardPage() {
   // 1. Top 5 Best Selling Products
   const topProductColumns: ColumnsType<any> = [
     {
-      title: 'Hạng',
-      key: 'rank',
+      title: "Hạng",
+      key: "rank",
       width: 60,
-      align: 'center',
+      align: "center",
       render: (_, __, index) => {
         const bg =
           index === 0
-            ? 'bg-amber-100 text-amber-800 border-amber-300'
+            ? "bg-amber-100 text-amber-800 border-amber-300"
             : index === 1
-            ? 'bg-slate-100 text-slate-700 border-slate-300'
-            : index === 2
-            ? 'bg-orange-100 text-orange-800 border-orange-300'
-            : 'bg-gray-50 text-secondary border-gray-200';
+              ? "bg-slate-100 text-slate-700 border-slate-300"
+              : index === 2
+                ? "bg-orange-100 text-orange-800 border-orange-300"
+                : "bg-gray-50 text-secondary border-gray-200";
         return (
-          <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border ${bg}`}>
+          <span
+            className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold border ${bg}`}
+          >
             {index + 1}
           </span>
         );
       },
     },
     {
-      title: 'Sản phẩm',
-      key: 'product',
+      title: "Sản phẩm",
+      key: "product",
       render: (_, record) => (
         <div className="flex items-center gap-3">
           <img
@@ -169,17 +190,21 @@ export default function DashboardPage() {
             className="w-10 h-10 rounded-lg object-cover border border-[#E5E7EB]"
           />
           <div>
-            <span className="font-semibold text-xs text-[#111827] block">{record.name}</span>
-            <span className="text-[11px] text-emerald-700 font-medium">{record.category}</span>
+            <span className="font-semibold text-xs text-[#111827] block">
+              {record.name}
+            </span>
+            <span className="text-[11px] text-emerald-700 font-medium">
+              {record.category}
+            </span>
           </div>
         </div>
       ),
     },
     {
-      title: 'Đã bán',
-      dataIndex: 'soldCount',
-      key: 'soldCount',
-      align: 'center',
+      title: "Đã bán",
+      dataIndex: "soldCount",
+      key: "soldCount",
+      align: "center",
       render: (count: number) => (
         <span className="font-bold text-xs text-[#111827] px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
           {count} cái
@@ -187,13 +212,13 @@ export default function DashboardPage() {
       ),
     },
     {
-      title: 'Doanh thu thu về',
-      dataIndex: 'revenue',
-      key: 'revenue',
-      align: 'right',
+      title: "Doanh thu thu về",
+      dataIndex: "revenue",
+      key: "revenue",
+      align: "right",
       render: (val: number) => (
         <span className="font-mono font-bold text-xs text-[#006C49]">
-          {val.toLocaleString('vi-VN')} ₫
+          {val.toLocaleString("vi-VN")} ₫
         </span>
       ),
     },
@@ -202,8 +227,8 @@ export default function DashboardPage() {
   // 2. Slow Selling Products Table
   const slowProductColumns: ColumnsType<SlowSellingProduct> = [
     {
-      title: 'Sản phẩm',
-      key: 'product',
+      title: "Sản phẩm",
+      key: "product",
       render: (_, record) => (
         <div className="flex items-center gap-3">
           <img
@@ -212,49 +237,57 @@ export default function DashboardPage() {
             className="w-10 h-10 rounded-lg object-cover border border-[#E5E7EB]"
           />
           <div>
-            <span className="font-semibold text-xs text-[#111827] block">{record.name}</span>
-            <span className="text-[11px] text-gray-500 font-medium">{record.category}</span>
+            <span className="font-semibold text-xs text-[#111827] block">
+              {record.name}
+            </span>
+            <span className="text-[11px] text-gray-500 font-medium">
+              {record.category}
+            </span>
           </div>
         </div>
       ),
     },
     {
-      title: 'Đã bán trong kỳ',
-      dataIndex: 'soldCount',
-      key: 'soldCount',
-      align: 'center',
+      title: "Đã bán trong kỳ",
+      dataIndex: "soldCount",
+      key: "soldCount",
+      align: "center",
       render: (count: number) => (
-        <span className={`text-xs font-bold px-2 py-0.5 rounded ${count === 0 ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-gray-100 text-gray-700'}`}>
+        <span
+          className={`text-xs font-bold px-2 py-0.5 rounded ${count === 0 ? "bg-red-50 text-red-700 border border-red-200" : "bg-gray-100 text-gray-700"}`}
+        >
           {count} cái
         </span>
       ),
     },
     {
-      title: 'Doanh thu',
-      dataIndex: 'revenue',
-      key: 'revenue',
-      align: 'right',
+      title: "Doanh thu",
+      dataIndex: "revenue",
+      key: "revenue",
+      align: "right",
       render: (val: number) => (
         <span className="font-mono font-semibold text-xs text-gray-700">
-          {val.toLocaleString('vi-VN')} ₫
+          {val.toLocaleString("vi-VN")} ₫
         </span>
       ),
     },
     {
-      title: 'Tồn kho hiện tại',
-      dataIndex: 'stock',
-      key: 'stock',
-      align: 'center',
+      title: "Tồn kho hiện tại",
+      dataIndex: "stock",
+      key: "stock",
+      align: "center",
       render: (stock: number) => (
-        <span className={`text-xs font-mono font-semibold ${stock > 20 ? 'text-amber-600 font-bold' : 'text-gray-600'}`}>
-          {stock} cái {stock > 20 ? '(Tồn đọng)' : ''}
+        <span
+          className={`text-xs font-mono font-semibold ${stock > 20 ? "text-amber-600 font-bold" : "text-gray-600"}`}
+        >
+          {stock} cái {stock > 20 ? "(Tồn đọng)" : ""}
         </span>
       ),
     },
     {
-      title: 'Hành động đề xuất',
-      key: 'action',
-      align: 'center',
+      title: "Hành động đề xuất",
+      key: "action",
+      align: "center",
       render: (_, record) => (
         <Tooltip title="Chỉnh sửa giá / Khuyến mãi">
           <Button
@@ -273,36 +306,38 @@ export default function DashboardPage() {
   // 3. Staff Performance Table
   const staffColumns: ColumnsType<StaffPerformanceStat> = [
     {
-      title: 'Hạng',
-      key: 'rank',
+      title: "Hạng",
+      key: "rank",
       width: 60,
-      align: 'center',
+      align: "center",
       render: (_, __, index) => (
-        <span className="font-bold text-xs text-secondary">
-          #{index + 1}
-        </span>
+        <span className="font-bold text-xs text-secondary">#{index + 1}</span>
       ),
     },
     {
-      title: 'Thu ngân / Nhân viên',
-      key: 'staffName',
+      title: "Thu ngân / Nhân viên",
+      key: "staffName",
       render: (_, record) => (
         <div className="flex items-center gap-3">
           <Avatar className="bg-[#006C49] text-white font-bold">
             {record.staffName.charAt(0)}
           </Avatar>
           <div>
-            <span className="font-semibold text-xs text-[#111827] block">{record.staffName}</span>
-            <span className="text-[11px] text-secondary">Mã NV: {record.staffId}</span>
+            <span className="font-semibold text-xs text-[#111827] block">
+              {record.staffName}
+            </span>
+            <span className="text-[11px] text-secondary">
+              Mã NV: {record.staffId}
+            </span>
           </div>
         </div>
       ),
     },
     {
-      title: 'Số đơn hoàn tất',
-      dataIndex: 'ordersCount',
-      key: 'ordersCount',
-      align: 'center',
+      title: "Số đơn hoàn tất",
+      dataIndex: "ordersCount",
+      key: "ordersCount",
+      align: "center",
       sorter: (a, b) => a.ordersCount - b.ordersCount,
       render: (cnt: number) => (
         <span className="font-bold text-xs text-[#111827] px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
@@ -311,27 +346,27 @@ export default function DashboardPage() {
       ),
     },
     {
-      title: 'Tổng doanh thu tạo ra',
-      dataIndex: 'revenue',
-      key: 'revenue',
-      align: 'right',
+      title: "Tổng doanh thu tạo ra",
+      dataIndex: "revenue",
+      key: "revenue",
+      align: "right",
       sorter: (a, b) => a.revenue - b.revenue,
-      defaultSortOrder: 'descend',
+      defaultSortOrder: "descend",
       render: (val: number) => (
         <span className="font-mono font-bold text-xs text-[#006C49]">
-          {val.toLocaleString('vi-VN')} ₫
+          {val.toLocaleString("vi-VN")} ₫
         </span>
       ),
     },
     {
-      title: 'Giá trị TB / Đơn',
-      dataIndex: 'averageOrderValue',
-      key: 'averageOrderValue',
-      align: 'right',
+      title: "Giá trị TB / Đơn",
+      dataIndex: "averageOrderValue",
+      key: "averageOrderValue",
+      align: "right",
       sorter: (a, b) => a.averageOrderValue - b.averageOrderValue,
       render: (val: number) => (
         <span className="font-mono text-xs text-secondary font-medium">
-          {val.toLocaleString('vi-VN')} ₫
+          {val.toLocaleString("vi-VN")} ₫
         </span>
       ),
     },
@@ -340,8 +375,8 @@ export default function DashboardPage() {
   // 4. Low Stock Detail Table
   const lowStockColumns: ColumnsType<LowStockDetailItem> = [
     {
-      title: 'Sản phẩm',
-      key: 'product',
+      title: "Sản phẩm",
+      key: "product",
       render: (_, record) => (
         <div className="flex items-center gap-3">
           <img
@@ -350,46 +385,57 @@ export default function DashboardPage() {
             className="w-10 h-10 rounded-lg object-cover border border-[#E5E7EB]"
           />
           <div>
-            <span className="font-semibold text-xs text-[#111827] block">{record.name}</span>
-            <span className="text-[11px] text-emerald-700 font-medium">{record.category}</span>
+            <span className="font-semibold text-xs text-[#111827] block">
+              {record.name}
+            </span>
+            <span className="text-[11px] text-emerald-700 font-medium">
+              {record.category}
+            </span>
           </div>
         </div>
       ),
     },
     {
-      title: 'Tồn kho hiện tại',
-      dataIndex: 'stock',
-      key: 'stock',
-      align: 'center',
+      title: "Tồn kho hiện tại",
+      dataIndex: "stock",
+      key: "stock",
+      align: "center",
       sorter: (a, b) => a.stock - b.stock,
       render: (stock: number) => (
-        <span className={`font-bold font-mono text-sm ${stock === 0 ? 'text-red-600' : 'text-amber-600'}`}>
+        <span
+          className={`font-bold font-mono text-sm ${stock === 0 ? "text-red-600" : "text-amber-600"}`}
+        >
           {stock} cái
         </span>
       ),
     },
     {
-      title: 'Ngưỡng cảnh báo',
-      dataIndex: 'threshold',
-      key: 'threshold',
-      align: 'center',
-      render: (th: number) => <span className="text-xs text-secondary font-mono">≤ {th} cái</span>,
+      title: "Ngưỡng cảnh báo",
+      dataIndex: "threshold",
+      key: "threshold",
+      align: "center",
+      render: (th: number) => (
+        <span className="text-xs text-secondary font-mono">≤ {th} cái</span>
+      ),
     },
     {
-      title: 'Trạng thái kho',
-      dataIndex: 'status',
-      key: 'status',
-      align: 'center',
+      title: "Trạng thái kho",
+      dataIndex: "status",
+      key: "status",
+      align: "center",
       render: (status: string) => (
-        <Tag color={status === 'Hết hàng' ? 'error' : 'warning'} className="font-semibold text-xs">
+        <Tag
+          color={status === "Hết hàng" ? "error" : "warning"}
+          className="font-semibold text-xs"
+        >
           {status}
         </Tag>
       ),
     },
     {
-      title: 'Thao tác',
-      key: 'action',
-      align: 'center',
+      title: "Thao tác",
+      key: "action",
+      align: "center",
       render: (_, record) => (
         <Button
           type="primary"
@@ -412,101 +458,100 @@ export default function DashboardPage() {
         actionsClassName="flex flex-wrap items-center gap-2.5"
         actions={
           <>
-          <div data-testid="dashboard-branch-filter" className="inline-block">
-            <Select
-              id="dashboard-branch-select"
-              value={selectedBranchId}
-              onChange={(val) => {
-                setSelectedBranchId(val);
-                loadStats(selectedRange, customDates, val);
-              }}
-              popupMatchSelectWidth={false}
-              className="w-full sm:w-80 min-w-[290px] text-xs h-9"
-              optionLabelProp="label"
-            options={[
-              {
-                value: 'ALL',
-                label: (
-                  <span className="flex items-center gap-2 font-semibold text-xs text-[#111827]">
-                    <AppstoreOutlined className="text-[#006C49]" />
-                    <span>Tất cả chi nhánh (Toàn chuỗi)</span>
-                  </span>
-                ),
-                children: (
-                  <div className="flex items-center justify-between py-1 gap-4">
-                    <span className="flex items-center gap-2 font-medium text-xs text-[#111827]">
-                      <AppstoreOutlined className="text-[#006C49]" />
-                      <span>Tất cả chi nhánh (Toàn chuỗi)</span>
-                    </span>
-                    <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium shrink-0">
-                      Toàn hệ thống
-                    </span>
-                  </div>
-                ),
-              },
-              ...branches.map((b) => ({
-                value: b.id,
-                label: (
-                  <span className="flex items-center gap-2 font-semibold text-xs text-[#111827]">
-                    <ShopOutlined className="text-[#006C49]" />
-                    <span>{b.name}</span>
-                  </span>
-                ),
-                children: (
-                  <div className="flex items-center justify-between py-1 gap-4">
-                    <span className="flex items-center gap-2 font-medium text-xs text-[#111827]">
-                      <ShopOutlined className="text-[#006C49]" />
-                      <span>{b.name}</span>
-                    </span>
-                    {b.isMain ? (
-                      <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold shrink-0">
-                        Trụ sở
+            <div data-testid="dashboard-branch-filter" className="inline-block">
+              <Select
+                id="dashboard-branch-select"
+                value={selectedBranchId}
+                onChange={(val) => {
+                  setSelectedBranchId(val);
+                }}
+                popupMatchSelectWidth={false}
+                className="w-full sm:w-80 min-w-[290px] text-xs h-9"
+                optionLabelProp="label"
+                options={[
+                  {
+                    value: "ALL",
+                    label: (
+                      <span className="flex items-center gap-2 font-semibold text-xs text-[#111827]">
+                        <AppstoreOutlined className="text-[#006C49]" />
+                        <span>Tất cả chi nhánh (Toàn chuỗi)</span>
                       </span>
-                    ) : (
-                      <span className="text-[10px] text-gray-500 font-mono bg-gray-100 px-1.5 py-0.5 rounded shrink-0">
-                        {b.code}
+                    ),
+                    children: (
+                      <div className="flex items-center justify-between py-1 gap-4">
+                        <span className="flex items-center gap-2 font-medium text-xs text-[#111827]">
+                          <AppstoreOutlined className="text-[#006C49]" />
+                          <span>Tất cả chi nhánh (Toàn chuỗi)</span>
+                        </span>
+                        <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium shrink-0">
+                          Toàn hệ thống
+                        </span>
+                      </div>
+                    ),
+                  },
+                  ...branches.map((b) => ({
+                    value: b.id,
+                    label: (
+                      <span className="flex items-center gap-2 font-semibold text-xs text-[#111827]">
+                        <ShopOutlined className="text-[#006C49]" />
+                        <span>{b.name}</span>
                       </span>
-                    )}
-                  </div>
-                ),
-              })),
-            ]}
-            optionRender={(option) => (option.data as any)?.children || option.label}
-          />
-          </div>
+                    ),
+                    children: (
+                      <div className="flex items-center justify-between py-1 gap-4">
+                        <span className="flex items-center gap-2 font-medium text-xs text-[#111827]">
+                          <ShopOutlined className="text-[#006C49]" />
+                          <span>{b.name}</span>
+                        </span>
+                        <span className="text-[10px] text-gray-500 font-mono bg-gray-100 px-1.5 py-0.5 rounded shrink-0">
+                          {b.code}
+                        </span>
+                      </div>
+                    ),
+                  })),
+                ]}
+                optionRender={(option) =>
+                  (option.data as any)?.children || option.label
+                }
+              />
+            </div>
 
-          <Segmented
-            options={[
-              { label: 'Hôm nay', value: 'today' },
-              { label: '7 ngày qua', value: '7days' },
-              { label: '30 ngày qua', value: '30days' },
-              { label: 'Tùy chọn', value: 'custom' },
-            ]}
-            value={selectedRange}
-            onChange={(val) => setSelectedRange(val as string)}
-            className="bg-[#F8F9FA] p-0.5 border border-[#E5E7EB] rounded-lg font-medium text-xs h-9 flex items-center"
-          />
-
-          {selectedRange === 'custom' && (
-            <RangePicker
-              format="DD/MM/YYYY"
-              value={customDates}
-              onChange={handleCustomRangeChange}
-              className="rounded-lg text-xs h-9"
-              placeholder={['Từ ngày', 'Đến ngày']}
+            <Segmented
+              options={[
+                { label: "Hôm nay", value: "today" },
+                { label: "7 ngày qua", value: "7days" },
+                { label: "30 ngày qua", value: "30days" },
+                { label: "Tùy chọn", value: "custom" },
+              ]}
+              value={selectedRange}
+              onChange={(val) => setSelectedRange(val as string)}
+              className="bg-[#F8F9FA] p-0.5 border border-[#E5E7EB] rounded-lg font-medium text-xs h-9 flex items-center"
             />
-          )}
 
-          <ReloadButton onClick={() => loadStats(selectedRange, customDates, selectedBranchId)} />
+            {selectedRange === "custom" && (
+              <RangePicker
+                format="DD/MM/YYYY"
+                value={customDates}
+                onChange={handleCustomRangeChange}
+                className="rounded-lg text-xs h-9"
+                placeholder={["Từ ngày", "Đến ngày"]}
+              />
+            )}
 
-          <Button
-            type="primary"
-            icon={<ShopOutlined />}
-            onClick={() => router.push('/pos')}
-            className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg text-xs shadow-xs h-9 flex items-center"
-          >
-            Mở quầy POS
-          </Button>
+            <ReloadButton
+              onClick={() =>
+                loadStats(selectedRange, customDates, selectedBranchId)
+              }
+            />
+
+            <Button
+              type="primary"
+              icon={<ShopOutlined />}
+              onClick={() => router.push("/pos")}
+              className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg text-xs shadow-xs h-9 flex items-center"
+            >
+              Mở quầy POS
+            </Button>
           </>
         }
       />
@@ -520,7 +565,7 @@ export default function DashboardPage() {
             <StatCard
               label={`Doanh thu (${stats.periodLabel})`}
               icon={<DollarOutlined className="text-base" />}
-              value={`${stats.todayRevenue.toLocaleString('vi-VN')} ₫`}
+              value={`${stats.todayRevenue.toLocaleString("vi-VN")} ₫`}
               footer={
                 <div className="mt-1 flex items-center text-xs">
                   {stats.revenueGrowth >= 0 ? (
@@ -532,7 +577,9 @@ export default function DashboardPage() {
                       <FallOutlined /> {stats.revenueGrowth}%
                     </span>
                   )}
-                  <span className="text-secondary ml-1.5">{stats.previousPeriodLabel}</span>
+                  <span className="text-secondary ml-1.5">
+                    {stats.previousPeriodLabel}
+                  </span>
                 </div>
               }
             />
@@ -541,7 +588,14 @@ export default function DashboardPage() {
               label="Tổng số đơn hàng"
               icon={<ShoppingOutlined className="text-base" />}
               iconClassName="bg-blue-50 text-blue-600"
-              value={<>{stats.todayOrdersCount}{' '}<span className="text-sm font-normal text-secondary">hóa đơn</span></>}
+              value={
+                <>
+                  {stats.todayOrdersCount}{" "}
+                  <span className="text-sm font-normal text-secondary">
+                    hóa đơn
+                  </span>
+                </>
+              }
               footer={
                 <div className="mt-1 flex items-center text-xs">
                   {stats.ordersGrowth >= 0 ? (
@@ -553,7 +607,9 @@ export default function DashboardPage() {
                       <FallOutlined /> {stats.ordersGrowth}%
                     </span>
                   )}
-                  <span className="text-secondary ml-1.5">{stats.previousPeriodLabel}</span>
+                  <span className="text-secondary ml-1.5">
+                    {stats.previousPeriodLabel}
+                  </span>
                 </div>
               }
             />
@@ -562,8 +618,12 @@ export default function DashboardPage() {
               label="Giá trị TB / Đơn (AOV)"
               icon={<RiseOutlined className="text-base" />}
               iconClassName="bg-purple-50 text-purple-600"
-              value={`${stats.averageOrderValue.toLocaleString('vi-VN')} ₫`}
-              footer={<div className="mt-1 text-xs text-secondary">Sức mua trung bình mỗi lượt khách mua hàng</div>}
+              value={`${stats.averageOrderValue.toLocaleString("vi-VN")} ₫`}
+              footer={
+                <div className="mt-1 text-xs text-secondary">
+                  Sức mua trung bình mỗi lượt khách mua hàng
+                </div>
+              }
             />
 
             <StatCard
@@ -571,9 +631,20 @@ export default function DashboardPage() {
               icon={<WarningOutlined className="text-base" />}
               iconClassName="bg-amber-50 text-amber-600"
               valueClassName="text-amber-600"
-              value={<>{stats.lowStockCount}{' '}<span className="text-sm font-normal text-secondary">mặt hàng (≤ 5)</span></>}
-              footer={<div className="mt-1 text-xs text-amber-700 font-medium hover:underline">Xem danh sách &amp; nhập hàng ngay →</div>}
-              onClick={() => setActiveTab('inventory-slow')}
+              value={
+                <>
+                  {stats.lowStockCount}{" "}
+                  <span className="text-sm font-normal text-secondary">
+                    mặt hàng (≤ 5)
+                  </span>
+                </>
+              }
+              footer={
+                <div className="mt-1 text-xs text-amber-700 font-medium hover:underline">
+                  Xem danh sách &amp; nhập hàng ngay →
+                </div>
+              }
+              onClick={() => setActiveTab("inventory-slow")}
               className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-amber-400 cursor-pointer transition-all bg-gradient-to-br from-white to-amber-50/30"
             />
           </div>
@@ -587,7 +658,7 @@ export default function DashboardPage() {
               className="dashboard-custom-tabs"
               items={[
                 {
-                  key: 'sales-trends',
+                  key: "sales-trends",
                   label: (
                     <span className="flex items-center gap-1.5 font-semibold text-xs px-2">
                       <BarChartOutlined /> Xu hướng Doanh thu &amp; Top Bán chạy
@@ -605,33 +676,71 @@ export default function DashboardPage() {
                             </span>
                           </div>
                           <Tag color="cyan" className="font-mono text-xs">
-                            {selectedRange === 'today' ? 'Theo khung giờ 2h' : 'Theo từng ngày'}
+                            {selectedRange === "today"
+                              ? "Theo khung giờ 2h"
+                              : "Theo từng ngày"}
                           </Tag>
                         </div>
                         <div className="h-72 w-full">
                           <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={stats.recentSalesChart} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                            <AreaChart
+                              data={stats.recentSalesChart}
+                              margin={{
+                                top: 10,
+                                right: 10,
+                                left: 0,
+                                bottom: 0,
+                              }}
+                            >
                               <defs>
-                                <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
-                                  <stop offset="5%" stopColor="#10B981" stopOpacity={0.4} />
-                                  <stop offset="95%" stopColor="#10B981" stopOpacity={0.0} />
+                                <linearGradient
+                                  id="colorRev"
+                                  x1="0"
+                                  y1="0"
+                                  x2="0"
+                                  y2="1"
+                                >
+                                  <stop
+                                    offset="5%"
+                                    stopColor="#10B981"
+                                    stopOpacity={0.4}
+                                  />
+                                  <stop
+                                    offset="95%"
+                                    stopColor="#10B981"
+                                    stopOpacity={0.0}
+                                  />
                                 </linearGradient>
                               </defs>
-                              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                              <XAxis dataKey="time" tick={{ fontSize: 11, fill: '#585F6C' }} axisLine={false} tickLine={false} />
-                              <YAxis
-                                tick={{ fontSize: 11, fill: '#585F6C' }}
+                              <CartesianGrid
+                                strokeDasharray="3 3"
+                                vertical={false}
+                                stroke="#E5E7EB"
+                              />
+                              <XAxis
+                                dataKey="time"
+                                tick={{ fontSize: 11, fill: "#585F6C" }}
                                 axisLine={false}
                                 tickLine={false}
-                                tickFormatter={(val) => `${(val / 1000000).toFixed(1)}M`}
+                              />
+                              <YAxis
+                                tick={{ fontSize: 11, fill: "#585F6C" }}
+                                axisLine={false}
+                                tickLine={false}
+                                tickFormatter={(val) =>
+                                  `${(val / 1000000).toFixed(1)}M`
+                                }
                               />
                               <RechartsTooltip
-                                formatter={(value: any) => [`${Number(value).toLocaleString('vi-VN')} ₫`, 'Doanh thu']}
+                                formatter={(value: any) => [
+                                  `${Number(value).toLocaleString("vi-VN")} ₫`,
+                                  "Doanh thu",
+                                ]}
                                 contentStyle={{
-                                  backgroundColor: '#fff',
-                                  borderRadius: '8px',
-                                  border: '1px solid #E5E7EB',
-                                  fontSize: '12px',
+                                  backgroundColor: "#fff",
+                                  borderRadius: "8px",
+                                  border: "1px solid #E5E7EB",
+                                  fontSize: "12px",
                                 }}
                               />
                               <Area
@@ -668,7 +777,7 @@ export default function DashboardPage() {
                   ),
                 },
                 {
-                  key: 'payments-categories',
+                  key: "payments-categories",
                   label: (
                     <span className="flex items-center gap-1.5 font-semibold text-xs px-2">
                       <PieChartOutlined /> Thanh toán &amp; Danh mục
@@ -685,7 +794,9 @@ export default function DashboardPage() {
                               Doanh Thu Theo Phương Thức Thanh Toán
                             </span>
                           </div>
-                          <span className="text-xs text-secondary font-mono">Tỷ trọng %</span>
+                          <span className="text-xs text-secondary font-mono">
+                            Tỷ trọng %
+                          </span>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
@@ -705,12 +816,18 @@ export default function DashboardPage() {
                                   {stats.paymentMethods.map((entry) => (
                                     <Cell
                                       key={entry.method}
-                                      fill={PAYMENT_COLORS[entry.method] || '#64748B'}
+                                      fill={
+                                        PAYMENT_COLORS[entry.method] ||
+                                        "#64748B"
+                                      }
                                     />
                                   ))}
                                 </Pie>
                                 <RechartsTooltip
-                                  formatter={(value: any) => [`${Number(value).toLocaleString('vi-VN')} ₫`, 'Doanh thu']}
+                                  formatter={(value: any) => [
+                                    `${Number(value).toLocaleString("vi-VN")} ₫`,
+                                    "Doanh thu",
+                                  ]}
                                 />
                               </PieChart>
                             </ResponsiveContainer>
@@ -718,27 +835,38 @@ export default function DashboardPage() {
 
                           <div className="space-y-3 text-xs">
                             {stats.paymentMethods.map((pm) => (
-                              <div key={pm.method} className="p-2.5 bg-white rounded-lg border border-[#E5E7EB]">
+                              <div
+                                key={pm.method}
+                                className="p-2.5 bg-white rounded-lg border border-[#E5E7EB]"
+                              >
                                 <div className="flex justify-between items-center mb-1">
                                   <span className="font-semibold flex items-center gap-1.5">
                                     <span
                                       className="w-2.5 h-2.5 rounded-full inline-block"
-                                      style={{ backgroundColor: PAYMENT_COLORS[pm.method] || '#64748B' }}
+                                      style={{
+                                        backgroundColor:
+                                          PAYMENT_COLORS[pm.method] ||
+                                          "#64748B",
+                                      }}
                                     />
                                     {pm.methodLabel}
                                   </span>
                                   <span className="font-bold text-[#006C49] font-mono">
-                                    {pm.revenue.toLocaleString('vi-VN')} ₫
+                                    {pm.revenue.toLocaleString("vi-VN")} ₫
                                   </span>
                                 </div>
                                 <div className="flex justify-between text-secondary text-[11px]">
                                   <span>{pm.count} giao dịch</span>
-                                  <span className="font-bold">{pm.percentage}%</span>
+                                  <span className="font-bold">
+                                    {pm.percentage}%
+                                  </span>
                                 </div>
                                 <Progress
                                   percent={pm.percentage}
                                   showInfo={false}
-                                  strokeColor={PAYMENT_COLORS[pm.method] || '#64748B'}
+                                  strokeColor={
+                                    PAYMENT_COLORS[pm.method] || "#64748B"
+                                  }
                                   size="small"
                                   className="mt-1"
                                 />
@@ -757,7 +885,9 @@ export default function DashboardPage() {
                               Doanh Thu Theo Danh Mục Sản Phẩm
                             </span>
                           </div>
-                          <span className="text-xs text-secondary font-mono">Phân bổ doanh số</span>
+                          <span className="text-xs text-secondary font-mono">
+                            Phân bổ doanh số
+                          </span>
                         </div>
 
                         <div className="h-56">
@@ -765,26 +895,51 @@ export default function DashboardPage() {
                             <BarChart
                               data={stats.categorySales}
                               layout="vertical"
-                              margin={{ top: 5, right: 20, left: 40, bottom: 5 }}
+                              margin={{
+                                top: 5,
+                                right: 20,
+                                left: 40,
+                                bottom: 5,
+                              }}
                             >
-                              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#E5E7EB" />
+                              <CartesianGrid
+                                strokeDasharray="3 3"
+                                horizontal={false}
+                                stroke="#E5E7EB"
+                              />
                               <XAxis
                                 type="number"
-                                tick={{ fontSize: 10, fill: '#585F6C' }}
-                                tickFormatter={(val) => `${(val / 1000000).toFixed(1)}M`}
+                                tick={{ fontSize: 10, fill: "#585F6C" }}
+                                tickFormatter={(val) =>
+                                  `${(val / 1000000).toFixed(1)}M`
+                                }
                               />
                               <YAxis
                                 type="category"
                                 dataKey="category"
-                                tick={{ fontSize: 10, fill: '#111827' }}
+                                tick={{ fontSize: 10, fill: "#111827" }}
                                 width={120}
                               />
                               <RechartsTooltip
-                                formatter={(value: any) => [`${Number(value).toLocaleString('vi-VN')} ₫`, 'Doanh thu']}
+                                formatter={(value: any) => [
+                                  `${Number(value).toLocaleString("vi-VN")} ₫`,
+                                  "Doanh thu",
+                                ]}
                               />
-                              <Bar dataKey="revenue" fill="#10B981" radius={[0, 6, 6, 0]}>
+                              <Bar
+                                dataKey="revenue"
+                                fill="#10B981"
+                                radius={[0, 6, 6, 0]}
+                              >
                                 {stats.categorySales.map((_, index) => (
-                                  <Cell key={`cell-${index}`} fill={CATEGORY_COLORS[index % CATEGORY_COLORS.length]} />
+                                  <Cell
+                                    key={`cell-${index}`}
+                                    fill={
+                                      CATEGORY_COLORS[
+                                        index % CATEGORY_COLORS.length
+                                      ]
+                                    }
+                                  />
                                 ))}
                               </Bar>
                             </BarChart>
@@ -793,12 +948,23 @@ export default function DashboardPage() {
 
                         <div className="grid grid-cols-2 gap-2 pt-2">
                           {stats.categorySales.map((cat, idx) => (
-                            <div key={cat.category} className="p-2 bg-white rounded-lg border border-[#E5E7EB] text-xs">
+                            <div
+                              key={cat.category}
+                              className="p-2 bg-white rounded-lg border border-[#E5E7EB] text-xs"
+                            >
                               <div className="flex items-center justify-between">
-                                <span className="font-semibold text-[11px] truncate" title={cat.category}>
+                                <span
+                                  className="font-semibold text-[11px] truncate"
+                                  title={cat.category}
+                                >
                                   <span
                                     className="w-2 h-2 rounded-full inline-block mr-1"
-                                    style={{ backgroundColor: CATEGORY_COLORS[idx % CATEGORY_COLORS.length]} }
+                                    style={{
+                                      backgroundColor:
+                                        CATEGORY_COLORS[
+                                          idx % CATEGORY_COLORS.length
+                                        ],
+                                    }}
                                   />
                                   {cat.category}
                                 </span>
@@ -808,7 +974,9 @@ export default function DashboardPage() {
                               </div>
                               <div className="flex justify-between text-secondary text-[10px] mt-0.5">
                                 <span>{cat.soldCount} cái đã bán</span>
-                                <span>{cat.revenue.toLocaleString('vi-VN')} ₫</span>
+                                <span>
+                                  {cat.revenue.toLocaleString("vi-VN")} ₫
+                                </span>
                               </div>
                             </div>
                           ))}
@@ -818,7 +986,7 @@ export default function DashboardPage() {
                   ),
                 },
                 {
-                  key: 'staff-performance',
+                  key: "staff-performance",
                   label: (
                     <span className="flex items-center gap-1.5 font-semibold text-xs px-2">
                       <TeamOutlined /> Hiệu suất Nhân viên
@@ -832,7 +1000,9 @@ export default function DashboardPage() {
                             Bảng Xếp Hạng Hiệu Suất Bán Hàng Nhân viên
                           </span>
                           <span className="text-xs text-secondary">
-                            Đánh giá số lượng hóa đơn xử lý, doanh số mang về và giá trị trung bình mỗi đơn trong khoảng thời gian {stats.periodLabel}
+                            Đánh giá số lượng hóa đơn xử lý, doanh số mang về và
+                            giá trị trung bình mỗi đơn trong khoảng thời gian{" "}
+                            {stats.periodLabel}
                           </span>
                         </div>
                         <Tag color="purple" className="font-semibold text-xs">
@@ -851,7 +1021,7 @@ export default function DashboardPage() {
                   ),
                 },
                 {
-                  key: 'inventory-slow',
+                  key: "inventory-slow",
                   label: (
                     <span className="flex items-center gap-1.5 font-semibold text-xs px-2">
                       <WarningOutlined /> Cảnh báo Tồn kho &amp; Hàng chậm bán
@@ -869,7 +1039,8 @@ export default function DashboardPage() {
                             </span>
                           </div>
                           <Tag color="orange" className="font-semibold text-xs">
-                            {stats.lowStockDetails.length} sản phẩm cần nhập thêm
+                            {stats.lowStockDetails.length} sản phẩm cần nhập
+                            thêm
                           </Tag>
                         </div>
 
@@ -898,7 +1069,8 @@ export default function DashboardPage() {
                             </span>
                           </div>
                           <span className="text-xs text-secondary">
-                            Căn cứ đánh giá để tiệm áp dụng combo khuyến mãi hoặc điều chỉnh kế hoạch làm bánh
+                            Căn cứ đánh giá để tiệm áp dụng combo khuyến mãi
+                            hoặc điều chỉnh kế hoạch làm bánh
                           </span>
                         </div>
 

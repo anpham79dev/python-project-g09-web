@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Table,
   Tag,
@@ -14,8 +14,8 @@ import {
   InputNumber,
   Space,
   Tooltip,
-} from 'antd';
-import type { ColumnsType } from 'antd/es/table';
+} from "antd";
+import type { ColumnsType } from "antd/es/table";
 import {
   ShopOutlined,
   AppstoreOutlined,
@@ -25,31 +25,35 @@ import {
   PhoneOutlined,
   UserOutlined,
   InboxOutlined,
-} from '@ant-design/icons';
+} from "@ant-design/icons";
 import {
   getBranches,
   createBranch,
   updateBranch,
   getWarehouseStocks,
   updateWarehouseStock,
-} from '@/lib/api';
-import { Branch, StockItem } from '@/lib/mock-data';
-import { usePageGuard } from '@/app/hooks/use-page-guard';
-import { useBranchChange } from '@/app/hooks/use-branch-change';
-import PageHeader from '@/app/components/page-header';
-import ReloadButton from '@/app/components/reload-button';
-import StatCard from '@/app/components/stat-card';
+} from "@/lib/api";
+import { Branch, StockItem } from "@/lib/mock-data";
+import { usePageGuard } from "@/app/hooks/use-page-guard";
+import { useBranchChange } from "@/app/hooks/use-branch-change";
+import PageHeader from "@/app/components/page-header";
+import ReloadButton from "@/app/components/reload-button";
+import StatCard from "@/app/components/stat-card";
 
 export default function BranchesPage() {
   const { message } = App.useApp();
   const [branches, setBranches] = useState<Branch[]>([]);
   const [stocks, setStocks] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('branches');
+  const [activeTab, setActiveTab] = useState("branches");
 
   // Filter for Stocks tab
-  const [selectedBranchId, setSelectedBranchId] = useState<string | undefined>(undefined);
-  const [selectedWarehouseId, setSelectedWarehouseId] = useState<string | undefined>(undefined);
+  const [selectedBranchId, setSelectedBranchId] = useState<string | undefined>(
+    undefined,
+  );
+  const [selectedWarehouseId, setSelectedWarehouseId] = useState<
+    string | undefined
+  >(undefined);
 
   // Branch Modal State
   const [isBranchModalOpen, setIsBranchModalOpen] = useState(false);
@@ -79,7 +83,7 @@ export default function BranchesPage() {
       setBranches(branchList);
       setStocks(stockList);
     } catch {
-      message.error('Lỗi khi tải dữ liệu chi nhánh và tồn kho');
+      message.error("Lỗi khi tải dữ liệu chi nhánh và tồn kho");
     } finally {
       setLoading(false);
     }
@@ -90,14 +94,14 @@ export default function BranchesPage() {
   }, [selectedBranchId, selectedWarehouseId]);
 
   useBranchChange((branchId) => {
-    setSelectedBranchId(branchId && branchId !== 'ALL' ? branchId : undefined);
+    setSelectedBranchId(branchId && branchId !== "ALL" ? branchId : undefined);
   });
 
   // Branch Modal Handlers
   const handleOpenCreateBranch = () => {
     setEditingBranch(null);
     branchForm.resetFields();
-    branchForm.setFieldsValue({ status: 'ACTIVE' });
+    branchForm.setFieldsValue({ status: "ACTIVE" });
     setIsBranchModalOpen(true);
   };
 
@@ -122,7 +126,7 @@ export default function BranchesPage() {
       loadData();
     } catch (err: any) {
       if (err?.errorFields) return;
-      message.error(err.message || 'Lỗi khi lưu chi nhánh');
+      message.error(err.message || "Lỗi khi lưu chi nhánh");
     } finally {
       setSubmittingBranch(false);
     }
@@ -146,11 +150,13 @@ export default function BranchesPage() {
         quantity: stockQty,
         minAlertStock: stockMinAlert,
       });
-      message.success(`Đã cập nhật tồn kho món "${editingStock.productName}" thành ${stockQty}!`);
+      message.success(
+        `Đã cập nhật tồn kho món "${editingStock.productName}" thành ${stockQty}!`,
+      );
       setIsStockModalOpen(false);
       loadData();
     } catch (err: any) {
-      message.error(err.message || 'Lỗi khi cập nhật tồn kho');
+      message.error(err.message || "Lỗi khi cập nhật tồn kho");
     } finally {
       setSubmittingStock(false);
     }
@@ -162,12 +168,14 @@ export default function BranchesPage() {
 
   const branchColumns: ColumnsType<Branch> = [
     {
-      title: 'Mã & Tên Chi Nhánh',
-      key: 'nameInfo',
+      title: "Mã & Tên Chi Nhánh",
+      key: "nameInfo",
       render: (_, record) => (
         <div>
           <div className="flex items-center gap-2">
-            <span className="font-bold text-sm text-[#111827]">{record.name}</span>
+            <span className="font-bold text-sm text-[#111827]">
+              {record.name}
+            </span>
             <Tag color="emerald" className="font-mono text-xs font-bold">
               {record.code}
             </Tag>
@@ -179,9 +187,9 @@ export default function BranchesPage() {
       ),
     },
     {
-      title: 'Hotline / SĐT',
-      dataIndex: 'phone',
-      key: 'phone',
+      title: "Hotline / SĐT",
+      dataIndex: "phone",
+      key: "phone",
       render: (val: string) => (
         <span className="text-xs font-mono text-[#111827] flex items-center gap-1">
           <PhoneOutlined className="text-secondary" /> {val}
@@ -189,18 +197,18 @@ export default function BranchesPage() {
       ),
     },
     {
-      title: 'Quản Lý Phụ Trách',
-      dataIndex: 'managerName',
-      key: 'managerName',
+      title: "Quản Lý Phụ Trách",
+      dataIndex: "managerName",
+      key: "managerName",
       render: (val: string) => (
         <span className="text-xs font-medium text-[#111827] flex items-center gap-1">
-          <UserOutlined className="text-secondary" /> {val || 'Chưa gán'}
+          <UserOutlined className="text-secondary" /> {val || "Chưa gán"}
         </span>
       ),
     },
     {
-      title: 'Các Kho Hàng',
-      key: 'warehouses',
+      title: "Các Kho Hàng",
+      key: "warehouses",
       render: (_, record) => (
         <div className="flex flex-wrap gap-1">
           {record.warehouses && record.warehouses.length > 0 ? (
@@ -216,20 +224,23 @@ export default function BranchesPage() {
       ),
     },
     {
-      title: 'Trạng Thái',
-      dataIndex: 'status',
-      key: 'status',
-      align: 'center',
+      title: "Trạng Thái",
+      dataIndex: "status",
+      key: "status",
+      align: "center",
       render: (st: string) => (
-        <Tag color={st === 'ACTIVE' ? 'success' : 'default'} className="font-semibold text-xs">
-          {st === 'ACTIVE' ? 'Hoạt động' : 'Tạm dừng'}
+        <Tag
+          color={st === "ACTIVE" ? "success" : "default"}
+          className="font-semibold text-xs"
+        >
+          {st === "ACTIVE" ? "Hoạt động" : "Tạm dừng"}
         </Tag>
       ),
     },
     {
-      title: 'Thao Tác',
-      key: 'action',
-      align: 'center',
+      title: "Thao Tác",
+      key: "action",
+      align: "center",
       render: (_, record) => (
         <Tooltip title="Chỉnh sửa chi nhánh">
           <Button
@@ -247,8 +258,8 @@ export default function BranchesPage() {
 
   const stockColumns: ColumnsType<StockItem> = [
     {
-      title: 'Sản Phẩm',
-      key: 'product',
+      title: "Sản Phẩm",
+      key: "product",
       render: (_, record) => (
         <div className="flex items-center gap-3">
           {record.productImage ? (
@@ -263,58 +274,82 @@ export default function BranchesPage() {
             </div>
           )}
           <div>
-            <span className="font-semibold text-xs text-[#111827] block">{record.productName}</span>
-            <span className="text-[11px] text-secondary">{record.productCategory}</span>
+            <span className="font-semibold text-xs text-[#111827] block">
+              {record.productName}
+            </span>
+            <span className="text-[11px] text-secondary">
+              {record.productCategory}
+            </span>
           </div>
         </div>
       ),
     },
     {
-      title: 'Kho Lưu Trữ',
-      key: 'warehouseInfo',
+      title: "Kho Lưu Trữ",
+      key: "warehouseInfo",
       render: (_, record) => (
         <div>
-          <span className="font-medium text-xs text-[#111827] block">{record.warehouseName}</span>
-          <span className="text-[11px] text-secondary">{record.branchName}</span>
+          <span className="font-medium text-xs text-[#111827] block">
+            {record.warehouseName}
+          </span>
+          <span className="text-[11px] text-secondary">
+            {record.branchName}
+          </span>
         </div>
       ),
     },
     {
-      title: 'Tồn Kho Thực Tế',
-      dataIndex: 'quantity',
-      key: 'quantity',
-      align: 'center',
+      title: "Tồn Kho Thực Tế",
+      dataIndex: "quantity",
+      key: "quantity",
+      align: "center",
       render: (qty: number) => (
-        <span className="font-mono font-bold text-sm text-[#111827]">{qty} cái</span>
+        <span className="font-mono font-bold text-sm text-[#111827]">
+          {qty} cái
+        </span>
       ),
     },
     {
-      title: 'Ngưỡng Cảnh Báo',
-      dataIndex: 'minAlertStock',
-      key: 'minAlertStock',
-      align: 'center',
+      title: "Ngưỡng Cảnh Báo",
+      dataIndex: "minAlertStock",
+      key: "minAlertStock",
+      align: "center",
       render: (min: number) => (
-        <span className="font-mono text-xs text-secondary">≤ {min || 5} cái</span>
+        <span className="font-mono text-xs text-secondary">
+          ≤ {min || 5} cái
+        </span>
       ),
     },
     {
-      title: 'Trạng Thái Tồn',
-      key: 'status',
-      align: 'center',
+      title: "Trạng Thái Tồn",
+      key: "status",
+      align: "center",
       render: (_, record) => {
-        if (record.status === 'out_of_stock') {
-          return <Tag color="error" className="font-semibold text-xs">Hết hàng (0)</Tag>;
+        if (record.status === "out_of_stock") {
+          return (
+            <Tag color="error" className="font-semibold text-xs">
+              Hết hàng (0)
+            </Tag>
+          );
         }
-        if (record.status === 'low_stock') {
-          return <Tag color="warning" className="font-semibold text-xs">Sắp hết ({record.quantity})</Tag>;
+        if (record.status === "low_stock") {
+          return (
+            <Tag color="warning" className="font-semibold text-xs">
+              Sắp hết ({record.quantity})
+            </Tag>
+          );
         }
-        return <Tag color="success" className="font-semibold text-xs">Còn hàng ({record.quantity})</Tag>;
+        return (
+          <Tag color="success" className="font-semibold text-xs">
+            Còn hàng ({record.quantity})
+          </Tag>
+        );
       },
     },
     {
-      title: 'Thao Tác',
-      key: 'action',
-      align: 'center',
+      title: "Thao Tác",
+      key: "action",
+      align: "center",
       render: (_, record) => (
         <Button
           size="small"
@@ -329,7 +364,10 @@ export default function BranchesPage() {
     },
   ];
 
-  const totalWarehousesCount = branches.reduce((sum, b) => sum + (b.warehouses?.length || 0), 0);
+  const totalWarehousesCount = branches.reduce(
+    (sum, b) => sum + (b.warehouses?.length || 0),
+    0,
+  );
 
   return (
     <div className="p-6 max-w-[1600px] mx-auto w-full space-y-6">
@@ -357,24 +395,55 @@ export default function BranchesPage() {
         <StatCard
           label="Tổng số chi nhánh"
           icon={<ShopOutlined className="text-base" />}
-          value={<>{branches.length} <span className="text-sm font-normal text-secondary">chi nhánh</span></>}
-          footer={<div className="mt-1 text-xs text-emerald-700 font-medium">Đang hoạt động trong chuỗi cửa hàng</div>}
+          value={
+            <>
+              {branches.length}{" "}
+              <span className="text-sm font-normal text-secondary">
+                chi nhánh
+              </span>
+            </>
+          }
+          footer={
+            <div className="mt-1 text-xs text-emerald-700 font-medium">
+              Đang hoạt động trong chuỗi cửa hàng
+            </div>
+          }
         />
 
         <StatCard
           label="Tổng số kho hàng"
           icon={<InboxOutlined className="text-base" />}
           iconClassName="bg-blue-50 text-blue-600"
-          value={<>{totalWarehousesCount} <span className="text-sm font-normal text-secondary">kho</span></>}
-          footer={<div className="mt-1 text-xs text-secondary">Bao gồm kho quầy bán lẻ &amp; kho lạnh</div>}
+          value={
+            <>
+              {totalWarehousesCount}{" "}
+              <span className="text-sm font-normal text-secondary">kho</span>
+            </>
+          }
+          footer={
+            <div className="mt-1 text-xs text-secondary">
+              Bao gồm kho quầy bán lẻ &amp; kho lạnh
+            </div>
+          }
         />
 
         <StatCard
           label="Mặt hàng quản lý kho"
           icon={<AppstoreOutlined className="text-base" />}
           iconClassName="bg-purple-50 text-purple-600"
-          value={<>{stocks.length} <span className="text-sm font-normal text-secondary">mục kho</span></>}
-          footer={<div className="mt-1 text-xs text-secondary">Được theo dõi số lượng tồn kho độc lập</div>}
+          value={
+            <>
+              {stocks.length}{" "}
+              <span className="text-sm font-normal text-secondary">
+                mục kho
+              </span>
+            </>
+          }
+          footer={
+            <div className="mt-1 text-xs text-secondary">
+              Được theo dõi số lượng tồn kho độc lập
+            </div>
+          }
         />
       </div>
 
@@ -385,7 +454,7 @@ export default function BranchesPage() {
           onChange={setActiveTab}
           items={[
             {
-              key: 'branches',
+              key: "branches",
               label: (
                 <span className="font-semibold text-xs flex items-center gap-1.5">
                   <ShopOutlined /> Danh Sách Chi Nhánh Chuỗi
@@ -403,7 +472,7 @@ export default function BranchesPage() {
               ),
             },
             {
-              key: 'stocks',
+              key: "stocks",
               label: (
                 <span className="font-semibold text-xs flex items-center gap-1.5">
                   <InboxOutlined /> Quản Lý Tồn Kho Theo Từng Kho
@@ -438,7 +507,9 @@ export default function BranchesPage() {
                       className="w-60 text-xs"
                     >
                       {branches
-                        .filter((b) => !selectedBranchId || b.id === selectedBranchId)
+                        .filter(
+                          (b) => !selectedBranchId || b.id === selectedBranchId,
+                        )
                         .flatMap((b) => b.warehouses || [])
                         .map((w) => (
                           <Select.Option key={w.id} value={w.id}>
@@ -453,7 +524,10 @@ export default function BranchesPage() {
                     dataSource={stocks}
                     rowKey="id"
                     loading={loading}
-                    pagination={{ pageSize: 8, showTotal: (t) => `Tổng cộng ${t} mục hàng tồn kho` }}
+                    pagination={{
+                      pageSize: 8,
+                      showTotal: (t) => `Tổng cộng ${t} mục hàng tồn kho`,
+                    }}
                     className="rounded-xl border border-[#E5E7EB] overflow-hidden"
                   />
                 </div>
@@ -468,54 +542,92 @@ export default function BranchesPage() {
         title={
           <div className="flex items-center gap-2 text-sm font-bold text-[#111827]">
             <ShopOutlined className="text-[#006C49]" />
-            <span>{editingBranch ? 'Chỉnh Sửa Chi Nhánh' : 'Thêm Chi Nhánh Mới'}</span>
+            <span>
+              {editingBranch ? "Chỉnh Sửa Chi Nhánh" : "Thêm Chi Nhánh Mới"}
+            </span>
           </div>
         }
         open={isBranchModalOpen}
         onCancel={() => setIsBranchModalOpen(false)}
         onOk={handleSaveBranch}
         confirmLoading={submittingBranch}
-        okText={editingBranch ? 'Cập nhật' : 'Tạo mới'}
+        okText={editingBranch ? "Cập nhật" : "Tạo mới"}
         cancelText="Hủy"
         width={520}
+        forceRender
       >
         <Form form={branchForm} layout="vertical" className="pt-3">
           <Form.Item
             name="code"
-            label={<span className="text-xs font-semibold text-[#111827]">MÃ CHI NHÁNH</span>}
-            rules={[{ required: true, message: 'Vui lòng nhập mã chi nhánh (ví dụ: CN-Q1, CN-BT)' }]}
+            label={
+              <span className="text-xs font-semibold text-[#111827]">
+                MÃ CHI NHÁNH
+              </span>
+            }
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng nhập mã chi nhánh (ví dụ: CN-Q1, CN-BT)",
+              },
+            ]}
           >
-            <Input placeholder="CN-Q1" disabled={!!editingBranch} className="font-mono text-xs uppercase" />
+            <Input
+              placeholder="CN-Q1"
+              disabled={!!editingBranch}
+              className="font-mono text-xs uppercase"
+            />
           </Form.Item>
 
           <Form.Item
             name="name"
-            label={<span className="text-xs font-semibold text-[#111827]">TÊN CHI NHÁNH</span>}
-            rules={[{ required: true, message: 'Vui lòng nhập tên chi nhánh' }]}
+            label={
+              <span className="text-xs font-semibold text-[#111827]">
+                TÊN CHI NHÁNH
+              </span>
+            }
+            rules={[{ required: true, message: "Vui lòng nhập tên chi nhánh" }]}
           >
-            <Input placeholder="Artisan Bakery - Chi Nhánh Quận 1" className="text-xs" />
+            <Input
+              placeholder="Artisan Bakery - Chi Nhánh Quận 1"
+              className="text-xs"
+            />
           </Form.Item>
 
           <Form.Item
             name="address"
-            label={<span className="text-xs font-semibold text-[#111827]">ĐỊA CHỈ HOẠT ĐỘNG</span>}
-            rules={[{ required: true, message: 'Vui lòng nhập địa chỉ' }]}
+            label={
+              <span className="text-xs font-semibold text-[#111827]">
+                ĐỊA CHỈ HOẠT ĐỘNG
+              </span>
+            }
+            rules={[{ required: true, message: "Vui lòng nhập địa chỉ" }]}
           >
-            <Input placeholder="123 Đường Đồng Khởi, Bến Nghé, Quận 1, TP.HCM" className="text-xs" />
+            <Input
+              placeholder="123 Đường Đồng Khởi, Bến Nghé, Quận 1, TP.HCM"
+              className="text-xs"
+            />
           </Form.Item>
 
           <div className="grid grid-cols-2 gap-3">
             <Form.Item
               name="phone"
-              label={<span className="text-xs font-semibold text-[#111827]">SỐ ĐIỆN THOẠI</span>}
-              rules={[{ required: true, message: 'Vui lòng nhập SĐT' }]}
+              label={
+                <span className="text-xs font-semibold text-[#111827]">
+                  SỐ ĐIỆN THOẠI
+                </span>
+              }
+              rules={[{ required: true, message: "Vui lòng nhập SĐT" }]}
             >
               <Input placeholder="0901 234 567" className="text-xs font-mono" />
             </Form.Item>
 
             <Form.Item
               name="managerName"
-              label={<span className="text-xs font-semibold text-[#111827]">QUẢN LÝ PHỤ TRÁCH</span>}
+              label={
+                <span className="text-xs font-semibold text-[#111827]">
+                  QUẢN LÝ PHỤ TRÁCH
+                </span>
+              }
             >
               <Input placeholder="Nguyễn Văn A" className="text-xs" />
             </Form.Item>
@@ -523,11 +635,17 @@ export default function BranchesPage() {
 
           <Form.Item
             name="status"
-            label={<span className="text-xs font-semibold text-[#111827]">TRẠNG THÁI</span>}
+            label={
+              <span className="text-xs font-semibold text-[#111827]">
+                TRẠNG THÁI
+              </span>
+            }
           >
             <Select className="text-xs">
               <Select.Option value="ACTIVE">Hoạt động (ACTIVE)</Select.Option>
-              <Select.Option value="INACTIVE">Tạm dừng (INACTIVE)</Select.Option>
+              <Select.Option value="INACTIVE">
+                Tạm dừng (INACTIVE)
+              </Select.Option>
             </Select>
           </Form.Item>
         </Form>
@@ -554,11 +672,15 @@ export default function BranchesPage() {
             <div className="p-3 bg-[#F8F9FA] rounded-xl border border-[#E5E7EB] space-y-1">
               <div className="flex justify-between">
                 <span className="text-secondary">Kho hàng:</span>
-                <span className="font-bold text-[#111827]">{editingStock.warehouseName}</span>
+                <span className="font-bold text-[#111827]">
+                  {editingStock.warehouseName}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-secondary">Chi nhánh:</span>
-                <span className="font-medium text-[#111827]">{editingStock.branchName}</span>
+                <span className="font-medium text-[#111827]">
+                  {editingStock.branchName}
+                </span>
               </div>
             </div>
 
@@ -575,7 +697,13 @@ export default function BranchesPage() {
                   onChange={(val) => setStockQty(val || 0)}
                   className="w-full font-mono text-base font-bold"
                 />
-                <Button disabled size="large" className="!bg-gray-100 !text-gray-600 font-medium !px-3">cái</Button>
+                <Button
+                  disabled
+                  size="large"
+                  className="!bg-gray-100 !text-gray-600 font-medium !px-3"
+                >
+                  cái
+                </Button>
               </Space.Compact>
             </div>
 
@@ -591,7 +719,12 @@ export default function BranchesPage() {
                   onChange={(val) => setStockMinAlert(val || 5)}
                   className="w-full text-xs font-mono"
                 />
-                <Button disabled className="!bg-gray-100 !text-gray-600 font-medium !px-2.5 text-xs">cái</Button>
+                <Button
+                  disabled
+                  className="!bg-gray-100 !text-gray-600 font-medium !px-2.5 text-xs"
+                >
+                  cái
+                </Button>
               </Space.Compact>
             </div>
           </div>

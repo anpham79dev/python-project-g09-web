@@ -1,29 +1,55 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Form, Input, Button, Card, Alert, Typography, Divider } from 'antd';
-import { UserOutlined, LockOutlined, ShoppingOutlined, ArrowRightOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
-import { login } from '@/lib/api';
-import { setAuthSession } from '@/lib/auth';
+import React, { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Form, Input, Button, Card, Alert, Typography, Divider } from "antd";
+import {
+  UserOutlined,
+  LockOutlined,
+  ShoppingOutlined,
+  ArrowRightOutlined,
+  SafetyCertificateOutlined,
+} from "@ant-design/icons";
+import { login } from "@/lib/api";
+import { setAuthSession } from "@/lib/auth";
 
 const { Title, Text } = Typography;
 
 export default function LoginPage() {
   const [form] = Form.useForm();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleFinish = async (values: { username: string; password?: string }) => {
+  const handleFinish = async (values: {
+    username: string;
+    password?: string;
+  }) => {
     setLoading(true);
     setErrorMessage(null);
     try {
       const response = await login(values);
       setAuthSession(response.user, response.token);
       const userPerms = response.user.permissions || [];
-      const canViewDashboard = response.user.role === 'SUPER_ADMIN' || userPerms.includes('dashboard:view');
-      window.location.href = canViewDashboard ? '/dashboard' : '/pos';
+      const canViewDashboard =
+        response.user.role === "SUPER_ADMIN" ||
+        userPerms.includes("dashboard:view");
+      const requestedRedirect = searchParams.get("redirect");
+      const isSafeRedirect =
+        !!requestedRedirect &&
+        requestedRedirect.startsWith("/") &&
+        !requestedRedirect.startsWith("//");
+      window.location.href = isSafeRedirect
+        ? requestedRedirect
+        : canViewDashboard
+          ? "/dashboard"
+          : "/pos";
     } catch (err: any) {
-      setErrorMessage(err.response?.data?.detail || err.response?.data?.message || 'Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin!');
+      setErrorMessage(
+        err.response?.data?.detail ||
+          err.response?.data?.message ||
+          "Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin!",
+      );
     } finally {
       setLoading(false);
     }
@@ -32,7 +58,7 @@ export default function LoginPage() {
   const fillQuickAccount = (username: string) => {
     form.setFieldsValue({
       username,
-      password: 'password123',
+      password: "password123",
     });
     setErrorMessage(null);
   };
@@ -56,7 +82,7 @@ export default function LoginPage() {
         {/* Login Card */}
         <Card
           className="shadow-md border border-[#E5E7EB] rounded-2xl"
-          styles={{ body: { padding: '32px 28px' } }}
+          styles={{ body: { padding: "32px 28px" } }}
         >
           <div className="mb-6">
             <Title level={4} className="!mb-1 text-[#111827]">
@@ -82,13 +108,19 @@ export default function LoginPage() {
             form={form}
             layout="vertical"
             onFinish={handleFinish}
-            initialValues={{ username: 'admin', password: 'password123' }}
+            initialValues={{ username: "admin", password: "password123" }}
             requiredMark={false}
           >
             <Form.Item
-              label={<span className="text-xs font-semibold uppercase text-secondary">Tên đăng nhập</span>}
+              label={
+                <span className="text-xs font-semibold uppercase text-secondary">
+                  Tên đăng nhập
+                </span>
+              }
               name="username"
-              rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập!' }]}
+              rules={[
+                { required: true, message: "Vui lòng nhập tên đăng nhập!" },
+              ]}
             >
               <Input
                 prefix={<UserOutlined className="text-gray-400 mr-1" />}
@@ -99,9 +131,13 @@ export default function LoginPage() {
             </Form.Item>
 
             <Form.Item
-              label={<span className="text-xs font-semibold uppercase text-secondary">Mật khẩu</span>}
+              label={
+                <span className="text-xs font-semibold uppercase text-secondary">
+                  Mật khẩu
+                </span>
+              }
               name="password"
-              rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
+              rules={[{ required: true, message: "Vui lòng nhập mật khẩu!" }]}
             >
               <Input.Password
                 prefix={<LockOutlined className="text-gray-400 mr-1" />}
@@ -133,21 +169,21 @@ export default function LoginPage() {
           <div className="grid grid-cols-3 gap-2">
             <Button
               size="small"
-              onClick={() => fillQuickAccount('superadmin')}
+              onClick={() => fillQuickAccount("superadmin")}
               className="rounded-lg border-purple-200 text-purple-800 bg-purple-50 hover:bg-purple-100 font-medium text-xs py-3 flex items-center justify-center gap-1"
             >
               <SafetyCertificateOutlined /> SuperAdmin
             </Button>
             <Button
               size="small"
-              onClick={() => fillQuickAccount('admin')}
+              onClick={() => fillQuickAccount("admin")}
               className="rounded-lg border-emerald-200 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-medium text-xs py-3 flex items-center justify-center gap-1"
             >
               <SafetyCertificateOutlined /> Admin (Quản lý)
             </Button>
             <Button
               size="small"
-              onClick={() => fillQuickAccount('staff')}
+              onClick={() => fillQuickAccount("staff")}
               className="rounded-lg border-blue-200 text-blue-800 bg-blue-50 hover:bg-blue-100 font-medium text-xs py-3 flex items-center justify-center gap-1"
             >
               <UserOutlined /> Staff (Thu ngân)
@@ -158,7 +194,10 @@ export default function LoginPage() {
         {/* Footer info */}
         <div className="text-center mt-6">
           <Text className="text-xs text-gray-500">
-            Phiên bản đồ án FE Next.js 15 • Mock Mode: {process.env.NEXT_PUBLIC_USE_MOCK !== 'false' ? 'BẬT (Local Mock)' : 'TẮT (FastAPI)'}
+            Phiên bản đồ án FE Next.js 15 • Mock Mode:{" "}
+            {process.env.NEXT_PUBLIC_USE_MOCK !== "false"
+              ? "BẬT (Local Mock)"
+              : "TẮT (FastAPI)"}
           </Text>
         </div>
       </div>
