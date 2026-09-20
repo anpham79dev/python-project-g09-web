@@ -2,12 +2,12 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Form, Input, Button, Card, Alert, Typography, Divider } from 'antd';
-import { UserOutlined, LockOutlined, ShoppingOutlined, ArrowRightOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Card, Alert, Typography } from 'antd';
+import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import { login } from '@/lib/api';
 import { setAuthSession } from '@/lib/auth';
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 export default function LoginPage() {
   const router = useRouter();
@@ -40,33 +40,30 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F8F9FA] via-[#E8F5E9] to-[#F1F8F5] p-4">
+    <div className="min-h-screen flex items-center justify-center bg-[#F8F9FA] p-4">
       <div className="w-full max-w-md">
         {/* Brand Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#10B981] text-white shadow-lg mb-3">
-            <ShoppingOutlined className="text-3xl" />
+        <div className="text-center mb-5">
+          <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white border border-[#E5E7EB] shadow-2xs mb-2">
+            <span className="text-[#006C49] font-bold text-lg font-serif">A</span>
           </div>
-          <Title level={2} className="!mb-1 text-[#006C49] !font-bold">
+          <Title level={3} className="!mb-0.5 text-[#006C49] !font-bold">
             Artisan Bakery
           </Title>
-          <Text className="text-secondary text-sm">
+          <p className="text-xs text-gray-500 m-0 mt-0.5">
             Hệ thống Quản lý Đơn hàng & Điểm Bán hàng (POS)
-          </Text>
+          </p>
         </div>
 
         {/* Login Card */}
         <Card
-          className="shadow-md border border-[#E5E7EB] rounded-2xl"
-          styles={{ body: { padding: '32px 28px' } }}
+          className="shadow-xs border border-[#E5E7EB] rounded-2xl"
+          styles={{ body: { padding: '28px 24px' } }}
         >
-          <div className="mb-6">
-            <Title level={4} className="!mb-1 text-[#111827]">
-              Đăng nhập tài khoản
+          <div className="mb-5">
+            <Title level={4} className="!mb-0 text-[#111827] !font-bold">
+              Đăng nhập
             </Title>
-            <Text className="text-secondary text-xs">
-              Nhập thông tin xác thực để bắt đầu phiên làm việc
-            </Text>
           </div>
 
           {errorMessage && (
@@ -75,7 +72,7 @@ export default function LoginPage() {
               type="error"
               showIcon
               closable
-              className="mb-5 rounded-lg text-xs"
+              className="mb-4 rounded-lg text-xs"
               onClose={() => setErrorMessage(null)}
             />
           )}
@@ -91,6 +88,7 @@ export default function LoginPage() {
               label={<span className="text-xs font-semibold uppercase text-secondary">Tên đăng nhập</span>}
               name="username"
               rules={[{ required: true, message: 'Vui lòng nhập tên đăng nhập!' }]}
+              className="mb-4"
             >
               <Input
                 prefix={<UserOutlined className="text-gray-400 mr-1" />}
@@ -104,6 +102,7 @@ export default function LoginPage() {
               label={<span className="text-xs font-semibold uppercase text-secondary">Mật khẩu</span>}
               name="password"
               rules={[{ required: true, message: 'Vui lòng nhập mật khẩu!' }]}
+              className="mb-5"
             >
               <Input.Password
                 prefix={<LockOutlined className="text-gray-400 mr-1" />}
@@ -113,56 +112,54 @@ export default function LoginPage() {
               />
             </Form.Item>
 
-            <Form.Item className="mt-6 mb-3">
+            <Form.Item className="mb-5">
               <Button
                 type="primary"
                 htmlType="submit"
                 size="large"
                 loading={loading}
                 block
-                icon={<ArrowRightOutlined />}
-                className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold h-11 rounded-lg"
+                className="bg-[#006C49] hover:bg-[#059669] text-white font-semibold h-10 rounded-lg text-sm"
               >
-                Đăng nhập hệ thống
+                Đăng nhập
               </Button>
             </Form.Item>
           </Form>
 
-          <Divider plain className="!my-4 !text-xs !text-gray-400">
-            Tài khoản mẫu thử nghiệm
-          </Divider>
+          {/* Quick Demo Accounts */}
+          <div className="pt-2 border-t border-[#F3F4F6]">
+            <div className="text-[11px] font-medium text-gray-400 mb-2">
+              Tài khoản demo
+            </div>
 
-          <div className="grid grid-cols-3 gap-2">
-            <Button
-              size="small"
-              onClick={() => fillQuickAccount('superadmin')}
-              className="rounded-lg border-purple-200 text-purple-800 bg-purple-50 hover:bg-purple-100 font-medium text-xs py-3 flex items-center justify-center gap-1"
-            >
-              <SafetyCertificateOutlined /> SuperAdmin
-            </Button>
-            <Button
-              size="small"
-              onClick={() => fillQuickAccount('admin')}
-              className="rounded-lg border-emerald-200 text-emerald-800 bg-emerald-50 hover:bg-emerald-100 font-medium text-xs py-3 flex items-center justify-center gap-1"
-            >
-              <SafetyCertificateOutlined /> Admin (Quản lý)
-            </Button>
-            <Button
-              size="small"
-              onClick={() => fillQuickAccount('staff')}
-              className="rounded-lg border-blue-200 text-blue-800 bg-blue-50 hover:bg-blue-100 font-medium text-xs py-3 flex items-center justify-center gap-1"
-            >
-              <UserOutlined /> Staff (Thu ngân)
-            </Button>
+            <div className="flex flex-col gap-1.5 w-full">
+              <button
+                type="button"
+                onClick={() => fillQuickAccount('superadmin')}
+                className="w-full flex items-center justify-between px-3 py-2 bg-white border border-[#E5E7EB] hover:bg-gray-50 hover:border-emerald-300 rounded-lg transition-colors text-left cursor-pointer group"
+              >
+                <span className="text-xs font-semibold text-[#111827] group-hover:text-[#006C49]">SuperAdmin</span>
+                <span className="text-[11px] font-mono text-gray-400">superadmin</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => fillQuickAccount('admin')}
+                className="w-full flex items-center justify-between px-3 py-2 bg-white border border-[#E5E7EB] hover:bg-gray-50 hover:border-emerald-300 rounded-lg transition-colors text-left cursor-pointer group"
+              >
+                <span className="text-xs font-semibold text-[#111827] group-hover:text-[#006C49]">Quản lý</span>
+                <span className="text-[11px] font-mono text-gray-400">admin</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => fillQuickAccount('staff')}
+                className="w-full flex items-center justify-between px-3 py-2 bg-white border border-[#E5E7EB] hover:bg-gray-50 hover:border-emerald-300 rounded-lg transition-colors text-left cursor-pointer group"
+              >
+                <span className="text-xs font-semibold text-[#111827] group-hover:text-[#006C49]">Thu ngân</span>
+                <span className="text-[11px] font-mono text-gray-400">staff</span>
+              </button>
+            </div>
           </div>
         </Card>
-
-        {/* Footer info */}
-        <div className="text-center mt-6">
-          <Text className="text-xs text-gray-500">
-            Phiên bản đồ án FE Next.js 15 • Mock Mode: {process.env.NEXT_PUBLIC_USE_MOCK !== 'false' ? 'BẬT (Local Mock)' : 'TẮT (FastAPI)'}
-          </Text>
-        </div>
       </div>
     </div>
   );
