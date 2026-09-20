@@ -21,16 +21,24 @@ export default function ProductImage({
 }: ProductImageProps) {
   const [hasError, setHasError] = useState(false);
 
-  if (hasError || !src) {
+  const isValidSrc =
+    Boolean(src) &&
+    typeof src === 'string' &&
+    src.trim() !== '' &&
+    src !== 'null' &&
+    src !== 'None' &&
+    src !== 'undefined';
+
+  if (hasError || !isValidSrc) {
     return (
       <div
-        className={`flex flex-col items-center justify-center bg-[#F3F4F6] text-gray-400 select-none overflow-hidden border border-[#E5E7EB] ${
+        className={`flex flex-col items-center justify-center bg-[#F3F4F6] text-gray-400 select-none overflow-hidden border border-[#E5E7EB] shrink-0 ${
           fallbackClassName || className
         }`}
         title={alt || 'Sản phẩm tiệm bánh'}
       >
         <svg
-          className="w-1/2 h-1/2 text-gray-300 shrink-0"
+          className="w-1/2 h-1/2 text-gray-400 shrink-0"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -49,10 +57,11 @@ export default function ProductImage({
 
   return (
     <img
-      src={src}
+      src={src!}
       alt=""
+      aria-hidden="true"
       onError={() => setHasError(true)}
-      className={className}
+      className={`${className} shrink-0`}
       loading="lazy"
     />
   );

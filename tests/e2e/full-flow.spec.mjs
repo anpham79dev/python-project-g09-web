@@ -269,7 +269,7 @@ async function runE2ETests() {
     // ---------------------------------------------------------
     console.log('\n[Flow 10/10] 📊 Kiểm thử Báo Cáo Doanh Thu Dashboard...');
     await page.goto('http://localhost:3000/dashboard');
-    await page.waitForSelector('text=Báo Cáo & Thống Kê');
+    await page.waitForSelector('[data-testid="dashboard-title"]');
     console.log('  ✅ Mở trang /dashboard thành công.');
 
     // Test Segmented Range Filters (7 ngày qua, 30 ngày qua)

@@ -41,7 +41,7 @@ async function runPBACPlaywrightTests() {
     // 1.2 Kiểm tra truy cập /dashboard
     await superPage.goto('http://localhost:3000/dashboard', { waitUntil: 'domcontentloaded' });
     await superPage.waitForTimeout(800);
-    const dashHeader = await superPage.locator('text=Báo Cáo & Thống Kê Hoạt Động').isVisible();
+    const dashHeader = await superPage.locator('[data-testid="dashboard-title"]').isVisible();
     console.log(`  👉 SuperAdmin truy cập /dashboard: ${dashHeader ? '✅ Thành công' : '❌ Thất bại'}`);
     if (!dashHeader) throw new Error('SuperAdmin không thể vào /dashboard!');
 

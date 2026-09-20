@@ -158,7 +158,7 @@ export default function DashboardPage() {
     {
       title: 'Hạng',
       key: 'rank',
-      width: 60,
+      width: 50,
       align: 'center',
       render: (_, __, index) => {
         const bg =
@@ -180,37 +180,41 @@ export default function DashboardPage() {
       title: 'Sản phẩm',
       key: 'product',
       render: (_, record) => (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 min-w-0">
           <ProductImage
             src={record.image}
             alt={record.name}
-            className="w-10 h-10 rounded-lg object-cover border border-[#E5E7EB]"
+            className="w-10 h-10 rounded-lg object-cover border border-[#E5E7EB] shrink-0"
           />
-          <div>
-            <span className="font-semibold text-xs text-[#111827] block">{record.name}</span>
-            <span className="text-[11px] text-emerald-700 font-medium">{record.category}</span>
+          <div className="min-w-0">
+            <span className="font-semibold text-xs text-[#111827] block line-clamp-2 leading-tight" title={record.name}>
+              {record.name}
+            </span>
+            <span className="text-[11px] text-gray-500 font-normal block mt-0.5">{record.category}</span>
           </div>
         </div>
       ),
     },
     {
-      title: 'Đã bán',
+      title: <span className="whitespace-nowrap">Đã bán</span>,
       dataIndex: 'soldCount',
       key: 'soldCount',
+      width: 90,
       align: 'center',
       render: (count: number) => (
-        <span className="font-bold text-xs text-[#111827] px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
+        <span className="font-medium text-xs text-[#111827] whitespace-nowrap">
           {count} cái
         </span>
       ),
     },
     {
-      title: 'Doanh thu thu về',
+      title: <span className="whitespace-nowrap">Doanh thu</span>,
       dataIndex: 'revenue',
       key: 'revenue',
+      width: 110,
       align: 'right',
       render: (val: number) => (
-        <span className="font-mono font-bold text-xs text-[#006C49]">
+        <span className="font-mono font-bold text-xs text-[#006C49] whitespace-nowrap">
           {val.toLocaleString('vi-VN')} ₫
         </span>
       ),
@@ -223,15 +227,17 @@ export default function DashboardPage() {
       title: 'Sản phẩm',
       key: 'product',
       render: (_, record) => (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 min-w-0">
           <ProductImage
             src={record.image}
             alt={record.name}
-            className="w-10 h-10 rounded-lg object-cover border border-[#E5E7EB]"
+            className="w-10 h-10 rounded-lg object-cover border border-[#E5E7EB] shrink-0"
           />
-          <div>
-            <span className="font-semibold text-xs text-[#111827] block">{record.name}</span>
-            <span className="text-[11px] text-gray-500 font-medium">{record.category}</span>
+          <div className="min-w-0">
+            <span className="font-semibold text-xs text-[#111827] block line-clamp-2 leading-tight" title={record.name}>
+              {record.name}
+            </span>
+            <span className="text-[11px] text-gray-500 font-normal block mt-0.5">{record.category}</span>
           </div>
         </div>
       ),
@@ -242,7 +248,7 @@ export default function DashboardPage() {
       key: 'soldCount',
       align: 'center',
       render: (count: number) => (
-        <span className={`text-xs font-bold px-2 py-0.5 rounded ${count === 0 ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-gray-100 text-gray-700'}`}>
+        <span className={`text-xs font-medium px-2 py-0.5 rounded whitespace-nowrap ${count === 0 ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-gray-100 text-gray-700'}`}>
           {count} cái
         </span>
       ),
@@ -253,7 +259,7 @@ export default function DashboardPage() {
       key: 'revenue',
       align: 'right',
       render: (val: number) => (
-        <span className="font-mono font-semibold text-xs text-gray-700">
+        <span className="font-mono font-semibold text-xs text-gray-700 whitespace-nowrap">
           {val.toLocaleString('vi-VN')} ₫
         </span>
       ),
@@ -264,7 +270,7 @@ export default function DashboardPage() {
       key: 'stock',
       align: 'center',
       render: (stock: number) => (
-        <span className={`text-xs font-mono font-semibold ${stock > 20 ? 'text-amber-600 font-bold' : 'text-gray-600'}`}>
+        <span className={`text-xs font-mono font-semibold whitespace-nowrap ${stock > 20 ? 'text-amber-600 font-bold' : 'text-gray-600'}`}>
           {stock} cái {stock > 20 ? '(Tồn đọng)' : ''}
         </span>
       ),
@@ -274,7 +280,7 @@ export default function DashboardPage() {
       key: 'action',
       align: 'center',
       render: (_, record) => (
-        <Tooltip title="Chỉnh sửa giá / Khuyến mãi">
+        <Tooltip title="Chỉnh sửa giá / khuyến mãi">
           <Button
             size="small"
             icon={<EditOutlined />}
@@ -302,7 +308,7 @@ export default function DashboardPage() {
       ),
     },
     {
-      title: 'Thu ngân / Nhân viên',
+      title: 'Thu ngân / nhân viên',
       key: 'staffName',
       render: (_, record) => (
         <div className="flex items-center gap-3">
@@ -323,32 +329,32 @@ export default function DashboardPage() {
       align: 'center',
       sorter: (a, b) => a.ordersCount - b.ordersCount,
       render: (cnt: number) => (
-        <span className="font-bold text-xs text-[#111827] px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+        <span className="font-medium text-xs text-[#111827] px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 whitespace-nowrap">
           {cnt} hóa đơn
         </span>
       ),
     },
     {
-      title: 'Tổng doanh thu tạo ra',
+      title: 'Tổng doanh thu',
       dataIndex: 'revenue',
       key: 'revenue',
       align: 'right',
       sorter: (a, b) => a.revenue - b.revenue,
       defaultSortOrder: 'descend',
       render: (val: number) => (
-        <span className="font-mono font-bold text-xs text-[#006C49]">
+        <span className="font-mono font-bold text-xs text-[#006C49] whitespace-nowrap">
           {val.toLocaleString('vi-VN')} ₫
         </span>
       ),
     },
     {
-      title: 'Giá trị TB / Đơn',
+      title: 'Giá trị trung bình / đơn',
       dataIndex: 'averageOrderValue',
       key: 'averageOrderValue',
       align: 'right',
       sorter: (a, b) => a.averageOrderValue - b.averageOrderValue,
       render: (val: number) => (
-        <span className="font-mono text-xs text-secondary font-medium">
+        <span className="font-mono text-xs text-secondary font-medium whitespace-nowrap">
           {val.toLocaleString('vi-VN')} ₫
         </span>
       ),
@@ -361,15 +367,17 @@ export default function DashboardPage() {
       title: 'Sản phẩm',
       key: 'product',
       render: (_, record) => (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5 min-w-0">
           <ProductImage
             src={record.image}
             alt={record.name}
-            className="w-10 h-10 rounded-lg object-cover border border-[#E5E7EB]"
+            className="w-10 h-10 rounded-lg object-cover border border-[#E5E7EB] shrink-0"
           />
-          <div>
-            <span className="font-semibold text-xs text-[#111827] block">{record.name}</span>
-            <span className="text-[11px] text-emerald-700 font-medium">{record.category}</span>
+          <div className="min-w-0">
+            <span className="font-semibold text-xs text-[#111827] block line-clamp-2 leading-tight" title={record.name}>
+              {record.name}
+            </span>
+            <span className="text-[11px] text-gray-500 font-normal block mt-0.5">{record.category}</span>
           </div>
         </div>
       ),
@@ -381,7 +389,7 @@ export default function DashboardPage() {
       align: 'center',
       sorter: (a, b) => a.stock - b.stock,
       render: (stock: number) => (
-        <span className={`font-bold font-mono text-sm ${stock === 0 ? 'text-red-600' : 'text-amber-600'}`}>
+        <span className={`font-bold font-mono text-sm whitespace-nowrap ${stock === 0 ? 'text-red-600' : 'text-amber-600'}`}>
           {stock} cái
         </span>
       ),
@@ -391,7 +399,7 @@ export default function DashboardPage() {
       dataIndex: 'threshold',
       key: 'threshold',
       align: 'center',
-      render: (th: number) => <span className="text-xs text-secondary font-mono">≤ {th} cái</span>,
+      render: (th: number) => <span className="text-xs text-secondary font-mono whitespace-nowrap">≤ {th} cái</span>,
     },
     {
       title: 'Trạng thái kho',
@@ -416,7 +424,7 @@ export default function DashboardPage() {
           onClick={() => router.push(`/products/${record.id}/edit`)}
           className="bg-[#10B981] hover:bg-[#059669] text-xs font-semibold"
         >
-          Nhập thêm / Sửa
+          Nhập thêm / sửa
         </Button>
       ),
     },
@@ -425,14 +433,11 @@ export default function DashboardPage() {
   return (
     <div className="p-6 max-w-[1600px] mx-auto w-full space-y-6">
       {/* Header & Date Range Toolbar */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-[#E5E7EB] shadow-xs">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div>
-          <Title level={3} className="!mb-0 text-[#111827] !font-bold">
-            Báo Cáo &amp; Thống Kê Hoạt Động Tiệm Bánh
+          <Title level={3} data-testid="dashboard-title" className="!mb-0 text-[#111827] !font-bold whitespace-nowrap">
+            Báo cáo hoạt động
           </Title>
-          <Text className="text-secondary text-xs mt-1 block">
-            Phân tích số liệu tức thời theo khoảng thời gian thực tế so với kỳ trước liền kề
-          </Text>
         </div>
 
         {/* Date Filter, Branch Filter & Actions Toolbar */}
@@ -448,56 +453,56 @@ export default function DashboardPage() {
               popupMatchSelectWidth={false}
               className="w-full sm:w-80 min-w-[290px] text-xs h-9"
               optionLabelProp="label"
-            options={[
-              {
-                value: 'ALL',
-                label: (
-                  <span className="flex items-center gap-2 font-semibold text-xs text-[#111827]">
-                    <AppstoreOutlined className="text-[#006C49]" />
-                    <span>Tất cả chi nhánh (Toàn chuỗi)</span>
-                  </span>
-                ),
-                children: (
-                  <div className="flex items-center justify-between py-1 gap-4">
-                    <span className="flex items-center gap-2 font-medium text-xs text-[#111827]">
+              options={[
+                {
+                  value: 'ALL',
+                  label: (
+                    <span className="flex items-center gap-2 font-semibold text-xs text-[#111827]">
                       <AppstoreOutlined className="text-[#006C49]" />
-                      <span>Tất cả chi nhánh (Toàn chuỗi)</span>
+                      <span>Tất cả chi nhánh (toàn chuỗi)</span>
                     </span>
-                    <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium shrink-0">
-                      Toàn hệ thống
-                    </span>
-                  </div>
-                ),
-              },
-              ...branches.map((b) => ({
-                value: b.id,
-                label: (
-                  <span className="flex items-center gap-2 font-semibold text-xs text-[#111827]">
-                    <ShopOutlined className="text-[#006C49]" />
-                    <span>{b.name}</span>
-                  </span>
-                ),
-                children: (
-                  <div className="flex items-center justify-between py-1 gap-4">
-                    <span className="flex items-center gap-2 font-medium text-xs text-[#111827]">
+                  ),
+                  children: (
+                    <div className="flex items-center justify-between py-1 gap-4">
+                      <span className="flex items-center gap-2 font-medium text-xs text-[#111827]">
+                        <AppstoreOutlined className="text-[#006C49]" />
+                        <span>Tất cả chi nhánh (toàn chuỗi)</span>
+                      </span>
+                      <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium shrink-0">
+                        Toàn hệ thống
+                      </span>
+                    </div>
+                  ),
+                },
+                ...branches.map((b) => ({
+                  value: b.id,
+                  label: (
+                    <span className="flex items-center gap-2 font-semibold text-xs text-[#111827]">
                       <ShopOutlined className="text-[#006C49]" />
                       <span>{b.name}</span>
                     </span>
-                    {b.isMain ? (
-                      <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold shrink-0">
-                        Trụ sở
+                  ),
+                  children: (
+                    <div className="flex items-center justify-between py-1 gap-4">
+                      <span className="flex items-center gap-2 font-medium text-xs text-[#111827]">
+                        <ShopOutlined className="text-[#006C49]" />
+                        <span>{b.name}</span>
                       </span>
-                    ) : (
-                      <span className="text-[10px] text-gray-500 font-mono bg-gray-100 px-1.5 py-0.5 rounded shrink-0">
-                        {b.code}
-                      </span>
-                    )}
-                  </div>
-                ),
-              })),
-            ]}
-            optionRender={(option) => (option.data as any)?.children || option.label}
-          />
+                      {b.isMain ? (
+                        <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold shrink-0">
+                          Trụ sở
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-gray-500 font-mono bg-gray-100 px-1.5 py-0.5 rounded shrink-0">
+                          {b.code}
+                        </span>
+                      )}
+                    </div>
+                  ),
+                })),
+              ]}
+              optionRender={(option) => (option.data as any)?.children || option.label}
+            />
           </div>
 
           <Segmented
@@ -529,15 +534,6 @@ export default function DashboardPage() {
           >
             Làm mới
           </Button>
-
-          <Button
-            type="primary"
-            icon={<ShopOutlined />}
-            onClick={() => router.push('/pos')}
-            className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg text-xs shadow-xs h-9 flex items-center"
-          >
-            Mở quầy POS
-          </Button>
         </div>
       </div>
 
@@ -550,14 +546,12 @@ export default function DashboardPage() {
           {/* Top 4 KPI Executive Stat Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* 1. Revenue Card */}
-            <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all">
+            <Card className="h-full border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-                  Doanh thu ({stats.periodLabel})
+                <span className="text-gray-500 text-xs font-normal">
+                  {selectedRange === 'today' ? 'Doanh thu hôm nay' : `Doanh thu (${stats.periodLabel})`}
                 </span>
-                <div className="w-8 h-8 rounded-lg bg-emerald-50 text-[#006C49] flex items-center justify-center">
-                  <DollarOutlined className="text-base" />
-                </div>
+                <DollarOutlined className="text-xl text-[#006C49]" />
               </div>
               <div className="mt-2.5">
                 <div className="text-2xl font-bold font-mono text-[#111827]">
@@ -579,14 +573,12 @@ export default function DashboardPage() {
             </Card>
 
             {/* 2. Orders Count Card */}
-            <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all">
+            <Card className="h-full border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <span className="text-secondary text-xs font-bold uppercase tracking-wider">
+                <span className="text-gray-500 text-xs font-normal">
                   Tổng số đơn hàng
                 </span>
-                <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                  <ShoppingOutlined className="text-base" />
-                </div>
+                <ShoppingOutlined className="text-xl text-[#006C49]" />
               </div>
               <div className="mt-2.5">
                 <div className="text-2xl font-bold font-mono text-[#111827]">
@@ -609,21 +601,21 @@ export default function DashboardPage() {
             </Card>
 
             {/* 3. Average Order Value (AOV) Card */}
-            <Card className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all">
+            <Card className="h-full border border-[#E5E7EB] shadow-xs rounded-xl hover:border-emerald-300 transition-all flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <span className="text-secondary text-xs font-bold uppercase tracking-wider">
-                  Giá trị TB / Đơn (AOV)
-                </span>
-                <div className="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
-                  <RiseOutlined className="text-base" />
-                </div>
+                <Tooltip title="Sức mua trung bình mỗi lượt khách mua hàng">
+                  <span className="text-gray-500 text-xs font-normal cursor-help">
+                    Giá trị trung bình mỗi đơn (AOV)
+                  </span>
+                </Tooltip>
+                <RiseOutlined className="text-xl text-[#006C49]" />
               </div>
               <div className="mt-2.5">
                 <div className="text-2xl font-bold font-mono text-[#111827]">
                   {stats.averageOrderValue.toLocaleString('vi-VN')} ₫
                 </div>
-                <div className="mt-1 text-xs text-secondary">
-                  Sức mua trung bình mỗi lượt khách mua hàng
+                <div className="mt-1 text-xs select-none invisible">
+                  &nbsp;
                 </div>
               </div>
             </Card>
@@ -631,15 +623,13 @@ export default function DashboardPage() {
             {/* 4. Low Stock Inventory Card */}
             <Card
               onClick={() => setActiveTab('inventory-slow')}
-              className="border border-[#E5E7EB] shadow-xs rounded-xl hover:border-amber-400 cursor-pointer transition-all bg-gradient-to-br from-white to-amber-50/30"
+              className="h-full border border-[#E5E7EB] shadow-xs rounded-xl hover:border-amber-400 cursor-pointer transition-all bg-gradient-to-br from-white to-amber-50/30 flex flex-col justify-between"
             >
               <div className="flex items-center justify-between">
-                <span className="text-secondary text-xs font-bold uppercase tracking-wider">
+                <span className="text-gray-500 text-xs font-normal">
                   Cảnh báo tồn kho
                 </span>
-                <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
-                  <WarningOutlined className="text-base" />
-                </div>
+                <WarningOutlined className="text-xl text-amber-500" />
               </div>
               <div className="mt-2.5">
                 <div className="text-2xl font-bold font-mono text-amber-600">
@@ -664,8 +654,8 @@ export default function DashboardPage() {
                 {
                   key: 'sales-trends',
                   label: (
-                    <span className="flex items-center gap-1.5 font-semibold text-xs px-2">
-                      <BarChartOutlined /> Xu hướng Doanh thu &amp; Top Bán chạy
+                    <span className="flex items-center gap-1.5 font-semibold text-xs px-2 whitespace-nowrap">
+                      <BarChartOutlined /> Xu hướng doanh thu &amp; top bán chạy
                     </span>
                   ),
                   children: (
@@ -676,7 +666,7 @@ export default function DashboardPage() {
                           <div className="flex items-center gap-2">
                             <CalendarOutlined className="text-[#006C49]" />
                             <span className="font-bold text-sm text-[#111827]">
-                              Biểu Đồ Doanh Thu ({stats.periodLabel})
+                              Biểu đồ doanh thu ({stats.periodLabel})
                             </span>
                           </div>
                           <Tag color="cyan" className="font-mono text-xs">
@@ -693,7 +683,17 @@ export default function DashboardPage() {
                                 </linearGradient>
                               </defs>
                               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E5E7EB" />
-                              <XAxis dataKey="time" tick={{ fontSize: 11, fill: '#585F6C' }} axisLine={false} tickLine={false} />
+                              <XAxis
+                                dataKey="time"
+                                tickFormatter={(val: string) => {
+                                  if (!val) return '';
+                                  const m = val.match(/^(\d{2}):00\s*-\s*(\d{2}):00$/);
+                                  return m ? `${m[1]}-${m[2]}` : val;
+                                }}
+                                tick={{ fontSize: 11, fill: '#585F6C' }}
+                                axisLine={false}
+                                tickLine={false}
+                              />
                               <YAxis
                                 tick={{ fontSize: 11, fill: '#585F6C' }}
                                 axisLine={false}
@@ -723,21 +723,23 @@ export default function DashboardPage() {
                       </div>
 
                       {/* Right: Top 5 Best Selling Products */}
-                      <div className="lg:col-span-5 bg-[#F8F9FA] p-4 rounded-xl border border-[#E5E7EB]">
-                        <div className="flex items-center gap-2 mb-4">
+                      <div className="lg:col-span-5 bg-[#F8F9FA] p-4 rounded-xl border border-[#E5E7EB] flex flex-col justify-between">
+                        <div className="flex items-center gap-2 mb-4 shrink-0">
                           <FireOutlined className="text-amber-500" />
                           <span className="font-bold text-sm text-[#111827]">
-                            Top 5 Bánh Bán Chạy Nhất
+                            Top 5 bánh bán chạy
                           </span>
                         </div>
-                        <Table
-                          columns={topProductColumns}
-                          dataSource={stats.topSellingProducts}
-                          rowKey="id"
-                          pagination={false}
-                          size="small"
-                          className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden"
-                        />
+                        <div className="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden">
+                          <Table
+                            columns={topProductColumns}
+                            dataSource={stats.topSellingProducts}
+                            rowKey="id"
+                            pagination={false}
+                            size="small"
+                            scroll={{ y: 280 }}
+                          />
+                        </div>
                       </div>
                     </div>
                   ),
@@ -745,8 +747,8 @@ export default function DashboardPage() {
                 {
                   key: 'payments-categories',
                   label: (
-                    <span className="flex items-center gap-1.5 font-semibold text-xs px-2">
-                      <PieChartOutlined /> Thanh toán &amp; Danh mục
+                    <span className="flex items-center gap-1.5 font-semibold text-xs px-2 whitespace-nowrap">
+                      <PieChartOutlined /> Thanh toán &amp; danh mục
                     </span>
                   ),
                   children: (
@@ -757,7 +759,7 @@ export default function DashboardPage() {
                           <div className="flex items-center gap-2">
                             <CreditCardOutlined className="text-[#006C49]" />
                             <span className="font-bold text-sm text-[#111827]">
-                              Doanh Thu Theo Phương Thức Thanh Toán
+                              Doanh thu theo phương thức thanh toán
                             </span>
                           </div>
                           <span className="text-xs text-secondary font-mono">Tỷ trọng %</span>
@@ -829,7 +831,7 @@ export default function DashboardPage() {
                           <div className="flex items-center gap-2">
                             <ShopOutlined className="text-[#006C49]" />
                             <span className="font-bold text-sm text-[#111827]">
-                              Doanh Thu Theo Danh Mục Sản Phẩm
+                              Doanh thu theo danh mục sản phẩm
                             </span>
                           </div>
                           <span className="text-xs text-secondary font-mono">Phân bổ doanh số</span>
@@ -895,8 +897,8 @@ export default function DashboardPage() {
                 {
                   key: 'staff-performance',
                   label: (
-                    <span className="flex items-center gap-1.5 font-semibold text-xs px-2">
-                      <TeamOutlined /> Hiệu suất Nhân viên
+                    <span className="flex items-center gap-1.5 font-semibold text-xs px-2 whitespace-nowrap">
+                      <TeamOutlined /> Hiệu suất nhân viên
                     </span>
                   ),
                   children: (
@@ -904,7 +906,7 @@ export default function DashboardPage() {
                       <div className="flex items-center justify-between">
                         <div>
                           <span className="font-bold text-sm text-[#111827] block">
-                            Bảng Xếp Hạng Hiệu Suất Bán Hàng Nhân viên
+                            Bảng xếp hạng hiệu suất bán hàng nhân viên
                           </span>
                           <span className="text-xs text-secondary">
                             Đánh giá số lượng hóa đơn xử lý, doanh số mang về và giá trị trung bình mỗi đơn trong khoảng thời gian {stats.periodLabel}
@@ -928,8 +930,8 @@ export default function DashboardPage() {
                 {
                   key: 'inventory-slow',
                   label: (
-                    <span className="flex items-center gap-1.5 font-semibold text-xs px-2">
-                      <WarningOutlined /> Cảnh báo Tồn kho &amp; Hàng chậm bán
+                    <span className="flex items-center gap-1.5 font-semibold text-xs px-2 whitespace-nowrap">
+                      <WarningOutlined /> Cảnh báo tồn kho &amp; hàng chậm bán
                     </span>
                   ),
                   children: (
@@ -940,7 +942,7 @@ export default function DashboardPage() {
                           <div className="flex items-center gap-2">
                             <WarningOutlined className="text-amber-500" />
                             <span className="font-bold text-sm text-[#111827]">
-                              Danh Sách Sản Phẩm Cảnh Báo Tồn Kho (≤ 5 sản phẩm)
+                              Danh sách sản phẩm cảnh báo tồn kho (≤ 5 sản phẩm)
                             </span>
                           </div>
                           <Tag color="orange" className="font-semibold text-xs">
@@ -969,7 +971,7 @@ export default function DashboardPage() {
                           <div className="flex items-center gap-2">
                             <InboxOutlined className="text-red-500" />
                             <span className="font-bold text-sm text-[#111827]">
-                              Sản Phẩm Bán Chậm &amp; Tồn Đọng Trong Kỳ
+                              Sản phẩm bán chậm &amp; tồn đọng trong kỳ
                             </span>
                           </div>
                           <span className="text-xs text-secondary">

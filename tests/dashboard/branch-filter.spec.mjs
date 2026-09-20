@@ -23,7 +23,7 @@ async function runDashboardBranchFilterTest() {
   await page.click('button:has-text("Quản lý")');
   await page.locator('button[type="submit"]').click();
   await page.waitForURL('**/dashboard', { timeout: 10000 });
-  await page.waitForSelector('text=Báo Cáo & Thống Kê Hoạt Động Tiệm Bánh');
+  await page.waitForSelector('[data-testid="dashboard-title"]');
   console.log('  ✅ Đăng nhập Admin thành công, đã vào /dashboard.');
 
   // 2. Định vị Dropdown chọn chi nhánh trên Dashboard Toolbar
