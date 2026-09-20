@@ -641,7 +641,9 @@ export default function DashboardPage() {
               <div className="mt-2.5">
                 <div className="text-2xl font-bold font-mono text-amber-600">
                   {stats.lowStockCount}{' '}
-                  <span className="text-sm font-normal text-secondary">mặt hàng (≤ 5)</span>
+                  <span className="text-sm font-normal text-secondary">
+                    mặt hàng (≤ {stats.lowStockThreshold ?? 5})
+                  </span>
                 </div>
                 <div className="mt-1 text-xs text-amber-700 font-medium hover:underline">
                   Xem danh sách &amp; nhập hàng ngay →
@@ -949,7 +951,7 @@ export default function DashboardPage() {
                           <div className="flex items-center gap-2">
                             <WarningOutlined className="text-amber-500" />
                             <span className="font-bold text-sm text-[#111827]">
-                              Danh sách sản phẩm cảnh báo tồn kho (≤ 5 sản phẩm)
+                              Danh sách sản phẩm cảnh báo tồn kho (≤ {stats.lowStockThreshold ?? 5} sản phẩm)
                             </span>
                           </div>
                           <Tag color="orange" className="font-semibold text-xs">
@@ -959,7 +961,7 @@ export default function DashboardPage() {
 
                         {stats.lowStockDetails.length === 0 ? (
                           <div className="bg-white p-6 rounded-xl border border-[#E5E7EB] text-center">
-                            <Empty description="Tất cả sản phẩm đều đang đủ tồn kho an toàn (> 5 cái)" />
+                            <Empty description={`Tất cả sản phẩm đều đang đủ tồn kho an toàn (> ${stats.lowStockThreshold ?? 5} cái)`} />
                           </div>
                         ) : (
                           <Table

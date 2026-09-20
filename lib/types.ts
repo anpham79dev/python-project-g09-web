@@ -304,6 +304,7 @@ export interface DashboardStats {
   categorySales: CategoryStat[];
   staffPerformances: StaffPerformanceStat[];
   lowStockDetails: LowStockDetailItem[];
+  lowStockThreshold?: number;
 }
 
 export const CATEGORIES = [

@@ -40,6 +40,7 @@ import {
   updateBranch,
   getWarehouseStocks,
   updateWarehouseStock,
+  getSystemSettings,
 } from '@/lib/api';
 import { Branch, Warehouse, StockItem } from '@/lib/types';
 import { getCurrentUser } from '@/lib/auth';
@@ -70,6 +71,7 @@ export default function BranchesPage() {
   const [editingStock, setEditingStock] = useState<StockItem | null>(null);
   const [stockQty, setStockQty] = useState<number>(0);
   const [stockMinAlert, setStockMinAlert] = useState<number>(5);
+  const [systemThreshold, setSystemThreshold] = useState<number>(5);
   const [submittingStock, setSubmittingStock] = useState(false);
 
   useEffect(() => {
@@ -82,15 +84,19 @@ export default function BranchesPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [branchList, stockList] = await Promise.all([
+      const [branchList, stockList, sysSettings] = await Promise.all([
         getBranches(),
         getWarehouseStocks({
           branchId: selectedBranchId,
           warehouseId: selectedWarehouseId,
         }),
+        getSystemSettings().catch(() => null),
       ]);
       setBranches(branchList);
       setStocks(stockList);
+      if (sysSettings?.lowStockThreshold) {
+        setSystemThreshold(sysSettings.lowStockThreshold);
+      }
     } catch {
       message.error('Lỗi khi tải dữ liệu chi nhánh và tồn kho');
     } finally {
@@ -173,7 +179,7 @@ export default function BranchesPage() {
   const handleOpenEditStock = (item: StockItem) => {
     setEditingStock(item);
     setStockQty(item.quantity);
-    setStockMinAlert(item.minAlertStock || 5);
+    setStockMinAlert(item.minAlertStock || systemThreshold || 5);
     setIsStockModalOpen(true);
   };
 
@@ -329,7 +335,7 @@ export default function BranchesPage() {
       key: 'minAlertStock',
       align: 'center',
       render: (min: number) => (
-        <span className="font-mono text-xs text-secondary">≤ {min || 5} cái</span>
+        <span className="font-mono text-xs text-secondary">≤ {min || systemThreshold || 5} cái</span>
       ),
     },
     {
@@ -553,7 +559,7 @@ export default function BranchesPage() {
           </div>
         }
         open={isBranchModalOpen}
-        destroyOnClose
+        destroyOnHidden
         onCancel={() => setIsBranchModalOpen(false)}
         onOk={handleSaveBranch}
         confirmLoading={submittingBranch}
@@ -562,6 +568,7 @@ export default function BranchesPage() {
         width={520}
       >
         <Form
+          key={editingBranch ? `branch-${editingBranch.id}` : 'branch-new'}
           form={branchForm}
           initialValues={editingBranch ? {
             code: editingBranch.code,

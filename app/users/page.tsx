@@ -402,13 +402,13 @@ export default function UsersPage() {
           </div>
         }
         open={isEditModalVisible}
-        destroyOnClose
-        forceRender
+        destroyOnHidden
         footer={null}
         onCancel={() => setIsEditModalVisible(false)}
         width={560}
       >
         <Form
+          key={selectedUser ? `user-${selectedUser.id}` : 'user-new'}
           form={form}
           initialValues={selectedUser ? {
             fullName: selectedUser.fullName || '',
