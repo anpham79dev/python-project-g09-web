@@ -29,6 +29,7 @@ import {
   PhoneOutlined,
   ClearOutlined,
   ClockCircleOutlined,
+  ShopOutlined,
 } from '@ant-design/icons';
 import { getProducts, createOrder, getCurrentShift, closeCurrentShift } from '@/lib/api';
 import { Product, CATEGORIES, Order, WorkShift } from '@/lib/mock-data';
@@ -39,6 +40,32 @@ const { Title, Text } = Typography;
 interface CartItem {
   product: Product;
   quantity: number;
+}
+
+/**
+ * Component hiển thị ảnh sản phẩm kèm fallback icon bánh xám khi ảnh bị lỗi (onError)
+ */
+function ProductImage({ src }: { src: string }) {
+  const [hasError, setHasError] = useState(false);
+
+  if (hasError || !src) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center bg-[#F3F4F6] text-gray-400">
+        <ShopOutlined className="text-2xl mb-1 text-gray-300" />
+        <span className="text-[10px] text-gray-400 font-medium">Artisan Bakery</span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt=""
+      onError={() => setHasError(true)}
+      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+      loading="lazy"
+    />
+  );
 }
 
 export default function POSPage() {
@@ -56,13 +83,13 @@ export default function POSPage() {
   const [closingShift, setClosingShift] = useState(false);
   const [closedShiftToPrint, setClosedShiftToPrint] = useState<WorkShift | null>(null);
 
-  // Cart state
+  // Cart state - Mặc định thanh toán bằng TIỀN MẶT
   const [cart, setCart] = useState<CartItem[]>([]);
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [orderNote, setOrderNote] = useState('');
   const [discount, setDiscount] = useState<number>(0);
-  const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'QR_TRANSFER' | 'CARD'>('QR_TRANSFER');
+  const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'QR_TRANSFER' | 'CARD'>('CASH');
   const [submitting, setSubmitting] = useState(false);
 
   // Success Modal
@@ -255,49 +282,39 @@ export default function POSPage() {
   };
 
   return (
-    <div className="flex-1 flex flex-col lg:flex-row h-[calc(100vh-64px)] overflow-hidden bg-[#F8F9FA]">
+    <div className="flex-1 flex flex-col lg:flex-row h-full min-h-0 overflow-hidden bg-[#F8F9FA]">
       {/* CỘT TRÁI: DANH MỤC & LƯỚI SẢN PHẨM (~65%) */}
-      <div className="flex-1 flex flex-col h-full border-r border-[#E5E7EB] overflow-hidden">
+      <div className="flex-1 flex flex-col h-full min-h-0 border-r border-[#E5E7EB] overflow-hidden">
         {/* Header Bộ lọc & Tìm kiếm */}
-        <div className="p-4 bg-white border-b border-[#E5E7EB] space-y-3 shrink-0">
-          <div className="flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <div className="p-3 bg-white border-b border-[#E5E7EB] space-y-2.5 shrink-0">
+          {/* 5 & 6. Ô tìm kiếm chiếm hết phần còn lại + Nút Kết ca không xuống dòng */}
+          <div className="flex items-center gap-3 w-full">
             <Input
               prefix={<SearchOutlined className="text-gray-400 mr-1" />}
               placeholder="Tìm kiếm theo tên bánh, danh mục hoặc mã..."
-              size="large"
+              size="middle"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               allowClear
-              className="w-full sm:max-w-md rounded-lg"
+              className="flex-1 rounded-lg"
             />
-            <div className="flex items-center gap-3">
-              {currentShift && (
-                <div className="hidden md:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                  <ClockCircleOutlined className="text-[#006C49]" />
-                  <span>{currentShift.shiftName.split('-')[0]}</span>
-                </div>
-              )}
-              <Button
-                icon={<ClockCircleOutlined />}
-                onClick={handleOpenShiftModal}
-                className="text-xs font-semibold text-[#006C49] border-[#10B981] hover:bg-emerald-50 h-9 flex items-center"
-              >
-                Kết ca / Chốt két
-              </Button>
-              <div className="text-xs text-secondary font-medium">
-                Tìm thấy <strong className="text-[#10B981]">{filteredProducts.length}</strong> món
-              </div>
-            </div>
+            <Button
+              icon={<ClockCircleOutlined />}
+              onClick={handleOpenShiftModal}
+              className="shrink-0 whitespace-nowrap text-xs font-semibold text-[#006C49] border-[#10B981] hover:bg-emerald-50 h-9 flex items-center"
+            >
+              Kết ca / chốt két
+            </Button>
           </div>
 
           {/* Category Tabs */}
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-none">
             {CATEGORIES.map((cat) => (
               <button
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all cursor-pointer border ${
+                className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-all cursor-pointer border ${
                   selectedCategory === cat
                     ? 'bg-[#006C49] text-white border-[#006C49] shadow-xs'
                     : 'bg-[#F8F9FA] text-[#585F6C] border-[#E5E7EB] hover:bg-[#F3F4F5] hover:text-[#111827]'
@@ -310,7 +327,7 @@ export default function POSPage() {
         </div>
 
         {/* Product Grid */}
-        <div className="flex-1 p-4 overflow-y-auto">
+        <div className="flex-1 p-3.5 overflow-y-auto min-h-0">
           {loading ? (
             <div className="flex flex-col items-center justify-center h-64">
               <Spin size="large" description="Đang tải danh mục bánh..." />
@@ -330,7 +347,7 @@ export default function POSPage() {
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3.5">
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
               {filteredProducts.map((product) => {
                 const isOutOfStock = product.stock <= 0;
                 const inCartItem = cart.find((item) => item.product.id === product.id);
@@ -339,10 +356,10 @@ export default function POSPage() {
                   <div
                     key={product.id}
                     onClick={() => !isOutOfStock && addToCart(product)}
-                    className={`group relative bg-white border border-[#E5E7EB] rounded-xl overflow-hidden p-3 flex flex-col justify-between transition-all select-none ${
+                    className={`group relative bg-white border border-[#E5E7EB] rounded-xl overflow-hidden p-2.5 flex flex-col justify-between transition-all select-none ${
                       isOutOfStock
-                        ? 'opacity-60 cursor-not-allowed bg-gray-50'
-                        : 'cursor-pointer hover:border-[#10B981] hover:shadow-md active:scale-[0.98]'
+                        ? 'opacity-50 cursor-not-allowed bg-gray-50 pointer-events-none'
+                        : 'cursor-pointer hover:border-[#10B981] hover:shadow-xs active:scale-[0.98]'
                     }`}
                   >
                     {inCartItem && (
@@ -351,32 +368,32 @@ export default function POSPage() {
                       </div>
                     )}
 
+                    {/* 7. Tag Hết hàng ở góc thẻ */}
+                    {isOutOfStock && (
+                      <div className="absolute top-2 left-2 z-10">
+                        <span className="text-[10px] font-bold bg-gray-600 text-white px-1.5 py-0.5 rounded shadow-2xs">
+                          Hết hàng
+                        </span>
+                      </div>
+                    )}
+
                     <div>
-                      <div className="relative w-full h-32 rounded-lg overflow-hidden mb-2.5 bg-gray-100">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                        />
-                        {isOutOfStock && (
-                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                            <span className="text-white text-xs font-bold uppercase tracking-wider bg-red-600 px-2 py-0.5 rounded">
-                              Hết hàng
-                            </span>
-                          </div>
-                        )}
+                      {/* 8. Ảnh sản phẩm có fallback icon bánh xám */}
+                      <div className="relative w-full h-28 rounded-lg overflow-hidden mb-2 bg-gray-100">
+                        <ProductImage src={product.image} />
                       </div>
 
-                      <span className="text-[11px] font-medium text-emerald-700 block uppercase tracking-wide mb-0.5">
-                        {product.category}
-                      </span>
-                      <h4 className="font-semibold text-sm text-[#111827] line-clamp-1 mb-1 group-hover:text-[#006C49]">
+                      {/* 7. Cho phép tên xuống tối đa 2 dòng, không cắt bằng '...' */}
+                      <h4
+                        title={product.name}
+                        className="font-semibold text-sm text-[#111827] line-clamp-2 min-h-[38px] leading-snug mb-1 group-hover:text-[#006C49]"
+                      >
                         {product.name}
                       </h4>
                     </div>
 
-                    <div className="pt-2 border-t border-dashed border-[#E5E7EB] flex items-center justify-between mt-2">
+                    {/* 7. Giữ giá và tồn kho */}
+                    <div className="pt-2 border-t border-dashed border-[#E5E7EB] flex items-center justify-between mt-1">
                       <span className="text-sm font-bold text-[#006C49] font-mono">
                         {product.price.toLocaleString('vi-VN')} ₫
                       </span>
@@ -393,18 +410,18 @@ export default function POSPage() {
       </div>
 
       {/* CỘT PHẢI: GIỎ HÀNG & THANH TOÁN (~35%, min 380px) */}
-      <div className="w-full lg:w-[400px] xl:w-[440px] bg-white flex flex-col h-full shrink-0 shadow-lg lg:shadow-none z-20 border-l border-[#E5E7EB]">
+      <div className="w-full lg:w-[380px] xl:w-[410px] bg-white flex flex-col h-full min-h-0 shrink-0 shadow-lg lg:shadow-none z-20 border-l border-[#E5E7EB]">
         {/* Cart Header */}
-        <div className="px-5 py-4 border-b border-[#E5E7EB] flex items-center justify-between bg-white shrink-0">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 text-[#10B981] flex items-center justify-center">
-              <ShoppingCartOutlined className="text-base" />
+        <div className="px-4 py-3 border-b border-[#E5E7EB] flex items-center justify-between bg-white shrink-0">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-emerald-50 text-[#006C49] flex items-center justify-center">
+              <ShoppingCartOutlined className="text-sm" />
             </div>
             <div>
               <h3 className="font-bold text-sm text-[#111827] m-0 leading-tight">
                 Đơn hàng hiện tại
               </h3>
-              <span className="text-[11px] text-secondary">
+              <span className="text-[10px] text-secondary">
                 {cart.reduce((s, i) => s + i.quantity, 0)} món trong giỏ
               </span>
             </div>
@@ -424,14 +441,14 @@ export default function POSPage() {
         </div>
 
         {/* Cart Items List */}
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-2.5">
+        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2 min-h-0">
           {cart.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center py-12 text-secondary">
-              <div className="w-16 h-16 rounded-full bg-[#F8F9FA] border border-[#E5E7EB] flex items-center justify-center mb-3">
-                <ShoppingCartOutlined className="text-2xl text-gray-300" />
+              <div className="w-14 h-14 rounded-full bg-[#F8F9FA] border border-[#E5E7EB] flex items-center justify-center mb-2.5">
+                <ShoppingCartOutlined className="text-xl text-gray-300" />
               </div>
               <p className="font-semibold text-sm text-[#111827] m-0">Chưa có sản phẩm nào</p>
-              <p className="text-xs text-gray-400 mt-1 max-w-[220px]">
+              <p className="text-xs text-gray-400 mt-1 max-w-[200px]">
                 Nhấp vào các món bánh bên thực đơn để thêm vào đơn hàng
               </p>
             </div>
@@ -439,60 +456,57 @@ export default function POSPage() {
             cart.map((item) => (
               <div
                 key={item.product.id}
-                className="w-full flex items-center justify-between gap-3 p-2.5 rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] hover:border-emerald-300 transition-all"
+                className="w-full flex items-center justify-between gap-2.5 p-2 rounded-xl border border-[#E5E7EB] bg-[#FAFAFA] hover:border-emerald-300 transition-all"
               >
-                <img
-                  src={item.product.image}
-                  alt={item.product.name}
-                  className="w-12 h-12 rounded-lg object-cover border border-[#E5E7EB] shrink-0"
-                />
+                <div className="w-11 h-11 rounded-lg overflow-hidden border border-[#E5E7EB] shrink-0">
+                  <ProductImage src={item.product.image} />
+                </div>
 
                 <div className="flex-1 min-w-0">
-                  <h5 className="font-semibold text-xs text-[#111827] truncate m-0">
+                  <p className="font-semibold text-xs text-[#111827] m-0 truncate">
                     {item.product.name}
-                  </h5>
-                  <p className="text-xs font-bold text-[#006C49] font-mono mt-0.5 m-0">
+                  </p>
+                  <p className="text-[11px] font-mono text-[#006C49] m-0">
                     {item.product.price.toLocaleString('vi-VN')} ₫
                   </p>
                 </div>
 
                 {/* Quantity Controls */}
-                <div className="flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-lg p-0.5 shrink-0">
+                <div className="flex items-center gap-1.5 shrink-0">
                   <Button
-                    type="text"
                     size="small"
                     icon={<MinusOutlined className="text-[10px]" />}
                     onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                    className="w-6 h-6 flex items-center justify-center p-0"
+                    className="w-6 h-6 p-0 flex items-center justify-center rounded-md"
                   />
-                  <span className="font-bold text-xs w-6 text-center">{item.quantity}</span>
+                  <span className="w-6 text-center text-xs font-bold font-mono">
+                    {item.quantity}
+                  </span>
                   <Button
-                    type="text"
                     size="small"
                     icon={<PlusOutlined className="text-[10px]" />}
                     onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                    className="w-6 h-6 flex items-center justify-center p-0"
+                    disabled={item.quantity >= item.product.stock}
+                    className="w-6 h-6 p-0 flex items-center justify-center rounded-md"
+                  />
+                  <Button
+                    type="text"
+                    danger
+                    size="small"
+                    icon={<DeleteOutlined className="text-xs" />}
+                    onClick={() => removeFromCart(item.product.id)}
+                    className="w-6 h-6 p-0 flex items-center justify-center text-gray-400 hover:text-red-500 ml-1"
                   />
                 </div>
-
-                {/* Remove button */}
-                <Button
-                  type="text"
-                  danger
-                  size="small"
-                  icon={<DeleteOutlined />}
-                  onClick={() => removeFromCart(item.product.id)}
-                  className="text-gray-400 hover:text-red-500 shrink-0"
-                />
               </div>
             ))
           )}
         </div>
 
-        {/* Customer & Payment Form */}
-        <div className="px-5 py-4 border-t border-[#E5E7EB] bg-white flex flex-col gap-3 shrink-0">
-          {/* Customer Inputs */}
-          <div className="grid grid-cols-2 gap-2.5 w-full">
+        {/* Cart Footer: Inputs, Payment, Summary & Checkout */}
+        <div className="p-3.5 bg-white border-t border-[#E5E7EB] space-y-2.5 shrink-0">
+          {/* Customer info */}
+          <div className="grid grid-cols-2 gap-2">
             <Input
               prefix={<UserOutlined className="text-gray-400 text-xs" />}
               placeholder="Tên khách hàng"
@@ -513,36 +527,25 @@ export default function POSPage() {
 
           {/* Note Input */}
           <Input
-            placeholder="Ghi chú đơn hàng (ví dụ: ít đá, cắt bánh, nến...)"
+            placeholder="Ghi chú đơn hàng (ví dụ: ít ngọt, cắt bánh...)"
             size="middle"
             value={orderNote}
             onChange={(e) => setOrderNote(e.target.value)}
             className="w-full rounded-lg text-xs"
           />
 
-          {/* Payment Method Selector */}
+          {/* 9. Payment Method Selector - Mặc định Tiền mặt */}
           <div className="w-full">
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-secondary block mb-1.5">
+            <span className="text-[11px] font-semibold text-secondary block mb-1">
               Phương thức thanh toán
             </span>
-            <div className="grid grid-cols-3 gap-2 w-full">
-              <button
-                type="button"
-                onClick={() => setPaymentMethod('QR_TRANSFER')}
-                className={`w-full py-2 px-1 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
-                  paymentMethod === 'QR_TRANSFER'
-                    ? 'bg-emerald-50 text-[#006C49] border-[#10B981] shadow-xs'
-                    : 'bg-[#F8F9FA] text-[#585F6C] border-[#E5E7EB] hover:bg-[#F3F4F5]'
-                }`}
-              >
-                <QrcodeOutlined /> Chuyển khoản
-              </button>
+            <div className="grid grid-cols-3 gap-1.5 w-full">
               <button
                 type="button"
                 onClick={() => setPaymentMethod('CASH')}
-                className={`w-full py-2 px-1 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
+                className={`w-full py-1.5 px-1 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 border transition-all cursor-pointer ${
                   paymentMethod === 'CASH'
-                    ? 'bg-emerald-50 text-[#006C49] border-[#10B981] shadow-xs'
+                    ? 'bg-emerald-50 text-[#006C49] border-[#10B981] shadow-2xs'
                     : 'bg-[#F8F9FA] text-[#585F6C] border-[#E5E7EB] hover:bg-[#F3F4F5]'
                 }`}
               >
@@ -550,10 +553,21 @@ export default function POSPage() {
               </button>
               <button
                 type="button"
+                onClick={() => setPaymentMethod('QR_TRANSFER')}
+                className={`w-full py-1.5 px-1 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 border transition-all cursor-pointer ${
+                  paymentMethod === 'QR_TRANSFER'
+                    ? 'bg-emerald-50 text-[#006C49] border-[#10B981] shadow-2xs'
+                    : 'bg-[#F8F9FA] text-[#585F6C] border-[#E5E7EB] hover:bg-[#F3F4F5]'
+                }`}
+              >
+                <QrcodeOutlined /> Chuyển khoản
+              </button>
+              <button
+                type="button"
                 onClick={() => setPaymentMethod('CARD')}
-                className={`w-full py-2 px-1 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 border transition-all cursor-pointer ${
+                className={`w-full py-1.5 px-1 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 border transition-all cursor-pointer ${
                   paymentMethod === 'CARD'
-                    ? 'bg-emerald-50 text-[#006C49] border-[#10B981] shadow-xs'
+                    ? 'bg-emerald-50 text-[#006C49] border-[#10B981] shadow-2xs'
                     : 'bg-[#F8F9FA] text-[#585F6C] border-[#E5E7EB] hover:bg-[#F3F4F5]'
                 }`}
               >
@@ -563,14 +577,14 @@ export default function POSPage() {
           </div>
 
           {/* Financial Summary Box */}
-          <div className="w-full bg-[#F8F9FA] rounded-xl p-3 border border-[#E5E7EB] space-y-1.5 text-xs">
+          <div className="w-full bg-[#F8F9FA] rounded-xl p-2.5 border border-[#E5E7EB] space-y-1.5 text-xs">
             <div className="flex justify-between text-secondary">
               <span>Tạm tính ({cart.reduce((s, i) => s + i.quantity, 0)} món):</span>
               <span className="font-mono font-medium text-[#111827]">{subtotal.toLocaleString('vi-VN')} ₫</span>
             </div>
             <div className="flex justify-between items-center text-secondary">
-              <span>Giảm giá khuyến mãi:</span>
-              <Space.Compact size="small" className="w-32">
+              <span>Giảm giá:</span>
+              <Space.Compact size="small" className="w-28">
                 <InputNumber
                   size="small"
                   min={0}
@@ -581,12 +595,12 @@ export default function POSPage() {
                   formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                   className="w-full"
                 />
-                <Button disabled size="small" className="!bg-gray-100 !text-gray-600 !px-2">₫</Button>
+                <Button disabled size="small" className="!bg-gray-100 !text-gray-600 !px-1.5">₫</Button>
               </Space.Compact>
             </div>
-            <div className="flex justify-between items-baseline pt-2 border-t border-[#E5E7EB]">
-              <span className="font-bold text-xs uppercase tracking-wider text-[#111827]">Tổng thanh toán:</span>
-              <span className="text-xl font-bold text-[#006C49] font-mono">
+            <div className="flex justify-between items-baseline pt-1.5 border-t border-[#E5E7EB]">
+              <span className="font-bold text-xs text-[#111827]">Tổng thanh toán:</span>
+              <span className="text-lg font-bold text-[#006C49] font-mono">
                 {finalTotal.toLocaleString('vi-VN')} ₫
               </span>
             </div>
@@ -601,7 +615,7 @@ export default function POSPage() {
             disabled={cart.length === 0}
             onClick={handleCheckout}
             icon={<CheckCircleOutlined />}
-            className="w-full bg-[#10B981] hover:bg-[#059669] text-white font-bold h-12 rounded-xl text-base shadow-sm"
+            className="w-full bg-[#006C49] hover:bg-[#059669] text-white font-bold h-11 rounded-xl text-sm shadow-xs"
           >
             Thanh toán ({finalTotal.toLocaleString('vi-VN')} ₫)
           </Button>
@@ -614,13 +628,13 @@ export default function POSPage() {
         onCancel={() => setShowSuccessModal(false)}
         footer={null}
         centered
-        width={460}
+        width={440}
         destroyOnHidden
       >
         {completedOrder && (
           <div className="py-2 text-center">
-            <div className="w-16 h-16 rounded-full bg-emerald-100 text-[#10B981] flex items-center justify-center mx-auto mb-3">
-              <CheckCircleOutlined className="text-3xl" />
+            <div className="w-14 h-14 rounded-full bg-emerald-100 text-[#006C49] flex items-center justify-center mx-auto mb-2.5">
+              <CheckCircleOutlined className="text-2xl" />
             </div>
             <Title level={4} className="!mb-1 text-[#111827]">
               Thanh toán thành công!
@@ -629,29 +643,29 @@ export default function POSPage() {
               Mã hóa đơn: <strong className="text-[#006C49] font-mono">{completedOrder.code}</strong>
             </Text>
 
-            <div className="mt-4 p-4 bg-[#F8F9FA] rounded-xl border border-[#E5E7EB] text-left text-xs space-y-2">
-              <div className="flex justify-between pb-2 border-b border-[#E5E7EB]">
+            <div className="mt-3.5 p-3.5 bg-[#F8F9FA] rounded-xl border border-[#E5E7EB] text-left text-xs space-y-2">
+              <div className="flex justify-between pb-1.5 border-b border-[#E5E7EB]">
                 <span className="text-secondary">Khách hàng:</span>
                 <span className="font-semibold">{completedOrder.customerName}</span>
               </div>
-              <div className="flex justify-between pb-2 border-b border-[#E5E7EB]">
+              <div className="flex justify-between pb-1.5 border-b border-[#E5E7EB]">
                 <span className="text-secondary">Thu ngân:</span>
                 <span className="font-semibold">{completedOrder.staffName}</span>
               </div>
-              <div className="flex justify-between pb-2 border-b border-[#E5E7EB]">
+              <div className="flex justify-between pb-1.5 border-b border-[#E5E7EB]">
                 <span className="text-secondary">Phương thức:</span>
                 <Tag color="green">
                   {completedOrder.paymentMethod === 'QR_TRANSFER'
-                    ? 'Chuyển khoản QR'
+                    ? 'Chuyển khoản'
                     : completedOrder.paymentMethod === 'CASH'
                     ? 'Tiền mặt'
                     : 'Quẹt thẻ'}
                 </Tag>
               </div>
 
-              <div className="py-2">
+              <div className="py-1.5">
                 <span className="font-semibold text-secondary block mb-1">Món đã mua:</span>
-                <div className="space-y-1 max-h-32 overflow-y-auto">
+                <div className="space-y-1 max-h-28 overflow-y-auto">
                   {completedOrder.items.map((i, idx) => (
                     <div key={idx} className="flex justify-between text-[11px]">
                       <span>
@@ -669,7 +683,7 @@ export default function POSPage() {
               </div>
             </div>
 
-            <div className="mt-5 flex gap-2 justify-center">
+            <div className="mt-4 flex gap-2 justify-center">
               <Button
                 icon={<PrinterOutlined />}
                 onClick={() => {
@@ -681,7 +695,7 @@ export default function POSPage() {
               <Button
                 type="primary"
                 onClick={() => setShowSuccessModal(false)}
-                className="bg-[#10B981] hover:bg-[#059669]"
+                className="bg-[#006C49] hover:bg-[#059669]"
               >
                 Bán đơn tiếp theo
               </Button>
@@ -722,10 +736,10 @@ export default function POSPage() {
               <span>Thanh toán:</span>
               <span>
                 {completedOrder.paymentMethod === 'QR_TRANSFER'
-                  ? 'Chuyển khoản QR'
+                  ? 'Chuyển khoản'
                   : completedOrder.paymentMethod === 'CASH'
                   ? 'Tiền mặt'
-                  : 'Quẹt thẻ POS'}
+                  : 'Quẹt thẻ'}
               </span>
             </div>
             {completedOrder.note && (
@@ -762,7 +776,7 @@ export default function POSPage() {
             </div>
             {completedOrder.discount > 0 && (
               <div className="flex justify-between">
-                <span>Giảm giá khuyến mãi:</span>
+                <span>Giảm giá:</span>
                 <span>-{completedOrder.discount.toLocaleString('vi-VN')} ₫</span>
               </div>
             )}
@@ -785,7 +799,7 @@ export default function POSPage() {
         title={
           <div className="flex items-center gap-2 text-sm font-bold text-[#111827]">
             <ClockCircleOutlined className="text-[#006C49]" />
-            <span>Chốt Ca &amp; Đối Soát Tiền Mặt Két Tiền</span>
+            <span>Chốt ca &amp; đối soát tiền mặt két tiền</span>
           </div>
         }
         open={showShiftModal}
@@ -799,16 +813,16 @@ export default function POSPage() {
             type="primary"
             loading={closingShift}
             onClick={handleConfirmCloseShift}
-            className="bg-[#10B981] hover:bg-[#059669] text-white font-bold"
+            className="bg-[#006C49] hover:bg-[#059669] text-white font-bold"
           >
-            Xác nhận kết ca &amp; In phiếu
+            Xác nhận kết ca &amp; in phiếu
           </Button>,
         ]}
-        width={540}
+        width={520}
         destroyOnHidden
       >
         {currentShift && (
-          <div className="space-y-4 py-2 text-xs">
+          <div className="space-y-3.5 py-2 text-xs">
             {/* Header info */}
             <div className="p-3 bg-[#F8F9FA] rounded-xl border border-[#E5E7EB] space-y-1.5">
               <div className="flex justify-between">
@@ -821,14 +835,14 @@ export default function POSPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-secondary">Số đơn hoàn tất trong ca:</span>
-                <span className="font-bold text-blue-700">{currentShift.ordersCount} hóa đơn</span>
+                <span className="font-bold text-[#006C49]">{currentShift.ordersCount} hóa đơn</span>
               </div>
             </div>
 
             {/* Sales breakdown */}
             <div className="p-3 bg-white rounded-xl border border-[#E5E7EB] space-y-2">
               <div className="font-bold text-xs text-[#111827] pb-1 border-b border-gray-100 flex items-center justify-between">
-                <span>DOANH SỐ PHÁT SINH TRONG CA</span>
+                <span>Doanh số phát sinh trong ca</span>
                 <span className="text-[#006C49] font-mono">{currentShift.totalRevenue.toLocaleString('vi-VN')} ₫</span>
               </div>
               <div className="flex justify-between text-secondary">
@@ -836,22 +850,22 @@ export default function POSPage() {
                 <span className="font-mono font-semibold text-[#111827]">{currentShift.cashRevenue.toLocaleString('vi-VN')} ₫</span>
               </div>
               <div className="flex justify-between text-secondary">
-                <span className="flex items-center gap-1"><CreditCardOutlined className="text-blue-600" /> Quẹt thẻ POS:</span>
+                <span className="flex items-center gap-1"><CreditCardOutlined className="text-blue-600" /> Quẹt thẻ:</span>
                 <span className="font-mono font-semibold text-[#111827]">{currentShift.cardRevenue.toLocaleString('vi-VN')} ₫</span>
               </div>
               <div className="flex justify-between text-secondary">
-                <span className="flex items-center gap-1"><QrcodeOutlined className="text-cyan-600" /> Chuyển khoản QR:</span>
+                <span className="flex items-center gap-1"><QrcodeOutlined className="text-cyan-600" /> Chuyển khoản:</span>
                 <span className="font-mono font-semibold text-[#111827]">{currentShift.qrRevenue.toLocaleString('vi-VN')} ₫</span>
               </div>
             </div>
 
             {/* Cash Drawer Reconciliation */}
-            <div className="p-3 bg-amber-50/50 rounded-xl border border-amber-200 space-y-2.5">
+            <div className="p-3 bg-amber-50/50 rounded-xl border border-amber-200 space-y-2">
               <div className="font-bold text-xs text-amber-900 pb-1 border-b border-amber-200">
-                ĐỐI SOÁT TIỀN MẶT KÉT BÀN GIAO
+                Đối soát tiền mặt két bàn giao
               </div>
               <div className="flex justify-between text-secondary">
-                <span>1. Tiền mặt đầu ca (tiền thối):</span>
+                <span>1. Tiền mặt đầu ca:</span>
                 <span className="font-mono font-semibold text-[#111827]">{currentShift.initialCash.toLocaleString('vi-VN')} ₫</span>
               </div>
               <div className="flex justify-between text-secondary">
@@ -881,7 +895,7 @@ export default function POSPage() {
               </div>
 
               {/* Difference Status */}
-              <div className="p-2.5 rounded-lg bg-white border border-amber-200 flex justify-between items-center">
+              <div className="p-2 rounded-lg bg-white border border-amber-200 flex justify-between items-center">
                 <span className="font-bold text-xs text-[#111827]">Chênh lệch két (4 - 3):</span>
                 {actualCashInput - currentShift.expectedCash === 0 ? (
                   <Tag color="success" className="font-bold text-xs mr-0 inline-flex items-center">
@@ -901,13 +915,13 @@ export default function POSPage() {
               {/* Note / Explanation */}
               <div>
                 <label className="text-[11px] text-secondary font-medium block mb-1">
-                  Ghi chú giải trình (nếu có chênh lệch hoặc bàn giao đặc biệt):
+                  Ghi chú giải trình (nếu có):
                 </label>
                 <Input.TextArea
                   rows={2}
                   value={shiftNote}
                   onChange={(e) => setShiftNote(e.target.value)}
-                  placeholder="Ví dụ: Bàn giao tiền chẵn cho chủ tiệm, thiếu 5k do không có tiền lẻ thối..."
+                  placeholder="Ví dụ: Bàn giao tiền chẵn cho chủ tiệm..."
                   className="text-xs rounded-lg"
                 />
               </div>
@@ -922,7 +936,7 @@ export default function POSPage() {
           <div className="shift-receipt-container">
             <div className="receipt-header">
               <h2>ARTISAN BAKERY</h2>
-              <p>Tiệm Bánh Thủ Công Pháp</p>
+              <p>Tiệm Bánh Thủ Công</p>
               <p>Hotline: 0901 234 567</p>
               <div className="divider">================================</div>
               <h3>PHIẾU BÀN GIAO KẾT CA</h3>
@@ -969,7 +983,7 @@ export default function POSPage() {
                 <span>{closedShiftToPrint.cardRevenue.toLocaleString('vi-VN')} đ</span>
               </div>
               <div className="receipt-row">
-                <span>- Chuyển khoản QR:</span>
+                <span>- Chuyển khoản:</span>
                 <span>{closedShiftToPrint.qrRevenue.toLocaleString('vi-VN')} đ</span>
               </div>
 

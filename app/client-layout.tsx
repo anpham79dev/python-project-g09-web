@@ -44,7 +44,6 @@ const { Sider, Header, Content } = Layout;
 const { Text } = Typography;
 
 const ROUTE_TO_SUBMENU: Record<string, string> = {
-  '/pos': 'sub_sales',
   '/orders': 'sub_orders',
   '/shifts': 'sub_orders',
   '/products': 'sub_inventory',
@@ -56,7 +55,7 @@ const ROUTE_TO_SUBMENU: Record<string, string> = {
   '/settings/roles': 'sub_system',
 };
 
-const ALL_SUBMENU_KEYS = ['sub_sales', 'sub_orders', 'sub_inventory', 'sub_admin', 'sub_system'];
+const ALL_SUBMENU_KEYS = ['sub_orders', 'sub_inventory', 'sub_admin', 'sub_system'];
 
 const antdTheme = {
   token: {
@@ -156,6 +155,7 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
   const [openKeys, setOpenKeys] = useState<string[]>(ALL_SUBMENU_KEYS);
 
   const isPublicPage = pathname === '/login';
+  const isPosPage = pathname === '/pos' || pathname?.startsWith('/pos/');
 
   // Xác định SubMenu cha của route hiện tại
   const currentSubmenu = Object.entries(ROUTE_TO_SUBMENU).find(([route]) =>
@@ -388,15 +388,6 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
     })),
   ];
 
-  // Cấu trúc Sidebar Collapsible SubMenu Items phân nhóm & phân quyền động (PBAC)
-  const salesChildren = [
-    hasPermission(currentUser, 'pos:access') && {
-      key: '/pos',
-      icon: <ShoppingOutlined />,
-      label: 'Quầy Bán Hàng (POS)',
-    },
-  ].filter(Boolean) as MenuProps['items'];
-
   const ordersChildren = [
     hasPermission(currentUser, 'orders:read') && {
       key: '/orders',
@@ -455,11 +446,10 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
   ].filter(Boolean) as MenuProps['items'];
 
   const siderMenuItems: MenuProps['items'] = [
-    salesChildren && salesChildren.length > 0 && {
-      key: 'sub_sales',
+    hasPermission(currentUser, 'pos:access') && {
+      key: '/pos',
       icon: <ShoppingOutlined className="text-base" />,
       label: 'Bán Hàng (POS)',
-      children: salesChildren,
     },
     ordersChildren && ordersChildren.length > 0 && {
       key: 'sub_orders',
@@ -487,14 +477,14 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
     },
   ].filter(Boolean) as MenuProps['items'];
 
-  // Nếu là trang Public (ví dụ Login) -> Không hiển thị Sider ERP
-  if (isPublicPage) {
+  // Nếu là trang Public (ví dụ Login) hoặc POS độc lập -> Không hiển thị Sider ERP
+  if (isPublicPage || isPosPage) {
     return (
       <>
         <Suspense fallback={null}>
           <AuthReasonNotifier />
         </Suspense>
-        <main className="flex-1 flex flex-col">
+        <main className="flex-1 flex flex-col min-h-screen w-full">
           {children}
         </main>
       </>
