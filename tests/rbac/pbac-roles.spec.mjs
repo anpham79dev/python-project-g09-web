@@ -27,7 +27,7 @@ async function runPBACPlaywrightTests() {
     await superPage.waitForTimeout(500);
     await superPage.click('button:has-text("SuperAdmin")');
     await superPage.waitForTimeout(300);
-    await superPage.click('button:has-text("Đăng nhập hệ thống")');
+    await superPage.locator('button[type="submit"]').click();
     await superPage.waitForURL((url) => !url.pathname.includes('/login'), { timeout: 10000 });
     await superPage.waitForTimeout(1000);
 
@@ -127,9 +127,9 @@ async function runPBACPlaywrightTests() {
 
     await staffPage.goto('http://localhost:3000/login', { waitUntil: 'domcontentloaded' });
     await staffPage.waitForTimeout(500);
-    await staffPage.click('button:has-text("Staff (Thu ngân)")');
+    await staffPage.click('button:has-text("Thu ngân")');
     await staffPage.waitForTimeout(300);
-    await staffPage.click('button:has-text("Đăng nhập hệ thống")');
+    await staffPage.locator('button[type="submit"]').click();
     await staffPage.waitForURL((url) => url.pathname.includes('/pos'), { timeout: 10000 });
     await staffPage.waitForTimeout(800);
 

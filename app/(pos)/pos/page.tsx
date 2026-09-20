@@ -31,8 +31,8 @@ import {
   ClockCircleOutlined,
   ShopOutlined,
 } from '@ant-design/icons';
-import { getProducts, createOrder, getCurrentShift, closeCurrentShift } from '@/lib/api';
-import { Product, CATEGORIES, Order, WorkShift } from '@/lib/mock-data';
+import { getProducts, createOrder, getCurrentShift, closeCurrentShift, openShift, getCurrentSchedule, getBranches } from '@/lib/api';
+import { Product, CATEGORIES, Order, WorkShift, ShiftScheduleResponse, Branch } from '@/lib/types';
 import { getCurrentUser } from '@/lib/auth';
 
 const { Title, Text } = Typography;
@@ -76,7 +76,14 @@ export default function POSPage() {
   const [selectedCategory, setSelectedCategory] = useState('Tất cả');
 
   // Shift State
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [activeBranchName, setActiveBranchName] = useState<string>('Chi nhánh');
   const [currentShift, setCurrentShift] = useState<WorkShift | null>(null);
+  const [currentSchedule, setCurrentSchedule] = useState<ShiftScheduleResponse | null>(null);
+  const [shiftChecking, setShiftChecking] = useState(true);
+  const [openShiftCash, setOpenShiftCash] = useState<number>(500000);
+  const [openShiftNote, setOpenShiftNote] = useState('');
+  const [openingShift, setOpeningShift] = useState(false);
   const [showShiftModal, setShowShiftModal] = useState(false);
   const [actualCashInput, setActualCashInput] = useState<number>(0);
   const [shiftNote, setShiftNote] = useState('');
@@ -99,7 +106,9 @@ export default function POSPage() {
   const fetchProductList = async () => {
     setLoading(true);
     try {
-      const data = await getProducts();
+      const activeBranchId = typeof window !== 'undefined' ? localStorage.getItem('artisan_active_branch_id') : null;
+      const params = activeBranchId && activeBranchId !== 'ALL' ? { branchId: activeBranchId } : undefined;
+      const data = await getProducts(params);
       setProducts(data);
     } catch (err) {
       message.error('Không thể tải danh sách sản phẩm');
@@ -110,15 +119,36 @@ export default function POSPage() {
 
   const fetchShift = async () => {
     try {
-      const shift = await getCurrentShift();
-      setCurrentShift(shift);
-      setActualCashInput(shift.expectedCash);
-    } catch {
-      // ignore
+      const [shift, sched] = await Promise.all([
+        getCurrentShift().catch(() => null),
+        getCurrentSchedule().catch(() => null),
+      ]);
+      setCurrentShift(shift || null);
+      if (sched) {
+        setCurrentSchedule(sched);
+        if (!shift) {
+          setOpenShiftCash(sched.defaultInitialCash || 500000);
+        }
+      }
+      if (shift) {
+        setActualCashInput(shift.expectedCash);
+      }
+    } finally {
+      setShiftChecking(false);
     }
   };
 
   useEffect(() => {
+    const user = getCurrentUser();
+    setCurrentUser(user);
+
+    getBranches().then((branches) => {
+      const activeBranchId = typeof window !== 'undefined' ? localStorage.getItem('artisan_active_branch_id') : null;
+      const targetId = activeBranchId || user?.lastActiveBranchId || user?.defaultBranchId;
+      const b = branches.find((item) => item.id === targetId);
+      if (b) setActiveBranchName(b.name);
+    }).catch(() => {});
+
     fetchProductList();
     fetchShift();
 
@@ -131,12 +161,38 @@ export default function POSPage() {
     return () => window.removeEventListener('artisan_branch_changed', handleBranchChange);
   }, []);
 
+  const handleOpenShift = async () => {
+    setOpeningShift(true);
+    try {
+      const activeBranchId = typeof window !== 'undefined' ? localStorage.getItem('artisan_active_branch_id') : undefined;
+      const branchId = activeBranchId && activeBranchId !== 'ALL' ? activeBranchId : undefined;
+      const shift = await openShift({
+        initialCash: openShiftCash,
+        branchId,
+        note: openShiftNote.trim() || undefined,
+      });
+      setCurrentShift(shift);
+      setActualCashInput(shift.expectedCash);
+      message.success('Mở ca làm việc thành công! Bắt đầu phiên bán hàng.');
+      window.dispatchEvent(new CustomEvent('artisan_shift_changed'));
+    } catch (err: any) {
+      message.error(err.response?.data?.detail || err.message || 'Lỗi khi mở ca');
+    } finally {
+      setOpeningShift(false);
+    }
+  };
+
   const handleOpenShiftModal = async () => {
     try {
       const shift = await getCurrentShift();
-      setCurrentShift(shift);
-      setActualCashInput(shift.expectedCash);
-      setShowShiftModal(true);
+      if (shift) {
+        setCurrentShift(shift);
+        setActualCashInput(shift.expectedCash);
+        setShowShiftModal(true);
+      } else {
+        setCurrentShift(null);
+        message.warning('Chưa có ca làm việc nào đang mở!');
+      }
     } catch (err: any) {
       message.error('Không thể tải thông tin ca làm việc');
     }
@@ -156,9 +212,12 @@ export default function POSPage() {
       setTimeout(() => {
         window.print();
       }, 300);
+      setCurrentShift(null);
+      clearCart();
+      window.dispatchEvent(new CustomEvent('artisan_shift_changed'));
       fetchShift();
     } catch (err: any) {
-      message.error(err.message || 'Lỗi khi kết ca');
+      message.error(err.response?.data?.detail || err.message || 'Lỗi khi kết ca');
     } finally {
       setClosingShift(false);
     }
@@ -273,13 +332,197 @@ export default function POSPage() {
       clearCart();
       // Re-fetch products to reflect decreased stock
       fetchProductList();
+      fetchShift();
+      window.dispatchEvent(new CustomEvent('artisan_shift_changed'));
       message.success('Thanh toán đơn hàng thành công!');
     } catch (err: any) {
-      message.error(err.message || 'Lỗi khi tạo đơn hàng');
+      message.error(err.response?.data?.detail || err.message || 'Lỗi khi tạo đơn hàng');
     } finally {
       setSubmitting(false);
     }
   };
+
+  if (shiftChecking) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center h-full bg-[#F8F9FA]">
+        <Spin size="large" description="Đang kiểm tra ca làm việc..." />
+      </div>
+    );
+  }
+
+  if (!currentShift) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center p-6 bg-[#F8F9FA] overflow-y-auto">
+        <div className="w-full max-w-md bg-white rounded-2xl border border-[#E5E7EB] shadow-md p-6 sm:p-8 space-y-5">
+          <div className="text-center space-y-1">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-[#006C49] flex items-center justify-center mx-auto text-2xl mb-3 border border-emerald-200">
+              <ClockCircleOutlined />
+            </div>
+            <Title level={4} className="!text-[#111827] !mb-1">Mở Ca Làm Việc Thu Ngân</Title>
+            <Text type="secondary" className="text-xs">
+              Vui lòng khai báo số tiền mặt đầu két để bắt đầu phiên bán hàng POS.
+            </Text>
+          </div>
+
+          <div className="bg-[#F8F9FA] rounded-xl p-3.5 border border-[#E5E7EB] space-y-2 text-xs">
+            <div className="flex justify-between items-center">
+              <span className="text-[#585F6C]">Thu ngân:</span>
+              <span className="font-semibold text-[#111827]">{currentUser?.fullName || 'Thu Ngân'}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-[#585F6C]">Chi nhánh:</span>
+              <span className="font-semibold text-[#111827]">{activeBranchName || 'Chi nhánh mặc định'}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-[#585F6C]">Khung ca hiện tại:</span>
+              <Tag color="cyan" className="mr-0 font-medium">
+                {currentSchedule?.displayText || 'Ca làm việc tự do'}
+              </Tag>
+            </div>
+          </div>
+
+          <div className="space-y-3.5">
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-[#111827] flex items-center justify-between">
+                <span>Số tiền mặt đầu ca (tiền thối):</span>
+                <span className="text-xs text-[#006C49] font-normal">
+                  Đề xuất: {(currentSchedule?.defaultInitialCash || 500000).toLocaleString('vi-VN')} đ
+                </span>
+              </label>
+              <InputNumber
+                size="large"
+                className="w-full font-mono text-base font-bold"
+                value={openShiftCash}
+                onChange={(v) => setOpenShiftCash(v || 0)}
+                formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                addonAfter="đ"
+                min={0}
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-[#111827]">Ghi chú đầu ca (tùy chọn):</label>
+              <Input.TextArea
+                rows={2}
+                placeholder="Ví dụ: Nhận 500k tiền mệnh giá nhỏ từ ca trước..."
+                value={openShiftNote}
+                onChange={(e) => setOpenShiftNote(e.target.value)}
+                className="rounded-lg text-xs"
+              />
+            </div>
+          </div>
+
+          <Button
+            type="primary"
+            size="large"
+            loading={openingShift}
+            onClick={handleOpenShift}
+            className="w-full bg-[#006C49] hover:bg-[#059669] font-bold h-11 text-sm shadow-xs"
+          >
+            Xác nhận mở ca &amp; Bắt đầu bán hàng
+          </Button>
+        </div>
+
+        {/* Closed shift receipt for printing if just closed */}
+        {closedShiftToPrint && (
+          <div id="pos-shift-receipt" className="hidden">
+            <div className="shift-receipt-container">
+              <div className="receipt-header">
+                <h2>ARTISAN BAKERY</h2>
+                <p>Tiệm Bánh Thủ Công</p>
+                <p>Hotline: 0901 234 567</p>
+                <div className="divider">================================</div>
+                <h3>PHIẾU BÀN GIAO KẾT CA</h3>
+                <div className="divider">================================</div>
+              </div>
+              <div className="receipt-body">
+                <div className="receipt-row">
+                  <span>Mã phiên:</span>
+                  <span>{closedShiftToPrint.id}</span>
+                </div>
+                <div className="receipt-row">
+                  <span>Ca làm:</span>
+                  <span>{closedShiftToPrint.shiftName}</span>
+                </div>
+                <div className="receipt-row">
+                  <span>Thu ngân:</span>
+                  <span>{closedShiftToPrint.staffName}</span>
+                </div>
+                <div className="receipt-row">
+                  <span>Bắt đầu:</span>
+                  <span>{new Date(closedShiftToPrint.startTime).toLocaleString('vi-VN')}</span>
+                </div>
+                <div className="receipt-row">
+                  <span>Kết thúc:</span>
+                  <span>{new Date(closedShiftToPrint.endTime || Date.now()).toLocaleString('vi-VN')}</span>
+                </div>
+                <div className="receipt-row">
+                  <span>Tổng đơn bán:</span>
+                  <span>{closedShiftToPrint.ordersCount} đơn</span>
+                </div>
+                <div className="divider">--------------------------------</div>
+                <div className="receipt-row bold">
+                  <span>TỔNG DOANH THU:</span>
+                  <span>{closedShiftToPrint.totalRevenue.toLocaleString('vi-VN')} đ</span>
+                </div>
+                <div className="receipt-row">
+                  <span>- Tiền mặt:</span>
+                  <span>{closedShiftToPrint.cashRevenue.toLocaleString('vi-VN')} đ</span>
+                </div>
+                <div className="receipt-row">
+                  <span>- Quẹt thẻ:</span>
+                  <span>{closedShiftToPrint.cardRevenue.toLocaleString('vi-VN')} đ</span>
+                </div>
+                <div className="receipt-row">
+                  <span>- Chuyển khoản:</span>
+                  <span>{closedShiftToPrint.qrRevenue.toLocaleString('vi-VN')} đ</span>
+                </div>
+                <div className="divider">--------------------------------</div>
+                <div className="receipt-row">
+                  <span>Tiền đầu ca:</span>
+                  <span>{closedShiftToPrint.initialCash.toLocaleString('vi-VN')} đ</span>
+                </div>
+                <div className="receipt-row bold">
+                  <span>Tiền lý thuyết két:</span>
+                  <span>{closedShiftToPrint.expectedCash.toLocaleString('vi-VN')} đ</span>
+                </div>
+                <div className="receipt-row bold">
+                  <span>Tiền thực đếm nộp:</span>
+                  <span>{closedShiftToPrint.actualCash.toLocaleString('vi-VN')} đ</span>
+                </div>
+                <div className="receipt-row bold">
+                  <span>Chênh lệch bàn giao:</span>
+                  <span>{closedShiftToPrint.difference > 0 ? '+' : ''}{closedShiftToPrint.difference.toLocaleString('vi-VN')} đ</span>
+                </div>
+                {closedShiftToPrint.note && (
+                  <>
+                    <div className="divider">--------------------------------</div>
+                    <div className="receipt-row">
+                      <span>Ghi chú:</span>
+                      <span>{closedShiftToPrint.note}</span>
+                    </div>
+                  </>
+                )}
+                <div className="divider">================================</div>
+                <div className="receipt-signatures">
+                  <div>
+                    <p>Thu ngân bàn giao</p>
+                    <br /><br />
+                    <p>{closedShiftToPrint.staffName}</p>
+                  </div>
+                  <div>
+                    <p>Quản lý nhận ca</p>
+                    <br /><br />
+                    <p>(Ký nhận)</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col lg:flex-row h-full min-h-0 overflow-hidden bg-[#F8F9FA]">

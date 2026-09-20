@@ -21,7 +21,7 @@ import {
   FileTextOutlined,
 } from '@ant-design/icons';
 import { getOrderDetail } from '@/lib/api';
-import { Order, OrderItem } from '@/lib/mock-data';
+import { Order, OrderItem } from '@/lib/types';
 import { getCurrentUser } from '@/lib/auth';
 
 const { Title, Text } = Typography;

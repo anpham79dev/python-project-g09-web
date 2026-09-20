@@ -23,7 +23,7 @@ import {
   ExclamationCircleOutlined,
 } from '@ant-design/icons';
 import { getProducts, deleteProduct } from '@/lib/api';
-import { Product, CATEGORIES } from '@/lib/mock-data';
+import { Product, CATEGORIES } from '@/lib/types';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
 
 const { Title, Text } = Typography;
@@ -51,7 +51,9 @@ export default function ProductsPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const data = await getProducts();
+      const activeBranchId = typeof window !== 'undefined' ? localStorage.getItem('artisan_active_branch_id') : null;
+      const params = activeBranchId && activeBranchId !== 'ALL' ? { branchId: activeBranchId } : undefined;
+      const data = await getProducts(params);
       setProducts(data);
     } catch (err: any) {
       message.error('Lỗi khi tải danh sách sản phẩm');

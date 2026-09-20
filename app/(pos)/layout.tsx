@@ -13,7 +13,7 @@ import {
 } from '@ant-design/icons';
 import { getCurrentUser, clearAuthSession, AuthUser, canAccessRoute, hasPermission } from '@/lib/auth';
 import { getCurrentShift, getBranches } from '@/lib/api';
-import { WorkShift, Branch } from '@/lib/mock-data';
+import { WorkShift, Branch } from '@/lib/types';
 
 export default function PosLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -38,12 +38,15 @@ export default function PosLayout({ children }: { children: React.ReactNode }) {
 
     setMounted(true);
 
-    // Lấy thông tin ca làm việc hiện tại
-    getCurrentShift()
-      .then((shift) => {
-        if (shift) setCurrentShift(shift);
-      })
-      .catch(() => {});
+    const refreshShift = () => {
+      getCurrentShift()
+        .then((shift) => {
+          setCurrentShift(shift || null);
+        })
+        .catch(() => setCurrentShift(null));
+    };
+
+    refreshShift();
 
     // Lấy thông tin chi nhánh đang hoạt động
     getBranches()
@@ -73,9 +76,16 @@ export default function PosLayout({ children }: { children: React.ReactNode }) {
       }).catch(() => {});
     };
 
+    const handleShiftChange = () => {
+      refreshShift();
+    };
+
     window.addEventListener('artisan_branch_changed', handleBranchChange);
+    window.addEventListener('artisan_shift_changed', handleShiftChange);
+
     return () => {
       window.removeEventListener('artisan_branch_changed', handleBranchChange);
+      window.removeEventListener('artisan_shift_changed', handleShiftChange);
     };
   }, [router]);
 
@@ -119,10 +129,15 @@ export default function PosLayout({ children }: { children: React.ReactNode }) {
 
         {/* Giữa / Phải: Ca làm việc hiện tại (MỘT thông tin duy nhất) & Hành động */}
         <div className="flex items-center gap-2.5 sm:gap-3">
-          {currentShift && (
+          {currentShift ? (
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200">
               <ClockCircleOutlined className="text-[#006C49]" />
               <span className="font-semibold">{currentShift.shiftName}</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200">
+              <ClockCircleOutlined className="text-amber-600" />
+              <span className="font-semibold">Chưa mở ca</span>
             </div>
           )}
 

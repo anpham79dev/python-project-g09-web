@@ -27,7 +27,7 @@ import {
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { getShifts, getShiftSummary, getUsers } from '@/lib/api';
-import { WorkShift, ShiftSummary, User } from '@/lib/mock-data';
+import { WorkShift, ShiftSummary, User } from '@/lib/types';
 import { getCurrentUser } from '@/lib/auth';
 
 const { Title } = Typography;

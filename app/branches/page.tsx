@@ -41,7 +41,7 @@ import {
   getWarehouseStocks,
   updateWarehouseStock,
 } from '@/lib/api';
-import { Branch, Warehouse, StockItem } from '@/lib/mock-data';
+import { Branch, Warehouse, StockItem } from '@/lib/types';
 import { getCurrentUser } from '@/lib/auth';
 
 const { Title, Text } = Typography;

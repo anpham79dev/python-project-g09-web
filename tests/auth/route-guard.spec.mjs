@@ -85,8 +85,8 @@ async function runRouteGuardTests() {
 
     // Đăng nhập tài khoản Staff
     await staffPage.goto('http://localhost:3000/login');
-    await staffPage.click('button:has-text("Staff (Thu ngân)")');
-    await staffPage.click('button:has-text("Đăng nhập hệ thống")');
+    await staffPage.click('button:has-text("Thu ngân")');
+    await staffPage.locator('button[type="submit"]').click();
     await staffPage.waitForURL('**/pos');
     console.log('  ✅ Đăng nhập Staff thành công và vào trang POS.');
 
@@ -142,8 +142,8 @@ async function runRouteGuardTests() {
     const adminPage = await adminContext.newPage();
 
     await adminPage.goto('http://localhost:3000/login');
-    await adminPage.click('button:has-text("Admin (Quản lý)")');
-    await adminPage.click('button:has-text("Đăng nhập hệ thống")');
+    await adminPage.click('button:has-text("Quản lý")');
+    await adminPage.locator('button[type="submit"]').click();
     await adminPage.waitForURL('**/dashboard');
     console.log('  ✅ Admin đăng nhập và hiển thị Dashboard chuẩn.');
 

@@ -34,7 +34,7 @@ import {
   KeyOutlined,
 } from '@ant-design/icons';
 import { getUsers, updateUser, deleteUser, getBranches, getRoles } from '@/lib/api';
-import { User, Branch, Role } from '@/lib/mock-data';
+import { User, Branch, Role } from '@/lib/types';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
 
 const { Title, Text } = Typography;

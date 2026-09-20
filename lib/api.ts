@@ -8,6 +8,7 @@ import {
   AuditLog,
   DashboardStats,
   WorkShift,
+  ShiftScheduleResponse,
   ShiftSummary,
   Branch,
   Warehouse,
@@ -17,186 +18,7 @@ import {
   Transaction,
   CashFlowSummary,
   PnLReport,
-  INITIAL_PRODUCTS,
-  INITIAL_ORDERS,
-  INITIAL_USERS,
-  INITIAL_ROLES,
-  INITIAL_PERMISSIONS,
-  INITIAL_AUDIT_LOGS,
-  INITIAL_SHIFTS,
-  INITIAL_BRANCHES,
-  INITIAL_SHIFT_TEMPLATES,
-  INITIAL_SYSTEM_SETTINGS,
-  INITIAL_TRANSACTIONS,
-} from './mock-data';
-import { ALL_PERMISSION_CODES } from './rbac-config';
-
-// Giả lập độ trễ mạng khi dùng mock data (~300ms)
-const simulateDelay = <T>(data: T, delay = 300): Promise<T> => {
-  return new Promise((resolve) => setTimeout(() => resolve(data), delay));
-};
-
-// Key LocalStorage cho Stateful Mocking
-const LS_KEYS = {
-  PRODUCTS: 'artisan_mock_products',
-  ORDERS: 'artisan_mock_orders',
-  USERS: 'artisan_mock_users',
-  ROLES: 'artisan_mock_roles',
-  PERMISSIONS: 'artisan_mock_permissions',
-  AUDIT_LOGS: 'artisan_mock_audit_logs',
-  SHIFTS: 'artisan_mock_shifts',
-  BRANCHES: 'artisan_mock_branches',
-  TEMPLATES: 'artisan_mock_shift_templates',
-  SETTINGS: 'artisan_mock_system_settings',
-  STOCKS: 'artisan_mock_warehouse_stocks',
-  TRANSACTIONS: 'artisan_mock_transactions',
-};
-
-// Helpers lấy/lưu mock data trong browser session
-const getStoredShifts = (): WorkShift[] => {
-  if (typeof window === 'undefined') return INITIAL_SHIFTS;
-  const stored = localStorage.getItem(LS_KEYS.SHIFTS);
-  if (!stored) {
-    localStorage.setItem(LS_KEYS.SHIFTS, JSON.stringify(INITIAL_SHIFTS));
-    return INITIAL_SHIFTS;
-  }
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return INITIAL_SHIFTS;
-  }
-};
-
-const saveStoredShifts = (shifts: WorkShift[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LS_KEYS.SHIFTS, JSON.stringify(shifts));
-  }
-};
-
-// Helpers lấy/lưu mock data trong browser session
-const getStoredProducts = (): Product[] => {
-  if (typeof window === 'undefined') return INITIAL_PRODUCTS;
-  const stored = localStorage.getItem(LS_KEYS.PRODUCTS);
-  if (!stored) {
-    localStorage.setItem(LS_KEYS.PRODUCTS, JSON.stringify(INITIAL_PRODUCTS));
-    return INITIAL_PRODUCTS;
-  }
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return INITIAL_PRODUCTS;
-  }
-};
-
-const saveStoredProducts = (products: Product[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LS_KEYS.PRODUCTS, JSON.stringify(products));
-  }
-};
-
-const getStoredOrders = (): Order[] => {
-  if (typeof window === 'undefined') return INITIAL_ORDERS;
-  const stored = localStorage.getItem(LS_KEYS.ORDERS);
-  if (!stored) {
-    localStorage.setItem(LS_KEYS.ORDERS, JSON.stringify(INITIAL_ORDERS));
-    return INITIAL_ORDERS;
-  }
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return INITIAL_ORDERS;
-  }
-};
-
-const saveStoredOrders = (orders: Order[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LS_KEYS.ORDERS, JSON.stringify(orders));
-  }
-};
-
-const getStoredUsers = (): User[] => {
-  if (typeof window === 'undefined') return INITIAL_USERS;
-  const stored = localStorage.getItem(LS_KEYS.USERS);
-  if (!stored) {
-    localStorage.setItem(LS_KEYS.USERS, JSON.stringify(INITIAL_USERS));
-    return INITIAL_USERS;
-  }
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return INITIAL_USERS;
-  }
-};
-
-const saveStoredUsers = (users: User[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LS_KEYS.USERS, JSON.stringify(users));
-  }
-};
-
-const getStoredRoles = (): Role[] => {
-  if (typeof window === 'undefined') return INITIAL_ROLES;
-  const stored = localStorage.getItem(LS_KEYS.ROLES);
-  if (!stored) {
-    localStorage.setItem(LS_KEYS.ROLES, JSON.stringify(INITIAL_ROLES));
-    return INITIAL_ROLES;
-  }
-  try {
-    const parsed = JSON.parse(stored);
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      localStorage.setItem(LS_KEYS.ROLES, JSON.stringify(INITIAL_ROLES));
-      return INITIAL_ROLES;
-    }
-    return parsed;
-  } catch {
-    return INITIAL_ROLES;
-  }
-};
-
-const saveStoredRoles = (roles: Role[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LS_KEYS.ROLES, JSON.stringify(roles));
-  }
-};
-
-const getStoredPermissions = (): Permission[] => {
-  if (typeof window === 'undefined') return INITIAL_PERMISSIONS;
-  const stored = localStorage.getItem(LS_KEYS.PERMISSIONS);
-  if (!stored) {
-    localStorage.setItem(LS_KEYS.PERMISSIONS, JSON.stringify(INITIAL_PERMISSIONS));
-    return INITIAL_PERMISSIONS;
-  }
-  try {
-    const parsed = JSON.parse(stored);
-    if (!Array.isArray(parsed) || parsed.length === 0) {
-      localStorage.setItem(LS_KEYS.PERMISSIONS, JSON.stringify(INITIAL_PERMISSIONS));
-      return INITIAL_PERMISSIONS;
-    }
-    return parsed;
-  } catch {
-    return INITIAL_PERMISSIONS;
-  }
-};
-
-const getStoredAuditLogs = (): AuditLog[] => {
-  if (typeof window === 'undefined') return INITIAL_AUDIT_LOGS;
-  const stored = localStorage.getItem(LS_KEYS.AUDIT_LOGS);
-  if (!stored) {
-    localStorage.setItem(LS_KEYS.AUDIT_LOGS, JSON.stringify(INITIAL_AUDIT_LOGS));
-    return INITIAL_AUDIT_LOGS;
-  }
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return INITIAL_AUDIT_LOGS;
-  }
-};
-
-const saveStoredAuditLogs = (logs: AuditLog[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LS_KEYS.AUDIT_LOGS, JSON.stringify(logs));
-  }
-};
+} from './types';
 
 // ==========================================
 // 1. AUTHENTICATION API
@@ -212,78 +34,27 @@ export const login = async (credentials: { username: string; password?: string }
 // ==========================================
 // 2. PRODUCTS API
 // ==========================================
-export const getProducts = async (params?: { search?: string; category?: string; status?: string }): Promise<Product[]> => {
-  if (true /* pending Phase 2/3/4 */) {
-    let list = getStoredProducts();
-    if (params?.category && params.category !== 'Tất cả') {
-      list = list.filter((p) => p.category === params.category);
-    }
-    if (params?.search) {
-      const q = params.search.toLowerCase().trim();
-      list = list.filter((p) => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
-    }
-    if (params?.status) {
-      list = list.filter((p) => p.status === params.status);
-    }
-    return simulateDelay(list);
-  }
-
+export const getProducts = async (params?: { search?: string; category?: string; status?: string; branchId?: string; warehouseId?: string }): Promise<Product[]> => {
   const response = await apiClient.get('/products', { params });
   return response.data;
 };
 
-export const getProductById = async (id: string): Promise<Product> => {
-  if (true /* pending Phase 2/3/4 */) {
-    const list = getStoredProducts();
-    const product = list.find((p) => p.id === id);
-    if (!product) throw new Error('Không tìm thấy sản phẩm');
-    return simulateDelay(product);
-  }
-
-  const response = await apiClient.get(`/products/${id}`);
+export const getProductById = async (id: string, params?: { branchId?: string; warehouseId?: string }): Promise<Product> => {
+  const response = await apiClient.get(`/products/${id}`, { params });
   return response.data;
 };
 
 export const createProduct = async (data: Omit<Product, 'id' | 'createdAt'>): Promise<Product> => {
-  if (true /* pending Phase 2/3/4 */) {
-    const list = getStoredProducts();
-    const newProduct: Product = {
-      ...data,
-      id: `prod-${Date.now().toString().slice(-4)}`,
-      createdAt: new Date().toISOString(),
-    };
-    saveStoredProducts([newProduct, ...list]);
-    return simulateDelay(newProduct);
-  }
-
   const response = await apiClient.post('/products', data);
   return response.data;
 };
 
 export const updateProduct = async (id: string, data: Partial<Product>): Promise<Product> => {
-  if (true /* pending Phase 2/3/4 */) {
-    const list = getStoredProducts();
-    const index = list.findIndex((p) => p.id === id);
-    if (index === -1) throw new Error('Không tìm thấy sản phẩm để cập nhật');
-    
-    const updated: Product = { ...list[index], ...data };
-    list[index] = updated;
-    saveStoredProducts([...list]);
-    return simulateDelay(updated);
-  }
-
   const response = await apiClient.put(`/products/${id}`, data);
   return response.data;
 };
 
 export const deleteProduct = async (id: string): Promise<{ success: boolean }> => {
-  if (true /* pending Phase 2/3/4 */) {
-    const list = getStoredProducts();
-    const filtered = list.filter((p) => p.id !== id);
-    saveStoredProducts(filtered);
-    return simulateDelay({ success: true });
-  }
-
   const response = await apiClient.delete(`/products/${id}`);
   return response.data;
 };
@@ -291,74 +62,19 @@ export const deleteProduct = async (id: string): Promise<{ success: boolean }> =
 // ==========================================
 // 3. ORDERS API
 // ==========================================
-export const getOrders = async (params?: { search?: string; status?: string; staffId?: string; date?: string }): Promise<Order[]> => {
-  if (true /* pending Phase 2/3/4 */) {
-    let list = getStoredOrders();
-    if (params?.status && params.status !== 'ALL') {
-      list = list.filter((o) => o.status === params.status);
-    }
-    if (params?.search) {
-      const q = params.search.toLowerCase().trim();
-      list = list.filter(
-        (o) =>
-          o.code.toLowerCase().includes(q) ||
-          (o.customerName && o.customerName.toLowerCase().includes(q)) ||
-          o.staffName.toLowerCase().includes(q)
-      );
-    }
-    if (params?.staffId) {
-      list = list.filter((o) => o.staffId === params.staffId);
-    }
-    return simulateDelay(list);
-  }
-
+export const getOrders = async (params?: { search?: string; status?: string; staffId?: string; date?: string; branchId?: string }): Promise<Order[]> => {
   const response = await apiClient.get('/orders', { params });
   return response.data;
 };
 
 export const getOrderDetail = async (id: string): Promise<Order> => {
-  if (true /* pending Phase 2/3/4 */) {
-    const list = getStoredOrders();
-    const order = list.find((o) => o.id === id || o.code === id);
-    if (!order) throw new Error('Không tìm thấy đơn hàng');
-    return simulateDelay(order);
-  }
-
   const response = await apiClient.get(`/orders/${id}`);
   return response.data;
 };
 
+export const getOrderById = getOrderDetail;
+
 export const createOrder = async (data: Omit<Order, 'id' | 'code' | 'createdAt'>): Promise<Order> => {
-  if (true /* pending Phase 2/3/4 */) {
-    const list = getStoredOrders();
-    const now = new Date();
-    const dateStr = now.toISOString().slice(2, 10).replace(/-/g, '');
-    const count = list.length + 1;
-    const code = `HD-${dateStr}-${count < 10 ? '0' + count : count}`;
-
-    const newOrder: Order = {
-      ...data,
-      id: `ord-${Date.now().toString().slice(-4)}`,
-      code,
-      createdAt: now.toISOString(),
-    };
-
-    // Giảm tồn kho các sản phẩm liên quan
-    const products = getStoredProducts();
-    data.items.forEach((item) => {
-      const p = products.find((prod) => prod.id === item.productId);
-      if (p) {
-        p.stock = Math.max(0, p.stock - item.quantity);
-        if (p.stock === 0) p.status = 'out_of_stock';
-        else if (p.stock <= 5) p.status = 'low_stock';
-      }
-    });
-    saveStoredProducts([...products]);
-    saveStoredOrders([newOrder, ...list]);
-
-    return simulateDelay(newOrder);
-  }
-
   const response = await apiClient.post('/orders', data);
   return response.data;
 };
@@ -420,135 +136,6 @@ export const getDashboardStats = async (params?: {
   endDate?: string;
   branchId?: string;
 }): Promise<DashboardStats> => {
-  if (true /* pending Phase 2/3/4 */) {
-    const orders = getStoredOrders();
-    const products = getStoredProducts();
-    const users = getStoredUsers();
-
-    const range = params?.range || 'today';
-    const periodLabel = range === '7days' ? '7 ngày qua' : range === '30days' ? '30 ngày qua' : range === 'custom' ? 'Tùy chọn' : 'Hôm nay';
-    const previousPeriodLabel = range === '7days' ? 'so với 7 ngày trước' : range === '30days' ? 'so với 30 ngày trước' : 'so với hôm qua';
-
-    const branchId = params?.branchId || 'ALL';
-
-    // Lọc đơn hàng theo chi nhánh nếu có chọn cụ thể
-    const branchOrders = branchId !== 'ALL'
-      ? orders.filter((o) => o.branchId === branchId)
-      : orders;
-
-    const completedOrders = branchOrders.filter((o) => o.status === 'COMPLETED');
-    
-    // Seed số liệu phân hóa theo chi nhánh để kiểm chứng trực quan
-    let branchBaseRevenue = 2780000;
-    let branchBaseOrders = 13;
-    let branchTopProduct = 'Croissant Bơ Pháp Truyền Thống';
-
-    if (branchId === 'branch-001') {
-      branchBaseRevenue = 1450000;
-      branchBaseOrders = 7;
-      branchTopProduct = 'Croissant Bơ Pháp Truyền Thống';
-    } else if (branchId === 'branch-002') {
-      branchBaseRevenue = 920000;
-      branchBaseOrders = 4;
-      branchTopProduct = 'Sourdough Men Tự Nhiên (500g)';
-    } else if (branchId === 'branch-003') {
-      branchBaseRevenue = 410000;
-      branchBaseOrders = 2;
-      branchTopProduct = 'Bánh Mì Phô Mai Bơ Tỏi Hàn Quốc';
-    }
-
-    const calculatedRevenue = completedOrders.reduce((sum, o) => sum + o.totalAmount, 0);
-    const todayRevenue = completedOrders.length > 0 ? calculatedRevenue : branchBaseRevenue;
-    const yesterdayRevenue = Math.round(todayRevenue * 0.72);
-    const revenueGrowth = 38.9;
-
-    const todayOrdersCount = completedOrders.length > 0 ? completedOrders.length : branchBaseOrders;
-    const yesterdayOrdersCount = Math.max(1, Math.round(todayOrdersCount * 0.7));
-    const ordersGrowth = 42.8;
-    const averageOrderValue = todayOrdersCount > 0 ? Math.round(todayRevenue / todayOrdersCount) : 198777;
-
-    const lowStockDetails = products
-      .filter((p) => p.stock <= 5)
-      .map((p) => ({
-        id: p.id,
-        name: p.name,
-        category: p.category,
-        stock: p.stock,
-        threshold: 5,
-        status: (p.stock === 0 ? 'Hết hàng' : 'Sắp hết') as 'Hết hàng' | 'Sắp hết',
-        image: p.image,
-      }));
-    const lowStockCount = lowStockDetails.length;
-
-    const recentSalesChart = [
-      { time: '07:00 - 09:00', revenue: Math.round(todayRevenue * 0.15), orders: Math.max(1, Math.round(todayOrdersCount * 0.15)) },
-      { time: '09:00 - 11:00', revenue: Math.round(todayRevenue * 0.1), orders: Math.max(0, Math.round(todayOrdersCount * 0.1)) },
-      { time: '11:00 - 13:00', revenue: Math.round(todayRevenue * 0.25), orders: Math.max(1, Math.round(todayOrdersCount * 0.25)) },
-      { time: '13:00 - 15:00', revenue: Math.round(todayRevenue * 0.05), orders: Math.max(0, Math.round(todayOrdersCount * 0.05)) },
-      { time: '15:00 - 17:00', revenue: Math.round(todayRevenue * 0.2), orders: Math.max(1, Math.round(todayOrdersCount * 0.2)) },
-      { time: '17:00 - 19:00', revenue: Math.round(todayRevenue * 0.15), orders: Math.max(1, Math.round(todayOrdersCount * 0.15)) },
-      { time: '19:00 - 21:00', revenue: Math.round(todayRevenue * 0.1), orders: Math.max(0, Math.round(todayOrdersCount * 0.1)) },
-    ];
-
-    const topSellingProducts = [
-      { id: 'prod-001', name: branchTopProduct, category: 'Bánh Mì Ngọt & Pastry', soldCount: Math.round(todayOrdersCount * 1.5), revenue: Math.round(todayRevenue * 0.35), image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&q=80' },
-      { id: 'prod-003', name: 'Pain au Chocolat (Bánh Sô-cô-la)', category: 'Bánh Mì Ngọt & Pastry', soldCount: Math.max(1, Math.round(todayOrdersCount * 0.8)), revenue: Math.round(todayRevenue * 0.2), image: 'https://images.unsplash.com/photo-1608198093002-ad4e005484ec?w=400&q=80' },
-      { id: 'prod-004', name: 'Baguette Pháp Truyền Thống', category: 'Bánh Mì Nghệ Nhân (Artisan)', soldCount: Math.max(1, Math.round(todayOrdersCount * 0.6)), revenue: Math.round(todayRevenue * 0.15), image: 'https://images.unsplash.com/photo-1597079910443-60c43fc4f749?w=400&q=80' },
-      { id: 'prod-008', name: 'Cà Phê Muối Kem Béo Artisan', category: 'Cà Phê & Đồ Uống', soldCount: Math.max(1, Math.round(todayOrdersCount * 0.4)), revenue: Math.round(todayRevenue * 0.1), image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=400&q=80' },
-      { id: 'prod-010', name: 'Bánh Mì Phô Mai Bơ Tỏi Hàn Quốc', category: 'Bánh Mì Ngọt & Pastry', soldCount: Math.max(1, Math.round(todayOrdersCount * 0.2)), revenue: Math.round(todayRevenue * 0.08), image: 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=400&q=80' },
-    ];
-
-    const slowSellingProducts = [
-      { id: 'prod-011', name: 'Cheesecake Cháy San Sebastian', category: 'Bánh Kem & Sinh Nhật', soldCount: 0, revenue: 0, stock: 6, image: 'https://images.unsplash.com/photo-1533134242443-d4fd215305ad?w=400&q=80' },
-      { id: 'prod-009', name: 'Trà Sữa Oolong Nướng Trân Châu', category: 'Cà Phê & Đồ Uống', soldCount: 1, revenue: 38000, stock: 79, image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&q=80' },
-      { id: 'prod-007', name: 'Cinnamon Roll Phủ Kem Phô Mai', category: 'Bánh Mì Ngọt & Pastry', soldCount: 1, revenue: 42000, stock: 22, image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80' },
-      { id: 'prod-006', name: 'Tiramisu Cacao Mascarpone Ý', category: 'Bánh Kem & Sinh Nhật', soldCount: 1, revenue: 55000, stock: 18, image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=400&q=80' },
-      { id: 'prod-002', name: 'Sourdough Men Tự Nhiên (500g)', category: 'Bánh Mì Nghệ Nhân (Artisan)', soldCount: 1, revenue: 65000, stock: 14, image: 'https://images.unsplash.com/photo-1589367920969-ab8e050bbb04?w=400&q=80' },
-    ];
-
-    const paymentMethods = [
-      { method: 'QR_TRANSFER', methodLabel: 'Chuyển khoản QR', count: Math.round(todayOrdersCount * 0.65), revenue: Math.round(todayRevenue * 0.7), percentage: 70.0 },
-      { method: 'CASH', methodLabel: 'Tiền mặt', count: Math.max(1, Math.round(todayOrdersCount * 0.2)), revenue: Math.round(todayRevenue * 0.18), percentage: 18.0 },
-      { method: 'CARD', methodLabel: 'Quẹt thẻ POS', count: Math.max(0, Math.round(todayOrdersCount * 0.15)), revenue: Math.round(todayRevenue * 0.12), percentage: 12.0 },
-    ];
-
-    const categorySales = [
-      { category: 'Bánh Mì Ngọt & Pastry', revenue: Math.round(todayRevenue * 0.55), soldCount: Math.round(todayOrdersCount * 1.8), percentage: 55.0 },
-      { category: 'Bánh Kem & Sinh Nhật', revenue: Math.round(todayRevenue * 0.2), soldCount: Math.max(1, Math.round(todayOrdersCount * 0.3)), percentage: 20.0 },
-      { category: 'Bánh Mì Nghệ Nhân (Artisan)', revenue: Math.round(todayRevenue * 0.15), soldCount: Math.max(1, Math.round(todayOrdersCount * 0.4)), percentage: 15.0 },
-      { category: 'Cà Phê & Đồ Uống', revenue: Math.round(todayRevenue * 0.1), soldCount: Math.max(1, Math.round(todayOrdersCount * 0.5)), percentage: 10.0 },
-    ];
-
-    const staffPerformances = users.map((u, i) => ({
-      staffId: u.id,
-      staffName: u.fullName,
-      ordersCount: i === 0 ? Math.round(todayOrdersCount * 0.6) : i === 1 ? Math.round(todayOrdersCount * 0.3) : Math.round(todayOrdersCount * 0.1),
-      revenue: i === 0 ? Math.round(todayRevenue * 0.6) : i === 1 ? Math.round(todayRevenue * 0.3) : Math.round(todayRevenue * 0.1),
-      averageOrderValue: averageOrderValue,
-    })).sort((a, b) => b.revenue - a.revenue);
-
-    return simulateDelay({
-      periodLabel,
-      previousPeriodLabel,
-      todayRevenue,
-      yesterdayRevenue,
-      revenueGrowth,
-      todayOrdersCount,
-      yesterdayOrdersCount,
-      ordersGrowth,
-      averageOrderValue,
-      totalProductsCount: products.length,
-      lowStockCount,
-      recentSalesChart,
-      topSellingProducts,
-      slowSellingProducts,
-      paymentMethods,
-      categorySales,
-      staffPerformances,
-      lowStockDetails,
-    });
-  }
-
   const response = await apiClient.get('/dashboard/stats', {
     params: {
       range: params?.range || 'today',
@@ -563,122 +150,32 @@ export const getDashboardStats = async (params?: {
 // ==========================================
 // 6. SHIFT & CASH RECONCILIATION API
 // ==========================================
-export const getCurrentShift = async (): Promise<WorkShift> => {
-  if (true /* pending Phase 2/3/4 */) {
-    const shifts = getStoredShifts();
-    const openShift = shifts.find((s) => s.status === 'OPEN') || {
-      id: `shift-${Date.now().toString().slice(-4)}`,
-      shiftName: 'Ca sáng (07:00 - 15:00) - 16/08/2026',
-      staffId: 'user-002',
-      staffName: 'Trần Thị Thu Ngân',
-      startTime: new Date(Date.now() - 4 * 3600 * 1000).toISOString(),
-      endTime: null,
-      initialCash: 500000,
-      cashRevenue: 150000,
-      cardRevenue: 380000,
-      qrRevenue: 479000,
-      totalRevenue: 1009000,
-      ordersCount: 6,
-      expectedCash: 650000,
-      actualCash: 0,
-      difference: -650000,
-      status: 'OPEN',
-      note: null,
-      createdAt: new Date().toISOString(),
-    };
-    return simulateDelay(openShift);
-  }
-
+export const getCurrentShift = async (): Promise<WorkShift | null> => {
   const response = await apiClient.get('/shifts/current');
   return response.data;
 };
 
-export const closeCurrentShift = async (data: { actualCash: number; note?: string }): Promise<WorkShift> => {
-  if (true /* pending Phase 2/3/4 */) {
-    const shifts = getStoredShifts();
-    const openIndex = shifts.findIndex((s) => s.status === 'OPEN');
-    if (openIndex >= 0) {
-      const shift = shifts[openIndex];
-      shift.actualCash = data.actualCash;
-      shift.difference = data.actualCash - shift.expectedCash;
-      shift.note = data.note || null;
-      shift.endTime = new Date().toISOString();
-      shift.status = 'CLOSED';
-      saveStoredShifts([...shifts]);
-      return simulateDelay(shift);
-    }
-    const closed: WorkShift = {
-      id: `shift-${Date.now().toString().slice(-4)}`,
-      shiftName: 'Ca vừa đóng',
-      staffId: 'user-current',
-      staffName: 'Nhân Viên',
-      startTime: new Date(Date.now() - 3600000).toISOString(),
-      endTime: new Date().toISOString(),
-      initialCash: 500000,
-      cashRevenue: 150000,
-      cardRevenue: 0,
-      qrRevenue: 0,
-      totalRevenue: 150000,
-      ordersCount: 1,
-      expectedCash: 650000,
-      actualCash: data.actualCash,
-      difference: data.actualCash - 650000,
-      status: 'CLOSED',
-      note: data.note || null,
-      createdAt: new Date().toISOString(),
-    };
-    return simulateDelay(closed);
-  }
+export const openShift = async (data: { initialCash: number; branchId?: string; note?: string }): Promise<WorkShift> => {
+  const response = await apiClient.post('/shifts/open', data);
+  return response.data;
+};
 
+export const closeCurrentShift = async (data: { actualCash: number; note?: string }): Promise<WorkShift> => {
   const response = await apiClient.post('/shifts/close', data);
   return response.data;
 };
 
-export const getShifts = async (params?: { status?: string; staffId?: string; date?: string; branchId?: string }): Promise<WorkShift[]> => {
-  if (true /* pending Phase 2/3/4 */) {
-    let list = getStoredShifts();
-    if (params?.status) list = list.filter((s) => s.status === params.status);
-    if (params?.staffId) list = list.filter((s) => s.staffId === params.staffId);
-    if (params?.branchId && params.branchId !== 'ALL') {
-      const match = list.filter((s) => !(s as any).branchId || (s as any).branchId === params.branchId);
-      if (match.length > 0) list = match;
-    }
-    return simulateDelay(list);
-  }
+export const getCurrentSchedule = async (): Promise<ShiftScheduleResponse> => {
+  const response = await apiClient.get('/shifts/current-schedule');
+  return response.data;
+};
 
+export const getShifts = async (params?: { status?: string; staffId?: string; date?: string; branchId?: string }): Promise<WorkShift[]> => {
   const response = await apiClient.get('/shifts', { params });
   return response.data;
 };
 
 export const getShiftSummary = async (params?: { date?: string; branchId?: string }): Promise<ShiftSummary> => {
-  if (true /* pending Phase 2/3/4 */) {
-    let list = getStoredShifts();
-    if (params?.branchId && params.branchId !== 'ALL') {
-      const match = list.filter((s) => !(s as any).branchId || (s as any).branchId === params.branchId);
-      if (match.length > 0) list = match;
-    }
-    const totalShiftsCount = list.length;
-    const closedShiftsCount = list.filter((s) => s.status === 'CLOSED').length;
-    const openShiftsCount = list.filter((s) => s.status === 'OPEN').length;
-    const totalRevenue = list.reduce((sum, s) => sum + s.totalRevenue, 0);
-    const totalCash = list.reduce((sum, s) => sum + s.cashRevenue, 0);
-    const totalCard = list.reduce((sum, s) => sum + s.cardRevenue, 0);
-    const totalQr = list.reduce((sum, s) => sum + s.qrRevenue, 0);
-    const totalDifference = list.filter((s) => s.status === 'CLOSED').reduce((sum, s) => sum + s.difference, 0);
-
-    return simulateDelay({
-      totalShiftsCount,
-      closedShiftsCount,
-      openShiftsCount,
-      totalRevenue,
-      totalCash,
-      totalCard,
-      totalQr,
-      totalDifference,
-      shifts: list,
-    });
-  }
-
   const response = await apiClient.get('/shifts/summary', { params });
   return response.data;
 };
@@ -686,26 +183,6 @@ export const getShiftSummary = async (params?: { date?: string; branchId?: strin
 // ==========================================
 // 7. BRANCHES & WAREHOUSES API
 // ==========================================
-const getStoredBranches = (): Branch[] => {
-  if (typeof window === 'undefined') return INITIAL_BRANCHES;
-  const stored = localStorage.getItem(LS_KEYS.BRANCHES);
-  if (!stored) {
-    localStorage.setItem(LS_KEYS.BRANCHES, JSON.stringify(INITIAL_BRANCHES));
-    return INITIAL_BRANCHES;
-  }
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return INITIAL_BRANCHES;
-  }
-};
-
-const saveStoredBranches = (branches: Branch[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LS_KEYS.BRANCHES, JSON.stringify(branches));
-  }
-};
-
 export const getBranches = async (params?: { status?: string }): Promise<Branch[]> => {
   const response = await apiClient.get('/branches', { params });
   return response.data;
@@ -721,61 +198,12 @@ export const updateBranch = async (id: string, data: Partial<Branch>): Promise<B
   return response.data;
 };
 
-export const getWarehouseStocks = async (params?: { warehouseId?: string; branchId?: string }): Promise<StockItem[]> => {
-  if (true /* pending Phase 2/3/4 */) {
-    const products = getStoredProducts();
-    const branches = getStoredBranches();
-    const stocks: StockItem[] = [];
-
-    branches.forEach((b) => {
-      b.warehouses.forEach((w) => {
-        if (params?.warehouseId && w.id !== params.warehouseId) return;
-        if (params?.branchId && b.id !== params.branchId) return;
-
-        products.forEach((p) => {
-          stocks.push({
-            id: `stk-${w.id}-${p.id}`,
-            warehouseId: w.id,
-            warehouseName: w.name,
-            branchId: b.id,
-            branchName: b.name,
-            productId: p.id,
-            productName: p.name,
-            productImage: p.image,
-            productCategory: p.category,
-            quantity: p.stock,
-            minAlertStock: 5,
-            status: p.stock > 5 ? 'in_stock' : p.stock > 0 ? 'low_stock' : 'out_of_stock',
-            updatedAt: new Date().toISOString(),
-          });
-        });
-      });
-    });
-
-    return simulateDelay(stocks);
-  }
+export const getWarehouseStocks = async (params?: { warehouseId?: string; branchId?: string; productId?: string }): Promise<StockItem[]> => {
   const response = await apiClient.get('/branches/stocks', { params });
   return response.data;
 };
 
 export const updateWarehouseStock = async (data: { warehouseId: string; productId: string; quantity: number; minAlertStock?: number }): Promise<StockItem> => {
-  if (true /* pending Phase 2/3/4 */) {
-    const products = getStoredProducts();
-    const prod = products.find((p) => p.id === data.productId);
-    if (prod) {
-      prod.stock = data.quantity;
-      saveStoredProducts([...products]);
-    }
-    return simulateDelay({
-      id: `stk-${data.warehouseId}-${data.productId}`,
-      warehouseId: data.warehouseId,
-      productId: data.productId,
-      quantity: data.quantity,
-      minAlertStock: data.minAlertStock || 5,
-      status: data.quantity > 5 ? 'in_stock' : data.quantity > 0 ? 'low_stock' : 'out_of_stock',
-      updatedAt: new Date().toISOString(),
-    });
-  }
   const response = await apiClient.put('/branches/stocks', data);
   return response.data;
 };
@@ -815,116 +243,24 @@ export const deleteShiftTemplate = async (id: string): Promise<void> => {
 // ==========================================
 // 9. BASIC ACCOUNTING & CASH FLOW API
 // ==========================================
-const getStoredTransactions = (): Transaction[] => {
-  if (typeof window === 'undefined') return INITIAL_TRANSACTIONS;
-  const stored = localStorage.getItem(LS_KEYS.TRANSACTIONS);
-  if (!stored) {
-    localStorage.setItem(LS_KEYS.TRANSACTIONS, JSON.stringify(INITIAL_TRANSACTIONS));
-    return INITIAL_TRANSACTIONS;
-  }
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return INITIAL_TRANSACTIONS;
-  }
-};
-
-const saveStoredTransactions = (txs: Transaction[]) => {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem(LS_KEYS.TRANSACTIONS, JSON.stringify(txs));
-  }
-};
-
 export const getTransactions = async (params?: { type?: string; category?: string; branchId?: string }): Promise<Transaction[]> => {
-  if (true /* pending Phase 2/3/4 */) {
-    let list = getStoredTransactions();
-    if (params?.type) list = list.filter((t) => t.transactionType === params.type);
-    if (params?.category) list = list.filter((t) => t.category === params.category);
-    if (params?.branchId && params.branchId !== 'ALL') list = list.filter((t) => t.branchId === params.branchId);
-    return simulateDelay(list);
-  }
-
+  const response = await apiClient.get('/accounting/transactions', { params });
+  return response.data;
 };
 
 export const createTransaction = async (data: Omit<Transaction, 'id' | 'code' | 'createdAt'>): Promise<Transaction> => {
-  if (true /* pending Phase 2/3/4 */) {
-    const list = getStoredTransactions();
-    const prefix = data.transactionType === 'INCOME' ? 'PT' : 'PC';
-    const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, '');
-    const newTx: Transaction = {
-      ...data,
-      id: `tx-${Date.now().toString().slice(-6)}`,
-      code: `${prefix}-${dateStr}-${(list.length + 1).toString().padStart(3, '0')}`,
-      createdAt: new Date().toISOString(),
-    };
-    list.unshift(newTx);
-    saveStoredTransactions(list);
-    return simulateDelay(newTx);
-  }
   const response = await apiClient.post('/accounting/transactions', data);
   return response.data;
 };
 
 export const getCashFlowSummary = async (params?: { branchId?: string }): Promise<CashFlowSummary> => {
-  if (true /* pending Phase 2/3/4 */) {
-    const txs = getStoredTransactions().filter((t) => !params?.branchId || params.branchId === 'ALL' || t.branchId === params.branchId);
-    const totalIncome = txs.filter((t) => t.transactionType === 'INCOME').reduce((sum, t) => sum + t.amount, 0);
-    const totalExpense = txs.filter((t) => t.transactionType === 'EXPENSE').reduce((sum, t) => sum + t.amount, 0);
-    const netCashFlow = totalIncome - totalExpense;
-
-    const incomeByCategory: Record<string, number> = {};
-    const expenseByCategory: Record<string, number> = {};
-
-    txs.forEach((t) => {
-      if (t.transactionType === 'INCOME') {
-        incomeByCategory[t.category] = (incomeByCategory[t.category] || 0) + t.amount;
-      } else {
-        expenseByCategory[t.category] = (expenseByCategory[t.category] || 0) + t.amount;
-      }
-    });
-
-    return simulateDelay({
-      periodLabel: 'Tháng này (08/2026)',
-      totalIncome,
-      totalExpense,
-      netCashFlow,
-      cashBalance: 2500000 + Math.max(0, netCashFlow * 0.2),
-      bankBalance: 18500000 + Math.max(0, netCashFlow * 0.8),
-      totalTransactionsCount: txs.length,
-      incomeByCategory,
-      expenseByCategory,
-    });
-  }
-
+  const response = await apiClient.get('/accounting/summary', { params });
+  return response.data;
 };
 
 export const getPnLReport = async (params?: { branchId?: string }): Promise<PnLReport> => {
-  if (true /* pending Phase 2/3/4 */) {
-    const orders = getStoredOrders().filter((o) => !params?.branchId || params.branchId === 'ALL' || o.branchId === params.branchId);
-    const grossRevenue = orders.reduce((sum, o) => sum + o.totalAmount, 0) || 5500000;
-    const cogs = Math.round(grossRevenue * 0.35);
-    const grossProfit = grossRevenue - cogs;
-    const operatingExpenses = Math.round(grossRevenue * 0.22);
-    const netProfit = grossProfit - operatingExpenses;
-
-    return simulateDelay({
-      periodLabel: 'Tháng 08/2026',
-      grossRevenue,
-      cogs,
-      grossProfit,
-      grossMarginPercent: Math.round((grossProfit / grossRevenue) * 1000) / 10,
-      operatingExpenses,
-      netProfit,
-      netMarginPercent: Math.round((netProfit / grossRevenue) * 1000) / 10,
-      expensesBreakdown: {
-        'Bột mì, Bơ lạt & Sữa': Math.round(cogs * 0.7),
-        'Bao bì hộp bánh': Math.round(cogs * 0.3),
-        'Điện nước & Gas nướng': Math.round(operatingExpenses * 0.4),
-        'Lương nhân sự ca': Math.round(operatingExpenses * 0.6),
-      },
-    });
-  }
-
+  const response = await apiClient.get('/accounting/pnl', { params });
+  return response.data;
 };
 
 // ==========================================
@@ -961,6 +297,6 @@ export const deleteRole = async (roleId: string): Promise<{ message: string }> =
 };
 
 export const getAuditLogs = async (targetType?: string): Promise<AuditLog[]> => {
-  const response = await apiClient.get('/audit-logs', { params: { target_type: targetType } });
+  const response = await apiClient.get('/audit-logs', { params: { targetType } });
   return response.data;
 };

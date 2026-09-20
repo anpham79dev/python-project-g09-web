@@ -23,7 +23,7 @@ import {
   ShoppingOutlined,
 } from '@ant-design/icons';
 import { getOrders } from '@/lib/api';
-import { Order } from '@/lib/mock-data';
+import { Order } from '@/lib/types';
 import { getCurrentUser } from '@/lib/auth';
 
 const { Title, Text } = Typography;

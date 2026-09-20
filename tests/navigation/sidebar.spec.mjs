@@ -27,8 +27,8 @@ async function testSidebarNavigation() {
     // 2. Đăng nhập Admin và kiểm tra 5 SubMenu Groups có thể đóng/mở
     console.log('\n[2/7] 🏢 Đăng nhập Admin và kiểm tra 5 khối SubMenu Groups...');
     await page.goto(`${BASE_URL}/login`);
-    await page.click('button:has-text("Admin (Quản lý)")');
-    await page.click('button:has-text("Đăng nhập hệ thống")');
+    await page.click('button:has-text("Quản lý")');
+    await page.locator('button[type="submit"]').click();
     await page.waitForURL('**/dashboard');
     await page.waitForTimeout(800);
 
@@ -45,11 +45,11 @@ async function testSidebarNavigation() {
     ];
 
     for (const title of subMenuTitles) {
-      const subMenu = sider.locator(`.ant-menu-submenu-title:has-text("${title}")`);
+      const subMenu = sider.locator(`:is(.ant-menu-submenu-title, .ant-menu-item):has-text("${title}")`);
       const isVisible = await subMenu.isVisible();
-      console.log(`  👉 SubMenu Group "${title}": ${isVisible ? '✅ Hiển thị' : '❌ Ẩn'}`);
+      console.log(`  👉 Menu Group "${title}": ${isVisible ? '✅ Hiển thị' : '❌ Ẩn'}`);
       if (!isVisible) {
-        throw new Error(`SubMenu "${title}" không xuất hiện!`);
+        throw new Error(`Menu Group "${title}" không xuất hiện!`);
       }
     }
     console.log('  ✅ 100% 5 SubMenu Groups hiển thị chuẩn xác.');
@@ -107,33 +107,34 @@ async function testSidebarNavigation() {
     const staffPage = await staffContext.newPage();
     await staffPage.goto(`${BASE_URL}/login`);
     await staffPage.waitForTimeout(400);
-    await staffPage.click('button:has-text("Staff (Thu ngân)")');
-    await staffPage.click('button:has-text("Đăng nhập hệ thống")');
+    await staffPage.click('button:has-text("Thu ngân")');
+    await staffPage.locator('button[type="submit"]').click();
     await staffPage.waitForURL('**/pos');
+    await staffPage.goto(`${BASE_URL}/orders`);
     await staffPage.waitForTimeout(800);
 
     const staffSider = staffPage.locator('.ant-layout-sider');
     await staffSider.waitFor({ state: 'visible' });
 
-    // Staff thấy SubMenu: Bán Hàng, Đơn Hàng & Ca Làm
+    // Staff thấy Menu: Bán Hàng, Đơn Hàng & Ca Làm
     const staffAllowedSub = ['Bán Hàng (POS)', 'Đơn Hàng & Ca Làm'];
     for (const title of staffAllowedSub) {
-      const sub = staffSider.locator(`.ant-menu-submenu-title:has-text("${title}")`);
+      const sub = staffSider.locator(`:is(.ant-menu-submenu-title, .ant-menu-item):has-text("${title}")`);
       if (!(await sub.isVisible())) {
-        throw new Error(`Staff phải thấy SubMenu "${title}"!`);
+        throw new Error(`Staff phải thấy Menu "${title}"!`);
       }
     }
-    console.log('  ✅ Staff thấy đúng các SubMenu được phân quyền.');
+    console.log('  ✅ Staff thấy đúng các Menu được phân quyền.');
 
-    // Staff KHÔNG ĐƯỢC thấy SubMenu Admin
+    // Staff KHÔNG ĐƯỢC thấy Menu Admin
     const staffForbiddenSub = ['Sản Phẩm & Kho Hàng', 'Quản Trị & Tài Chính', 'Cài Đặt Hệ Thống'];
     for (const title of staffForbiddenSub) {
-      const sub = staffSider.locator(`.ant-menu-submenu-title:has-text("${title}")`);
+      const sub = staffSider.locator(`:is(.ant-menu-submenu-title, .ant-menu-item):has-text("${title}")`);
       if (await sub.isVisible()) {
-        throw new Error(`Staff KHÔNG ĐƯỢC thấy SubMenu Admin "${title}"!`);
+        throw new Error(`Staff KHÔNG ĐƯỢC thấy Menu Admin "${title}"!`);
       }
     }
-    console.log('  ✅ 100% SubMenu Admin đã bị ẩn an toàn đối với Staff.');
+    console.log('  ✅ 100% Menu Admin đã bị ẩn an toàn đối với Staff.');
 
     // 7. Kiểm tra Topbar ERP
     console.log('\n[7/7] 🎯 Kiểm tra Topbar ERP...');

@@ -37,8 +37,8 @@ import {
   KeyOutlined,
 } from '@ant-design/icons';
 import { getCurrentUser, clearAuthSession, AuthUser, hasPermission, canAccessRoute, hasAdminAccess, isSuperAdmin } from '@/lib/auth';
-import { getBranches, updateUserActiveBranch } from '@/lib/api';
-import { Branch } from '@/lib/mock-data';
+import { getBranches, updateUserActiveBranch, getCurrentSchedule } from '@/lib/api';
+import { Branch, ShiftScheduleResponse } from '@/lib/types';
 
 const { Sider, Header, Content } = Layout;
 const { Text } = Typography;
@@ -153,6 +153,7 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
 
   // SubMenu Collapsible Groups State - Lưu trạng thái các nhóm đang mở
   const [openKeys, setOpenKeys] = useState<string[]>(ALL_SUBMENU_KEYS);
+  const [currentSchedule, setCurrentSchedule] = useState<ShiftScheduleResponse | null>(null);
 
   const isPublicPage = pathname === '/login';
   const isPosPage = pathname === '/pos' || pathname?.startsWith('/pos/');
@@ -166,6 +167,10 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
     const user = getCurrentUser();
     setCurrentUser(user);
     setMounted(true);
+
+    getCurrentSchedule()
+      .then((sched) => setCurrentSchedule(sched))
+      .catch(() => {});
 
     // Khởi tạo trạng thái thu gọn sidebar từ localStorage
     if (typeof window !== 'undefined') {
@@ -651,7 +656,7 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
             <div className="flex items-center gap-3">
               <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
                 <ClockCircleOutlined className="text-emerald-600" />
-                <span>Ca: 07:00 - 15:00</span>
+                <span>{currentSchedule?.displayText || 'Đang cập nhật ca'}</span>
               </div>
 
               {currentUser && (

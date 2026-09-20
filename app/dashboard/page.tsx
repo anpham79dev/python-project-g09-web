@@ -67,7 +67,7 @@ import {
   LowStockDetailItem,
   SlowSellingProduct,
   Branch,
-} from '@/lib/mock-data';
+} from '@/lib/types';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
 
 const { Title, Text } = Typography;

@@ -18,8 +18,8 @@ import {
   ArrowLeftOutlined,
   SaveOutlined,
 } from '@ant-design/icons';
-import { createProduct, getBranches } from '@/lib/api';
-import { CATEGORIES, Branch } from '@/lib/mock-data';
+import { createProduct } from '@/lib/api';
+import { CATEGORIES } from '@/lib/types';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
 
 const { Title, Text } = Typography;
@@ -29,13 +29,12 @@ export default function NewProductPage() {
   const router = useRouter();
   const { message } = App.useApp();
   const [form] = Form.useForm();
-  const [branches, setBranches] = useState<Branch[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>(
     'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600&q=80'
   );
 
-  // Check PBAC permission and load branches
+  // Check PBAC permission
   useEffect(() => {
     const user = getCurrentUser();
     if (!user) {
@@ -44,34 +43,17 @@ export default function NewProductPage() {
       message.error('Bạn không có quyền thêm sản phẩm mới!');
       router.push('/pos');
     }
-
-    getBranches().then((list) => {
-      setBranches(list);
-      const activeBranchId = typeof window !== 'undefined' ? localStorage.getItem('artisan_active_branch_id') : null;
-      const matchedBranch = list.find((b) => b.id === activeBranchId) || list[0];
-      if (matchedBranch && matchedBranch.warehouses?.length > 0) {
-        form.setFieldValue('warehouseId', matchedBranch.warehouses[0].id);
-      }
-    });
-  }, [router, form, message]);
+  }, [router, message]);
 
   const handleSubmit = async (values: any) => {
     setSubmitting(true);
     try {
-      const stock = Number(values.stock) || 0;
-      let status: 'in_stock' | 'low_stock' | 'out_of_stock' = 'in_stock';
-      if (stock === 0) status = 'out_of_stock';
-      else if (stock <= 5) status = 'low_stock';
-
       await createProduct({
         name: values.name.trim(),
         category: values.category,
         price: Number(values.price),
-        stock,
         description: values.description?.trim() || '',
         image: values.image?.trim() || previewImage,
-        status,
-        warehouseId: values.warehouseId || undefined,
       } as any);
 
       message.success('Thêm sản phẩm mới thành công!');
@@ -124,7 +106,6 @@ export default function NewProductPage() {
           initialValues={{
             category: 'Bánh Mì Ngọt & Pastry',
             price: 35000,
-            stock: 20,
             image: previewImage,
           }}
           requiredMark="optional"
@@ -170,44 +151,6 @@ export default function NewProductPage() {
                       className="w-full rounded-l-lg"
                     />
                     <Button disabled size="large" className="!bg-gray-100 !text-gray-600 font-medium !px-3">₫</Button>
-                  </Space.Compact>
-                </Form.Item>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Form.Item
-                  label={<span className="font-semibold text-xs uppercase text-secondary">Kho lưu trữ ban đầu</span>}
-                  name="warehouseId"
-                  help="Chọn kho lưu trữ nhập mẻ bánh này (mặc định là kho quầy bán lẻ của chi nhánh hiện tại)"
-                >
-                  <Select
-                    size="large"
-                    placeholder="Chọn kho lưu trữ"
-                    options={[
-                      { label: 'Tất cả các kho quầy bán lẻ (Tự động đồng bộ)', value: '' },
-                      ...branches.flatMap((b) =>
-                        (b.warehouses || []).map((w) => ({
-                          label: `${b.code} — ${w.name}`,
-                          value: w.id,
-                        }))
-                      ),
-                    ]}
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  label={<span className="font-semibold text-xs uppercase text-secondary">Số lượng tồn kho nhập ban đầu</span>}
-                  name="stock"
-                  rules={[{ required: true, message: 'Vui lòng nhập số lượng tồn kho!' }]}
-                >
-                  <Space.Compact size="large" className="w-full">
-                    <InputNumber
-                      size="large"
-                      min={0}
-                      step={1}
-                      className="w-full rounded-l-lg"
-                    />
-                    <Button disabled size="large" className="!bg-gray-100 !text-gray-600 font-medium !px-3">cái</Button>
                   </Space.Compact>
                 </Form.Item>
               </div>

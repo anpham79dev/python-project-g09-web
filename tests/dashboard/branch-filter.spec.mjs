@@ -20,8 +20,8 @@ async function runDashboardBranchFilterTest() {
   console.log('[1/5] 🔐 Đăng nhập tài khoản Quản trị viên (Admin)...');
   await page.goto(`${BASE_URL}/login`);
   await page.waitForSelector('text=Artisan Bakery');
-  await page.click('button:has-text("Admin (Quản lý)")');
-  await page.click('button:has-text("Đăng nhập hệ thống")');
+  await page.click('button:has-text("Quản lý")');
+  await page.locator('button[type="submit"]').click();
   await page.waitForURL('**/dashboard', { timeout: 10000 });
   await page.waitForSelector('text=Báo Cáo & Thống Kê Hoạt Động Tiệm Bánh');
   console.log('  ✅ Đăng nhập Admin thành công, đã vào /dashboard.');

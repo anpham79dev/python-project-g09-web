@@ -39,7 +39,7 @@ import {
   ApartmentOutlined,
 } from '@ant-design/icons';
 import { getRoles, getPermissions, createRole, updateRole, deleteRole, getAuditLogs } from '@/lib/api';
-import { Role, Permission, AuditLog } from '@/lib/mock-data';
+import { Role, Permission, AuditLog } from '@/lib/types';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
 
 const { Title, Text, Paragraph } = Typography;

@@ -33,8 +33,8 @@ async function runE2ETests() {
 
     // 1.1 Test Staff Login & Branch Locking
     console.log('  👉 1.1 Đăng nhập tài khoản Staff...');
-    await page.click('button:has-text("Staff (Thu ngân)")');
-    await page.click('button:has-text("Đăng nhập hệ thống")');
+    await page.click('button:has-text("Thu ngân")');
+    await page.locator('button[type="submit"]').click();
     await page.waitForURL('**/pos');
     console.log('  ✅ Staff tự động điều hướng vào /pos thành công.');
 
@@ -57,8 +57,8 @@ async function runE2ETests() {
 
     // 1.4 Admin Login
     console.log('  👉 1.4 Đăng nhập tài khoản Admin...');
-    await page.click('button:has-text("Admin (Quản lý)")');
-    await page.click('button:has-text("Đăng nhập hệ thống")');
+    await page.click('button:has-text("Quản lý")');
+    await page.locator('button[type="submit"]').click();
     await page.waitForURL('**/dashboard');
     console.log('  ✅ Admin đăng nhập thành công, chuyển hướng vào /dashboard.');
 
@@ -182,7 +182,7 @@ async function runE2ETests() {
     // ---------------------------------------------------------
     console.log('\n[Flow 6/10] ⏰ Kiểm thử Quản Lý Ca & Xem Chi Tiết Biên Bản Bàn Giao...');
     await page.goto('http://localhost:3000/shifts');
-    await page.waitForSelector('text=Quản Lý Ca Làm Việc');
+    await page.waitForSelector('[data-testid="page-title"]');
     console.log('  ✅ Mở trang quản lý ca làm việc /shifts thành công.');
 
     // Wait for table to load and click "Chi tiết" if available

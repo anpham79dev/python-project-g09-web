@@ -13,10 +13,10 @@ async function testAccountingBranchFilter() {
     // 1. Đăng nhập Admin
     console.log('\n[1/5] 🔐 Đăng nhập tài khoản Quản trị viên (Admin)...');
     await page.goto('http://localhost:3000/login');
-    const adminBtn = page.getByRole('button', { name: /Admin \(Quản lý\)|Quản trị viên/i });
+    const adminBtn = page.getByRole('button', { name: /Quản lý|Admin/i });
     await adminBtn.click();
     await page.waitForTimeout(300);
-    await page.getByRole('button', { name: /Đăng nhập hệ thống/i }).click();
+    await page.locator('button[type="submit"]').click();
     await page.waitForURL('**/dashboard', { timeout: 10000 });
     console.log('  ✅ Đăng nhập Admin thành công.');
 

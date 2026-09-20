@@ -15,8 +15,8 @@ async function testAccountingIconsAndHeader() {
     // 1. Đăng nhập Admin
     console.log('\n[1/5] 🔐 Đăng nhập tài khoản Admin...');
     await page.goto(`${BASE_URL}/login`);
-    await page.click('button:has-text("Admin (Quản lý)")');
-    await page.click('button:has-text("Đăng nhập hệ thống")');
+    await page.click('button:has-text("Quản lý")');
+    await page.locator('button[type="submit"]').click();
     await page.waitForURL('**/dashboard');
     await page.waitForTimeout(600);
     console.log('  ✅ Đăng nhập Admin thành công.');

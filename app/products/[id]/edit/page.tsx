@@ -20,7 +20,7 @@ import {
   SaveOutlined,
 } from '@ant-design/icons';
 import { getProductById, updateProduct } from '@/lib/api';
-import { CATEGORIES } from '@/lib/mock-data';
+import { CATEGORIES } from '@/lib/types';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
 
 const { Title, Text } = Typography;
@@ -69,25 +69,18 @@ export default function EditProductPage() {
   const handleSubmit = async (values: any) => {
     setSubmitting(true);
     try {
-      const stock = Number(values.stock) || 0;
-      let status: 'in_stock' | 'low_stock' | 'out_of_stock' = 'in_stock';
-      if (stock === 0) status = 'out_of_stock';
-      else if (stock <= 5) status = 'low_stock';
-
       await updateProduct(id, {
         name: values.name.trim(),
         category: values.category,
         price: Number(values.price),
-        stock,
         description: values.description?.trim() || '',
         image: values.image?.trim() || previewImage,
-        status,
       });
 
       message.success('Cập nhật sản phẩm thành công!');
       router.push('/products');
     } catch (err: any) {
-      message.error(err.message || 'Không thể cập nhật sản phẩm');
+      message.error(err.response?.data?.detail || err.message || 'Không thể cập nhật sản phẩm');
     } finally {
       setSubmitting(false);
     }
@@ -176,32 +169,17 @@ export default function EditProductPage() {
                 </Form.Item>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Form.Item
-                  label={<span className="font-semibold text-xs uppercase text-secondary">Số lượng tồn kho</span>}
-                  name="stock"
-                  rules={[{ required: true, message: 'Vui lòng nhập số lượng tồn kho!' }]}
-                >
-                  <InputNumber
-                    size="large"
-                    min={0}
-                    step={1}
-                    className="w-full rounded-lg"
-                  />
-                </Form.Item>
-
-                <Form.Item
-                  label={<span className="font-semibold text-xs uppercase text-secondary">URL Hình ảnh</span>}
-                  name="image"
-                  rules={[{ required: true, message: 'Vui lòng nhập URL ảnh!' }]}
-                >
-                  <Input
-                    size="large"
-                    onChange={(e) => setPreviewImage(e.target.value)}
-                    className="rounded-lg"
-                  />
-                </Form.Item>
-              </div>
+              <Form.Item
+                label={<span className="font-semibold text-xs uppercase text-secondary">URL Hình ảnh</span>}
+                name="image"
+                rules={[{ required: true, message: 'Vui lòng nhập URL ảnh!' }]}
+              >
+                <Input
+                  size="large"
+                  onChange={(e) => setPreviewImage(e.target.value)}
+                  className="rounded-lg"
+                />
+              </Form.Item>
 
               <Form.Item
                 label={<span className="font-semibold text-xs uppercase text-secondary">Mô tả & Thành phần nguyên liệu</span>}

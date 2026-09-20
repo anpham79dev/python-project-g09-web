@@ -43,7 +43,7 @@ import {
   updateShiftTemplate,
   deleteShiftTemplate,
 } from '@/lib/api';
-import { ShiftTemplate, SystemSettings } from '@/lib/mock-data';
+import { ShiftTemplate, SystemSettings } from '@/lib/types';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
 
 const { Title, Text } = Typography;

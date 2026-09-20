@@ -46,10 +46,10 @@ async function runAntdV6DeprecationTest() {
   // 2. Đăng nhập Admin
   console.log('[2/8] 🔐 Đăng nhập tài khoản Admin...');
   await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' });
-  const adminBtn = page.getByRole('button', { name: /Quản trị viên/i });
+  const adminBtn = page.getByRole('button', { name: /Quản lý|admin/i });
   if (await adminBtn.isVisible()) {
     await adminBtn.click();
-    await page.getByRole('button', { name: /Đăng nhập hệ thống/i }).click();
+    await page.locator('button[type="submit"]').click();
     await page.waitForURL('**/dashboard', { timeout: 10000 });
   }
 
@@ -94,16 +94,16 @@ async function runAntdV6DeprecationTest() {
   await page.goto(`${BASE_URL}/settings/roles`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
 
-  // 8. Đăng nhập SuperAdmin & Kiểm tra CMS Landing Page
-  console.log('[8/8] 👑 Kiểm tra Quản trị Landing Page (/settings/landing-page)...');
+  // 8. Đăng nhập SuperAdmin & Kiểm tra Cài đặt Phân quyền
+  console.log('[8/8] 👑 Kiểm tra Phân Quyền Vai Trò (/settings/roles)...');
   await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' });
   const superAdminBtn = page.getByRole('button', { name: /SuperAdmin/i });
   if (await superAdminBtn.isVisible()) {
     await superAdminBtn.click();
-    await page.getByRole('button', { name: /Đăng nhập hệ thống/i }).click();
+    await page.locator('button[type="submit"]').click();
     await page.waitForTimeout(1000);
   }
-  await page.goto(`${BASE_URL}/settings/landing-page`, { waitUntil: 'networkidle' });
+  await page.goto(`${BASE_URL}/settings/roles`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1500);
 
   await browser.close();
