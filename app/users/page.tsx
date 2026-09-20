@@ -92,19 +92,34 @@ export default function UsersPage() {
 
   const handleEdit = (user: User) => {
     setSelectedUser(user);
-    // Find matching role id
     const matchedRole = roles.find((r) => r.id === user.roleId || r.code === user.role);
+    form.resetFields();
     form.setFieldsValue({
-      fullName: user.fullName,
-      email: user.email,
-      phone: user.phone,
+      fullName: user.fullName || '',
+      email: user.email || (user as any).user_email || '',
+      phone: user.phone || (user as any).phone_number || (user as any).hotline || '',
       role: matchedRole ? matchedRole.id : user.role,
-      defaultBranchId: user.defaultBranchId,
+      defaultBranchId: user.defaultBranchId || null,
       status: user.status,
       password: '',
     });
     setIsEditModalVisible(true);
   };
+
+  useEffect(() => {
+    if (isEditModalVisible && selectedUser) {
+      const matchedRole = roles.find((r) => r.id === selectedUser.roleId || r.code === selectedUser.role);
+      form.setFieldsValue({
+        fullName: selectedUser.fullName || '',
+        email: selectedUser.email || (selectedUser as any).user_email || '',
+        phone: selectedUser.phone || (selectedUser as any).phone_number || (selectedUser as any).hotline || '',
+        role: matchedRole ? matchedRole.id : selectedUser.role,
+        defaultBranchId: selectedUser.defaultBranchId || null,
+        status: selectedUser.status,
+        password: '',
+      });
+    }
+  }, [isEditModalVisible, selectedUser, roles, form]);
 
   const handleUpdateUser = async (values: any) => {
     if (!selectedUser) return;
@@ -387,6 +402,7 @@ export default function UsersPage() {
           </div>
         }
         open={isEditModalVisible}
+        destroyOnClose
         forceRender
         footer={null}
         onCancel={() => setIsEditModalVisible(false)}
@@ -394,6 +410,15 @@ export default function UsersPage() {
       >
         <Form
           form={form}
+          initialValues={selectedUser ? {
+            fullName: selectedUser.fullName || '',
+            email: selectedUser.email || (selectedUser as any).user_email || '',
+            phone: selectedUser.phone || (selectedUser as any).phone_number || (selectedUser as any).hotline || '',
+            role: roles.find((r) => r.id === selectedUser.roleId || r.code === selectedUser.role)?.id || selectedUser.role,
+            defaultBranchId: selectedUser.defaultBranchId || null,
+            status: selectedUser.status,
+            password: '',
+          } : undefined}
           layout="vertical"
           onFinish={handleUpdateUser}
           className="mt-4"

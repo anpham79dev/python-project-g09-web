@@ -656,11 +656,15 @@ export default function AccountingPage() {
                 <Form.Item
                   name="amount"
                   noStyle
-                  rules={[{ required: true, message: 'Vui lòng nhập số tiền' }]}
+                  rules={[
+                    { required: true, message: 'Vui lòng nhập số tiền' },
+                    { type: 'number', min: 1, message: 'Số tiền phải từ 1 ₫' }
+                  ]}
                 >
                   <InputNumber
-                    min={1000}
-                    step={10000}
+                    min={1}
+                    step={1000}
+                    placeholder="Nhập số tiền..."
                     formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
                     className="w-full font-mono text-xs font-bold"
                   />

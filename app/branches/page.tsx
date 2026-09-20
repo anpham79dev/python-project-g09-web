@@ -123,9 +123,30 @@ export default function BranchesPage() {
 
   const handleOpenEditBranch = (branch: Branch) => {
     setEditingBranch(branch);
-    branchForm.setFieldsValue(branch);
+    branchForm.resetFields();
+    branchForm.setFieldsValue({
+      code: branch.code,
+      name: branch.name,
+      address: branch.address,
+      phone: branch.phone || (branch as any).hotline || '',
+      managerName: branch.managerName,
+      status: branch.status,
+    });
     setIsBranchModalOpen(true);
   };
+
+  useEffect(() => {
+    if (isBranchModalOpen && editingBranch) {
+      branchForm.setFieldsValue({
+        code: editingBranch.code,
+        name: editingBranch.name,
+        address: editingBranch.address,
+        phone: editingBranch.phone || (editingBranch as any).hotline || '',
+        managerName: editingBranch.managerName,
+        status: editingBranch.status,
+      });
+    }
+  }, [isBranchModalOpen, editingBranch, branchForm]);
 
   const handleSaveBranch = async () => {
     try {
@@ -532,6 +553,7 @@ export default function BranchesPage() {
           </div>
         }
         open={isBranchModalOpen}
+        destroyOnClose
         onCancel={() => setIsBranchModalOpen(false)}
         onOk={handleSaveBranch}
         confirmLoading={submittingBranch}
@@ -539,7 +561,19 @@ export default function BranchesPage() {
         cancelText="Hủy"
         width={520}
       >
-        <Form form={branchForm} layout="vertical" className="pt-3">
+        <Form
+          form={branchForm}
+          initialValues={editingBranch ? {
+            code: editingBranch.code,
+            name: editingBranch.name,
+            address: editingBranch.address,
+            phone: editingBranch.phone || (editingBranch as any).hotline || '',
+            managerName: editingBranch.managerName,
+            status: editingBranch.status,
+          } : { status: 'ACTIVE' }}
+          layout="vertical"
+          className="pt-3"
+        >
           <Form.Item
             name="code"
             label={<span className="text-xs font-semibold text-[#111827]">MÃ CHI NHÁNH</span>}

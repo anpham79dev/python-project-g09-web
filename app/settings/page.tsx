@@ -94,6 +94,12 @@ export default function SettingsPage() {
     loadData();
   }, []);
 
+  useEffect(() => {
+    if (settings) {
+      settingsForm.setFieldsValue(settings);
+    }
+  }, [settings, settingsForm]);
+
   const handleSaveSettings = async () => {
     try {
       const values = await settingsForm.validateFields();
@@ -306,7 +312,7 @@ export default function SettingsPage() {
                   </span>
                 ),
                 children: (
-                  <Form form={settingsForm} layout="vertical" className="max-w-3xl pt-2 space-y-4">
+                  <Form form={settingsForm} initialValues={settings || undefined} layout="vertical" className="max-w-3xl pt-2 space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Form.Item
                         name="storeName"
@@ -394,13 +400,14 @@ export default function SettingsPage() {
               },
               {
                 key: 'rules',
+                forceRender: true,
                 label: (
                   <span className="font-semibold text-xs flex items-center gap-1.5">
                     <SettingOutlined /> 3. Quy Tắc POS &amp; Tồn Kho
                   </span>
                 ),
                 children: (
-                  <Form form={settingsForm} layout="vertical" className="max-w-2xl pt-2 space-y-4">
+                  <Form form={settingsForm} initialValues={settings || undefined} layout="vertical" className="max-w-2xl pt-2 space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Form.Item
                         label={<span className="text-xs font-semibold text-[#111827]">NGƯỠNG CẢNH BÁO TỒN KHO THẤP</span>}

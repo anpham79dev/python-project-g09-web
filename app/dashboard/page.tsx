@@ -146,6 +146,10 @@ export default function DashboardPage() {
     setCustomDates(dates);
     if (dates && dates[0] && dates[1]) {
       loadStats('custom', dates, selectedBranchId);
+    } else {
+      setSelectedRange('today');
+      setCustomDates(null);
+      loadStats('today', null, selectedBranchId);
     }
   };
 

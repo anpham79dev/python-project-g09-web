@@ -50,12 +50,15 @@ export default function EditProductPage() {
     }
   }, [router, message]);
 
+  const [productData, setProductData] = useState<any>(null);
+
   useEffect(() => {
     if (!id) return;
     const fetchProduct = async () => {
       setLoading(true);
       try {
         const data = await getProductById(id);
+        setProductData(data);
         form.setFieldsValue(data);
         setPreviewImage(data.image);
       } catch (err: any) {
@@ -67,6 +70,12 @@ export default function EditProductPage() {
     };
     fetchProduct();
   }, [id, form, router]);
+
+  useEffect(() => {
+    if (productData) {
+      form.setFieldsValue(productData);
+    }
+  }, [productData, form]);
 
   const handleSubmit = async (values: any) => {
     setSubmitting(true);
@@ -123,6 +132,7 @@ export default function EditProductPage() {
       <Card className="border border-[#E5E7EB] shadow-xs rounded-xl" styles={{ body: { padding: '28px 32px' } }}>
         <Form
           form={form}
+          initialValues={productData}
           layout="vertical"
           onFinish={handleSubmit}
           requiredMark="optional"

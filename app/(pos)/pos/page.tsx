@@ -31,7 +31,7 @@ import {
   ClockCircleOutlined,
   ShopOutlined,
 } from '@ant-design/icons';
-import { getProducts, createOrder, getCurrentShift, closeCurrentShift, openShift, getCurrentSchedule, getBranches } from '@/lib/api';
+import { getProducts, createOrder, getCurrentShift, closeCurrentShift, openShift, getCurrentSchedule, getBranches, getSystemSettings } from '@/lib/api';
 import { Product, CATEGORIES, Order, WorkShift, ShiftScheduleResponse, Branch } from '@/lib/types';
 import { getCurrentUser } from '@/lib/auth';
 
@@ -138,6 +138,19 @@ export default function POSPage() {
     }
   };
 
+  const [allowNegativeStock, setAllowNegativeStock] = useState(false);
+
+  const fetchSettings = async () => {
+    try {
+      const st = await getSystemSettings();
+      if (st && typeof st.allowNegativeStock === 'boolean') {
+        setAllowNegativeStock(st.allowNegativeStock);
+      }
+    } catch {
+      // ignore
+    }
+  };
+
   useEffect(() => {
     const user = getCurrentUser();
     setCurrentUser(user);
@@ -149,10 +162,12 @@ export default function POSPage() {
       if (b) setActiveBranchName(b.name);
     }).catch(() => {});
 
+    fetchSettings();
     fetchProductList();
     fetchShift();
 
     const handleBranchChange = () => {
+      fetchSettings();
       fetchProductList();
       fetchShift();
       setCart([]);
@@ -234,13 +249,13 @@ export default function POSPage() {
 
   // Cart Actions
   const addToCart = (product: Product) => {
-    if (product.stock <= 0) {
+    if (!allowNegativeStock && product.stock <= 0) {
       message.warning(`Sản phẩm "${product.name}" hiện đã hết hàng!`);
       return;
     }
 
     const inCart = cart.find((item) => item.product.id === product.id);
-    if (inCart && inCart.quantity >= product.stock) {
+    if (!allowNegativeStock && inCart && inCart.quantity >= product.stock) {
       message.warning(`Số lượng đã đạt giới hạn tồn kho (${product.stock})`);
       return;
     }
@@ -248,7 +263,7 @@ export default function POSPage() {
     setCart((prevCart) => {
       const existing = prevCart.find((item) => item.product.id === product.id);
       if (existing) {
-        if (existing.quantity >= product.stock) {
+        if (!allowNegativeStock && existing.quantity >= product.stock) {
           return prevCart;
         }
         return prevCart.map((item) =>
@@ -266,7 +281,7 @@ export default function POSPage() {
     }
 
     const product = products.find((p) => p.id === productId);
-    if (product && newQuantity > product.stock) {
+    if (!allowNegativeStock && product && newQuantity > product.stock) {
       message.warning(`Tồn kho chỉ còn ${product.stock} sản phẩm`);
       return;
     }
@@ -608,14 +623,15 @@ export default function POSPage() {
             <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
               {filteredProducts.map((product) => {
                 const isOutOfStock = product.stock <= 0;
+                const canAddToCart = !isOutOfStock || allowNegativeStock;
                 const inCartItem = cart.find((item) => item.product.id === product.id);
 
                 return (
                   <div
                     key={product.id}
-                    onClick={() => !isOutOfStock && addToCart(product)}
+                    onClick={() => canAddToCart && addToCart(product)}
                     className={`group relative bg-white border border-[#E5E7EB] rounded-xl overflow-hidden p-2.5 flex flex-col justify-between transition-all select-none ${
-                      isOutOfStock
+                      !canAddToCart
                         ? 'opacity-50 cursor-not-allowed bg-gray-50 pointer-events-none'
                         : 'cursor-pointer hover:border-[#10B981] hover:shadow-xs active:scale-[0.98]'
                     }`}
@@ -626,11 +642,11 @@ export default function POSPage() {
                       </div>
                     )}
 
-                    {/* 7. Tag Hết hàng ở góc thẻ */}
+                    {/* 7. Tag Hết hàng hoặc Bán âm kho ở góc thẻ */}
                     {isOutOfStock && (
                       <div className="absolute top-2 left-2 z-10">
-                        <span className="text-[10px] font-bold bg-gray-600 text-white px-1.5 py-0.5 rounded shadow-2xs">
-                          Hết hàng
+                        <span className={`text-[10px] font-bold text-white px-1.5 py-0.5 rounded shadow-2xs ${allowNegativeStock ? 'bg-amber-600' : 'bg-gray-600'}`}>
+                          {allowNegativeStock ? 'Bán âm kho' : 'Hết hàng'}
                         </span>
                       </div>
                     )}
