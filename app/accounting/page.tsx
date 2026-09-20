@@ -20,6 +20,7 @@ import {
   Radio,
   Progress,
   Divider,
+  Tooltip,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -164,9 +165,21 @@ export default function AccountingPage() {
       title: 'Mã Phiếu',
       dataIndex: 'code',
       key: 'code',
-      render: (code: string) => (
-        <span className="font-mono font-bold text-xs text-[#006C49]">{code}</span>
-      ),
+      render: (code: string, record) => {
+        const isAuto =
+          record.createdBy === 'Hệ thống (Kết ca)' ||
+          (record.note && record.note.includes('[Mã ca:'));
+        return (
+          <div className="flex flex-col gap-1 items-start">
+            <span className="font-mono font-bold text-xs text-[#006C49]">{code}</span>
+            {isAuto && (
+              <Tag color="cyan" className="text-[10px] font-semibold m-0 border-cyan-300">
+                Tự động - kết ca
+              </Tag>
+            )}
+          </div>
+        );
+      },
     },
     {
       title: 'Loại Phiếu',
@@ -242,6 +255,21 @@ export default function AccountingPage() {
       render: (rp: string) => <span className="text-xs font-medium text-[#111827]">{rp}</span>,
     },
     {
+      title: 'Người Lập',
+      dataIndex: 'createdBy',
+      key: 'createdBy',
+      render: (cb: string, record) => {
+        const isAuto =
+          record.createdBy === 'Hệ thống (Kết ca)' ||
+          (record.note && record.note.includes('[Mã ca:'));
+        return (
+          <span className={`text-xs ${isAuto ? 'text-cyan-700 font-semibold' : 'text-secondary'}`}>
+            {cb || 'Hệ thống'}
+          </span>
+        );
+      },
+    },
+    {
       title: 'Thời Gian',
       dataIndex: 'createdAt',
       key: 'createdAt',
@@ -255,6 +283,32 @@ export default function AccountingPage() {
           })}
         </span>
       ),
+    },
+    {
+      title: 'Thao tác',
+      key: 'actions',
+      align: 'center',
+      render: (_, record) => {
+        const isAuto =
+          record.createdBy === 'Hệ thống (Kết ca)' ||
+          (record.note && record.note.includes('[Mã ca:'));
+        if (isAuto) {
+          return (
+            <Tooltip title="Bút toán tự động từ kết ca POS, không thể sửa/xóa">
+              <span className="text-[11px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded cursor-not-allowed border border-gray-200">
+                Khóa sửa/xóa
+              </span>
+            </Tooltip>
+          );
+        }
+        return (
+          <Tooltip title="Phiếu thu chi đã được ghi sổ kế toán">
+            <span className="text-[11px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              Đã ghi sổ
+            </span>
+          </Tooltip>
+        );
+      },
     },
   ];
 

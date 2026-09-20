@@ -69,6 +69,7 @@ import {
   Branch,
 } from '@/lib/types';
 import { getCurrentUser, hasPermission } from '@/lib/auth';
+import ProductImage from '@/app/components/product-image';
 
 const { Title, Text } = Typography;
 const { RangePicker } = DatePicker;
@@ -180,7 +181,7 @@ export default function DashboardPage() {
       key: 'product',
       render: (_, record) => (
         <div className="flex items-center gap-3">
-          <img
+          <ProductImage
             src={record.image}
             alt={record.name}
             className="w-10 h-10 rounded-lg object-cover border border-[#E5E7EB]"
@@ -223,7 +224,7 @@ export default function DashboardPage() {
       key: 'product',
       render: (_, record) => (
         <div className="flex items-center gap-3">
-          <img
+          <ProductImage
             src={record.image}
             alt={record.name}
             className="w-10 h-10 rounded-lg object-cover border border-[#E5E7EB]"
@@ -361,7 +362,7 @@ export default function DashboardPage() {
       key: 'product',
       render: (_, record) => (
         <div className="flex items-center gap-3">
-          <img
+          <ProductImage
             src={record.image}
             alt={record.name}
             className="w-10 h-10 rounded-lg object-cover border border-[#E5E7EB]"

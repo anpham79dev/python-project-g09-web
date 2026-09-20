@@ -23,6 +23,7 @@ import {
 import { getOrderDetail } from '@/lib/api';
 import { Order, OrderItem } from '@/lib/types';
 import { getCurrentUser } from '@/lib/auth';
+import ProductImage from '@/app/components/product-image';
 
 const { Title, Text } = Typography;
 
@@ -65,8 +66,8 @@ export default function OrderDetailPage() {
       key: 'product',
       render: (_, record) => (
         <div className="flex items-center gap-3">
-          <img
-            src={record.image || 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=100&q=80'}
+          <ProductImage
+            src={record.image}
             alt={record.productName}
             className="w-12 h-12 rounded-lg object-cover border border-[#E5E7EB]"
           />

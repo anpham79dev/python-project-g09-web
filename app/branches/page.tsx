@@ -43,6 +43,7 @@ import {
 } from '@/lib/api';
 import { Branch, Warehouse, StockItem } from '@/lib/types';
 import { getCurrentUser } from '@/lib/auth';
+import ProductImage from '@/app/components/product-image';
 
 const { Title, Text } = Typography;
 
@@ -270,17 +271,11 @@ export default function BranchesPage() {
       key: 'product',
       render: (_, record) => (
         <div className="flex items-center gap-3">
-          {record.productImage ? (
-            <img
-              src={record.productImage}
-              alt={record.productName}
-              className="w-10 h-10 rounded-lg object-cover border border-[#E5E7EB]"
-            />
-          ) : (
-            <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
-              <InboxOutlined />
-            </div>
-          )}
+          <ProductImage
+            src={record.productImage}
+            alt={record.productName}
+            className="w-10 h-10 rounded-lg object-cover border border-[#E5E7EB]"
+          />
           <div>
             <span className="font-semibold text-xs text-[#111827] block">{record.productName}</span>
             <span className="text-[11px] text-secondary">{record.productCategory}</span>
