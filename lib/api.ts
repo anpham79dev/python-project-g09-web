@@ -31,11 +31,6 @@ import {
 } from './mock-data';
 import { ALL_PERMISSION_CODES } from './rbac-config';
 
-// Kiểm tra biến môi trường chuyển đổi mock <-> API thật
-const isMockMode = (): boolean => {
-  return process.env.NEXT_PUBLIC_USE_MOCK !== 'false';
-};
-
 // Giả lập độ trễ mạng khi dùng mock data (~300ms)
 const simulateDelay = <T>(data: T, delay = 300): Promise<T> => {
   return new Promise((resolve) => setTimeout(() => resolve(data), delay));
@@ -207,59 +202,18 @@ const saveStoredAuditLogs = (logs: AuditLog[]) => {
 // 1. AUTHENTICATION API
 // ==========================================
 export const login = async (credentials: { username: string; password?: string }): Promise<{ token: string; user: User }> => {
-  if (isMockMode()) {
-    const users = getStoredUsers();
-    const roles = getStoredRoles();
-    const cleanUser = credentials.username.toLowerCase().trim();
-    let found = users.find((u) => u.username.toLowerCase() === cleanUser);
-    
-    if (!found) {
-      const isSuper = cleanUser === 'superadmin';
-      const isAdmin = cleanUser === 'admin' || cleanUser.includes('admin');
-      const rCode = isSuper ? 'SUPER_ADMIN' : (isAdmin ? 'ADMIN' : 'STAFF');
-      const matchedRole = roles.find((r) => r.code === rCode) || roles[0];
-
-      found = {
-        id: isSuper ? 'user-000' : (isAdmin ? 'user-001' : 'user-002'),
-        username: cleanUser,
-        fullName: isSuper ? 'Tổng Quản Trị Hệ Thống' : (isAdmin ? 'Quản Trị Viên' : 'Thu Ngân Bán Hàng'),
-        email: `${cleanUser}@artisanbakery.vn`,
-        phone: '0901234567',
-        role: rCode,
-        roleId: matchedRole.id,
-        roleName: matchedRole.name,
-        permissions: matchedRole.permissions.map((p) => p.code),
-        permissionsVersion: matchedRole.permissions_version || 1,
-        status: 'ACTIVE',
-        createdAt: new Date().toISOString(),
-      } as User;
-    } else {
-      // Refresh permissions from role definition
-      const userRole = roles.find((r) => r.id === found!.roleId || r.code === found!.role);
-      if (userRole) {
-        found.roleId = userRole.id;
-        found.roleName = userRole.name;
-        found.role = userRole.code;
-        found.permissions = userRole.permissions.map((p) => p.code);
-        found.permissionsVersion = userRole.permissions_version || 1;
-      }
-    }
-
-    return simulateDelay({
-      token: `mock_jwt_token_${found.role.toLowerCase()}_${Date.now()}`,
-      user: found,
-    });
-  }
-
   const response = await apiClient.post('/auth/login', credentials);
-  return response.data;
+  return {
+    token: response.data.token || response.data.access_token,
+    user: response.data.user,
+  };
 };
 
 // ==========================================
 // 2. PRODUCTS API
 // ==========================================
 export const getProducts = async (params?: { search?: string; category?: string; status?: string }): Promise<Product[]> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     let list = getStoredProducts();
     if (params?.category && params.category !== 'Tất cả') {
       list = list.filter((p) => p.category === params.category);
@@ -279,7 +233,7 @@ export const getProducts = async (params?: { search?: string; category?: string;
 };
 
 export const getProductById = async (id: string): Promise<Product> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     const list = getStoredProducts();
     const product = list.find((p) => p.id === id);
     if (!product) throw new Error('Không tìm thấy sản phẩm');
@@ -291,7 +245,7 @@ export const getProductById = async (id: string): Promise<Product> => {
 };
 
 export const createProduct = async (data: Omit<Product, 'id' | 'createdAt'>): Promise<Product> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     const list = getStoredProducts();
     const newProduct: Product = {
       ...data,
@@ -307,7 +261,7 @@ export const createProduct = async (data: Omit<Product, 'id' | 'createdAt'>): Pr
 };
 
 export const updateProduct = async (id: string, data: Partial<Product>): Promise<Product> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     const list = getStoredProducts();
     const index = list.findIndex((p) => p.id === id);
     if (index === -1) throw new Error('Không tìm thấy sản phẩm để cập nhật');
@@ -323,7 +277,7 @@ export const updateProduct = async (id: string, data: Partial<Product>): Promise
 };
 
 export const deleteProduct = async (id: string): Promise<{ success: boolean }> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     const list = getStoredProducts();
     const filtered = list.filter((p) => p.id !== id);
     saveStoredProducts(filtered);
@@ -338,7 +292,7 @@ export const deleteProduct = async (id: string): Promise<{ success: boolean }> =
 // 3. ORDERS API
 // ==========================================
 export const getOrders = async (params?: { search?: string; status?: string; staffId?: string; date?: string }): Promise<Order[]> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     let list = getStoredOrders();
     if (params?.status && params.status !== 'ALL') {
       list = list.filter((o) => o.status === params.status);
@@ -363,7 +317,7 @@ export const getOrders = async (params?: { search?: string; status?: string; sta
 };
 
 export const getOrderDetail = async (id: string): Promise<Order> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     const list = getStoredOrders();
     const order = list.find((o) => o.id === id || o.code === id);
     if (!order) throw new Error('Không tìm thấy đơn hàng');
@@ -375,7 +329,7 @@ export const getOrderDetail = async (id: string): Promise<Order> => {
 };
 
 export const createOrder = async (data: Omit<Order, 'id' | 'code' | 'createdAt'>): Promise<Order> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     const list = getStoredOrders();
     const now = new Date();
     const dateStr = now.toISOString().slice(2, 10).replace(/-/g, '');
@@ -413,48 +367,11 @@ export const createOrder = async (data: Omit<Order, 'id' | 'code' | 'createdAt'>
 // 4. USERS API
 // ==========================================
 export const getUsers = async (): Promise<User[]> => {
-  if (isMockMode()) {
-    const list = getStoredUsers();
-    return simulateDelay(list);
-  }
-
   const response = await apiClient.get('/users');
   return response.data;
 };
 
 export const createUser = async (data: Omit<User, 'id' | 'createdAt'> & { password?: string; role_id?: string }): Promise<User> => {
-  if (isMockMode()) {
-    const list = getStoredUsers();
-    const branches = getStoredBranches();
-    const roles = getStoredRoles();
-    const br = branches.find((b) => b.id === data.defaultBranchId);
-    
-    // Resolve role details
-    let roleObj = roles.find((r) => r.id === (data.roleId || (data as any).role_id) || r.code === data.role);
-    if (!roleObj) {
-      roleObj = roles.find((r) => r.code === 'STAFF') || roles[0];
-    }
-
-    const newUser: User = {
-      id: `user-${Date.now().toString().slice(-4)}`,
-      username: data.username,
-      fullName: data.fullName,
-      email: data.email,
-      phone: data.phone,
-      role: roleObj.code,
-      roleId: roleObj.id,
-      roleName: roleObj.name,
-      permissions: roleObj.permissions.map((p) => p.code),
-      permissionsVersion: roleObj.permissions_version || 1,
-      status: data.status || 'ACTIVE',
-      defaultBranchId: data.defaultBranchId || null,
-      defaultBranchName: br ? br.name : (data.defaultBranchName || null),
-      createdAt: new Date().toISOString(),
-    };
-    saveStoredUsers([...list, newUser]);
-    return simulateDelay(newUser);
-  }
-
   const payload = {
     ...data,
     role_id: data.roleId || (data as any).role_id,
@@ -464,100 +381,23 @@ export const createUser = async (data: Omit<User, 'id' | 'createdAt'> & { passwo
 };
 
 export const updateUserActiveBranch = async (branchId: string): Promise<User> => {
-  if (isMockMode()) {
-    const users = getStoredUsers();
-    const curUserStr = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+  const response = await apiClient.patch('/users/me/active-branch', { branch_id: branchId });
+  if (typeof window !== 'undefined') {
+    const curUserStr = localStorage.getItem('user');
     if (curUserStr) {
       try {
         const curUser = JSON.parse(curUserStr);
         curUser.lastActiveBranchId = branchId;
         localStorage.setItem('user', JSON.stringify(curUser));
-        const idx = users.findIndex((u) => u.id === curUser.id);
-        if (idx >= 0) {
-          users[idx].lastActiveBranchId = branchId;
-          saveStoredUsers(users);
-        }
-        return simulateDelay(curUser);
       } catch {
         // ignore
       }
-    }
-    return simulateDelay({} as User);
-  }
-
-  const response = await apiClient.patch('/users/me/active-branch', { branchId });
-  if (typeof window !== 'undefined') {
-    const curUserStr = localStorage.getItem('user');
-    if (curUserStr) {
-      const curUser = JSON.parse(curUserStr);
-      curUser.lastActiveBranchId = branchId;
-      localStorage.setItem('user', JSON.stringify(curUser));
     }
   }
   return response.data;
 };
 
 export const updateUser = async (id: string, data: Partial<User> & { password?: string; role_id?: string }): Promise<User> => {
-  if (isMockMode()) {
-    const users = getStoredUsers();
-    const idx = users.findIndex((u) => u.id === id);
-    if (idx >= 0) {
-      const branches = getStoredBranches();
-      const roles = getStoredRoles();
-      const br = branches.find((b) => b.id === data.defaultBranchId);
-      const oldUser = users[idx];
-
-      let updatedRole = oldUser.role;
-      let updatedRoleId = oldUser.roleId;
-      let updatedRoleName = oldUser.roleName;
-      let updatedPermissions = oldUser.permissions;
-      let updatedPermissionsVersion = oldUser.permissionsVersion;
-
-      const requestedRoleId = data.roleId || (data as any).role_id;
-      if (requestedRoleId || (data.role && data.role !== oldUser.role)) {
-        const matchedRole = roles.find((r) => r.id === requestedRoleId || r.code === data.role);
-        if (matchedRole) {
-          updatedRole = matchedRole.code;
-          updatedRoleId = matchedRole.id;
-          updatedRoleName = matchedRole.name;
-          updatedPermissions = matchedRole.permissions.map((p) => p.code);
-          updatedPermissionsVersion = matchedRole.permissions_version || 1;
-
-          // Record audit log for user role change
-          const auditLogs = getStoredAuditLogs();
-          const newAudit: AuditLog = {
-            id: `audit-${Date.now().toString().slice(-6)}`,
-            user_id: 'user-000',
-            user_name: 'Tổng Quản Trị Hệ Thống',
-            action: 'USER_ROLE_CHANGE',
-            target_type: 'USER',
-            target_id: oldUser.id,
-            target_name: oldUser.fullName || oldUser.username,
-            changes_summary: `Đổi vai trò người dùng '${oldUser.username}' từ '${oldUser.roleName || oldUser.role}' sang '${matchedRole.name}'`,
-            details_json: JSON.stringify({ old_role: oldUser.role, new_role: matchedRole.code }),
-            ip_address: '127.0.0.1',
-            created_at: new Date().toISOString(),
-          };
-          saveStoredAuditLogs([newAudit, ...auditLogs]);
-        }
-      }
-
-      users[idx] = {
-        ...users[idx],
-        ...data,
-        role: updatedRole,
-        roleId: updatedRoleId,
-        roleName: updatedRoleName,
-        permissions: updatedPermissions,
-        permissionsVersion: updatedPermissionsVersion,
-        defaultBranchName: br ? br.name : (data.defaultBranchName !== undefined ? data.defaultBranchName : users[idx].defaultBranchName),
-      };
-      saveStoredUsers(users);
-      return simulateDelay(users[idx]);
-    }
-    throw new Error('User not found');
-  }
-
   const payload = {
     ...data,
     role_id: data.roleId || (data as any).role_id,
@@ -567,16 +407,6 @@ export const updateUser = async (id: string, data: Partial<User> & { password?: 
 };
 
 export const deleteUser = async (id: string): Promise<User> => {
-  if (isMockMode()) {
-    const users = getStoredUsers();
-    const idx = users.findIndex((u) => u.id === id);
-    if (idx >= 0) {
-      users[idx].status = 'INACTIVE';
-      saveStoredUsers(users);
-      return simulateDelay(users[idx]);
-    }
-    throw new Error('User not found');
-  }
   const response = await apiClient.delete(`/users/${id}`);
   return response.data;
 };
@@ -590,7 +420,7 @@ export const getDashboardStats = async (params?: {
   endDate?: string;
   branchId?: string;
 }): Promise<DashboardStats> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     const orders = getStoredOrders();
     const products = getStoredProducts();
     const users = getStoredUsers();
@@ -734,7 +564,7 @@ export const getDashboardStats = async (params?: {
 // 6. SHIFT & CASH RECONCILIATION API
 // ==========================================
 export const getCurrentShift = async (): Promise<WorkShift> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     const shifts = getStoredShifts();
     const openShift = shifts.find((s) => s.status === 'OPEN') || {
       id: `shift-${Date.now().toString().slice(-4)}`,
@@ -764,7 +594,7 @@ export const getCurrentShift = async (): Promise<WorkShift> => {
 };
 
 export const closeCurrentShift = async (data: { actualCash: number; note?: string }): Promise<WorkShift> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     const shifts = getStoredShifts();
     const openIndex = shifts.findIndex((s) => s.status === 'OPEN');
     if (openIndex >= 0) {
@@ -805,7 +635,7 @@ export const closeCurrentShift = async (data: { actualCash: number; note?: strin
 };
 
 export const getShifts = async (params?: { status?: string; staffId?: string; date?: string; branchId?: string }): Promise<WorkShift[]> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     let list = getStoredShifts();
     if (params?.status) list = list.filter((s) => s.status === params.status);
     if (params?.staffId) list = list.filter((s) => s.staffId === params.staffId);
@@ -821,7 +651,7 @@ export const getShifts = async (params?: { status?: string; staffId?: string; da
 };
 
 export const getShiftSummary = async (params?: { date?: string; branchId?: string }): Promise<ShiftSummary> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     let list = getStoredShifts();
     if (params?.branchId && params.branchId !== 'ALL') {
       const match = list.filter((s) => !(s as any).branchId || (s as any).branchId === params.branchId);
@@ -877,58 +707,22 @@ const saveStoredBranches = (branches: Branch[]) => {
 };
 
 export const getBranches = async (params?: { status?: string }): Promise<Branch[]> => {
-  if (isMockMode()) {
-    let list = getStoredBranches();
-    if (params?.status) list = list.filter((b) => b.status === params.status);
-    return simulateDelay(list);
-  }
   const response = await apiClient.get('/branches', { params });
   return response.data;
 };
 
 export const createBranch = async (data: Omit<Branch, 'id' | 'createdAt' | 'warehouses'>): Promise<Branch> => {
-  if (isMockMode()) {
-    const branches = getStoredBranches();
-    const newBranch: Branch = {
-      ...data,
-      id: `branch-${Date.now().toString().slice(-4)}`,
-      createdAt: new Date().toISOString(),
-      warehouses: [
-        {
-          id: `wh-${Date.now().toString().slice(-4)}`,
-          branchId: `branch-${Date.now().toString().slice(-4)}`,
-          code: `KHO-${data.code}-POS`,
-          name: `Kho Quầy Bán Lẻ - ${data.name}`,
-          warehouseType: 'RETAIL',
-          status: 'ACTIVE',
-          createdAt: new Date().toISOString(),
-        }
-      ]
-    };
-    branches.push(newBranch);
-    saveStoredBranches(branches);
-    return simulateDelay(newBranch);
-  }
   const response = await apiClient.post('/branches', data);
   return response.data;
 };
 
 export const updateBranch = async (id: string, data: Partial<Branch>): Promise<Branch> => {
-  if (isMockMode()) {
-    const branches = getStoredBranches();
-    const idx = branches.findIndex((b) => b.id === id);
-    if (idx >= 0) {
-      branches[idx] = { ...branches[idx], ...data };
-      saveStoredBranches(branches);
-      return simulateDelay(branches[idx]);
-    }
-  }
   const response = await apiClient.put(`/branches/${id}`, data);
   return response.data;
 };
 
 export const getWarehouseStocks = async (params?: { warehouseId?: string; branchId?: string }): Promise<StockItem[]> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     const products = getStoredProducts();
     const branches = getStoredBranches();
     const stocks: StockItem[] = [];
@@ -965,7 +759,7 @@ export const getWarehouseStocks = async (params?: { warehouseId?: string; branch
 };
 
 export const updateWarehouseStock = async (data: { warehouseId: string; productId: string; quantity: number; minAlertStock?: number }): Promise<StockItem> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     const products = getStoredProducts();
     const prod = products.find((p) => p.id === data.productId);
     if (prod) {
@@ -990,87 +784,31 @@ export const updateWarehouseStock = async (data: { warehouseId: string; productI
 // 8. SYSTEM SETTINGS & SHIFT TEMPLATES API
 // ==========================================
 export const getSystemSettings = async (): Promise<SystemSettings> => {
-  if (isMockMode()) {
-    const stored = localStorage.getItem(LS_KEYS.SETTINGS);
-    if (!stored) {
-      localStorage.setItem(LS_KEYS.SETTINGS, JSON.stringify(INITIAL_SYSTEM_SETTINGS));
-      return simulateDelay(INITIAL_SYSTEM_SETTINGS);
-    }
-    try {
-      return simulateDelay(JSON.parse(stored));
-    } catch {
-      return simulateDelay(INITIAL_SYSTEM_SETTINGS);
-    }
-  }
   const response = await apiClient.get('/settings');
   return response.data;
 };
 
 export const updateSystemSettings = async (data: Partial<SystemSettings>): Promise<SystemSettings> => {
-  if (isMockMode()) {
-    const current = await getSystemSettings();
-    const updated = { ...current, ...data };
-    localStorage.setItem(LS_KEYS.SETTINGS, JSON.stringify(updated));
-    return simulateDelay(updated);
-  }
   const response = await apiClient.put('/settings', data);
   return response.data;
 };
 
 export const getShiftTemplates = async (): Promise<ShiftTemplate[]> => {
-  if (isMockMode()) {
-    const stored = localStorage.getItem(LS_KEYS.TEMPLATES);
-    if (!stored) {
-      localStorage.setItem(LS_KEYS.TEMPLATES, JSON.stringify(INITIAL_SHIFT_TEMPLATES));
-      return simulateDelay(INITIAL_SHIFT_TEMPLATES);
-    }
-    try {
-      return simulateDelay(JSON.parse(stored));
-    } catch {
-      return simulateDelay(INITIAL_SHIFT_TEMPLATES);
-    }
-  }
   const response = await apiClient.get('/settings/shift-templates');
   return response.data;
 };
 
 export const createShiftTemplate = async (data: Omit<ShiftTemplate, 'id' | 'createdAt'>): Promise<ShiftTemplate> => {
-  if (isMockMode()) {
-    const templates = await getShiftTemplates();
-    const newTmpl: ShiftTemplate = {
-      ...data,
-      id: `tmpl-${Date.now().toString().slice(-4)}`,
-      createdAt: new Date().toISOString(),
-    };
-    templates.push(newTmpl);
-    localStorage.setItem(LS_KEYS.TEMPLATES, JSON.stringify(templates));
-    return simulateDelay(newTmpl);
-  }
   const response = await apiClient.post('/settings/shift-templates', data);
   return response.data;
 };
 
 export const updateShiftTemplate = async (id: string, data: Partial<ShiftTemplate>): Promise<ShiftTemplate> => {
-  if (isMockMode()) {
-    const templates = await getShiftTemplates();
-    const idx = templates.findIndex((t) => t.id === id);
-    if (idx >= 0) {
-      templates[idx] = { ...templates[idx], ...data };
-      localStorage.setItem(LS_KEYS.TEMPLATES, JSON.stringify(templates));
-      return simulateDelay(templates[idx]);
-    }
-  }
   const response = await apiClient.put(`/settings/shift-templates/${id}`, data);
   return response.data;
 };
 
 export const deleteShiftTemplate = async (id: string): Promise<void> => {
-  if (isMockMode()) {
-    const templates = await getShiftTemplates();
-    const filtered = templates.filter((t) => t.id !== id);
-    localStorage.setItem(LS_KEYS.TEMPLATES, JSON.stringify(filtered));
-    return simulateDelay(undefined);
-  }
   await apiClient.delete(`/settings/shift-templates/${id}`);
 };
 
@@ -1098,26 +836,18 @@ const saveStoredTransactions = (txs: Transaction[]) => {
 };
 
 export const getTransactions = async (params?: { type?: string; category?: string; branchId?: string }): Promise<Transaction[]> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     let list = getStoredTransactions();
     if (params?.type) list = list.filter((t) => t.transactionType === params.type);
     if (params?.category) list = list.filter((t) => t.category === params.category);
     if (params?.branchId && params.branchId !== 'ALL') list = list.filter((t) => t.branchId === params.branchId);
     return simulateDelay(list);
   }
-  const queryParams: any = {};
-  if (params?.type) queryParams.type = params.type;
-  if (params?.category) queryParams.category = params.category;
-  if (params?.branchId && params.branchId !== 'ALL') {
-    queryParams.branch_id = params.branchId;
-    queryParams.branchId = params.branchId;
-  }
-  const response = await apiClient.get('/accounting/transactions', { params: queryParams });
-  return response.data;
+
 };
 
 export const createTransaction = async (data: Omit<Transaction, 'id' | 'code' | 'createdAt'>): Promise<Transaction> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     const list = getStoredTransactions();
     const prefix = data.transactionType === 'INCOME' ? 'PT' : 'PC';
     const dateStr = new Date().toISOString().slice(2, 10).replace(/-/g, '');
@@ -1136,7 +866,7 @@ export const createTransaction = async (data: Omit<Transaction, 'id' | 'code' | 
 };
 
 export const getCashFlowSummary = async (params?: { branchId?: string }): Promise<CashFlowSummary> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     const txs = getStoredTransactions().filter((t) => !params?.branchId || params.branchId === 'ALL' || t.branchId === params.branchId);
     const totalIncome = txs.filter((t) => t.transactionType === 'INCOME').reduce((sum, t) => sum + t.amount, 0);
     const totalExpense = txs.filter((t) => t.transactionType === 'EXPENSE').reduce((sum, t) => sum + t.amount, 0);
@@ -1165,17 +895,11 @@ export const getCashFlowSummary = async (params?: { branchId?: string }): Promis
       expenseByCategory,
     });
   }
-  const queryParams: any = {};
-  if (params?.branchId && params.branchId !== 'ALL') {
-    queryParams.branch_id = params.branchId;
-    queryParams.branchId = params.branchId;
-  }
-  const response = await apiClient.get('/accounting/summary', { params: queryParams });
-  return response.data;
+
 };
 
 export const getPnLReport = async (params?: { branchId?: string }): Promise<PnLReport> => {
-  if (isMockMode()) {
+  if (true /* pending Phase 2/3/4 */) {
     const orders = getStoredOrders().filter((o) => !params?.branchId || params.branchId === 'ALL' || o.branchId === params.branchId);
     const grossRevenue = orders.reduce((sum, o) => sum + o.totalAmount, 0) || 5500000;
     const cogs = Math.round(grossRevenue * 0.35);
@@ -1200,222 +924,43 @@ export const getPnLReport = async (params?: { branchId?: string }): Promise<PnLR
       },
     });
   }
-  const queryParams: any = {};
-  if (params?.branchId && params.branchId !== 'ALL') {
-    queryParams.branch_id = params.branchId;
-    queryParams.branchId = params.branchId;
-  }
-  const response = await apiClient.get('/accounting/pnl', { params: queryParams });
-  return response.data;
+
 };
 
 // ==========================================
 // 10. ROLES & PERMISSIONS API (PBAC)
 // ==========================================
 export const getPermissions = async (): Promise<Permission[]> => {
-  if (isMockMode()) {
-    const list = getStoredPermissions();
-    return simulateDelay(list);
-  }
   const response = await apiClient.get('/permissions');
   return response.data;
 };
 
 export const getRoles = async (): Promise<Role[]> => {
-  if (isMockMode()) {
-    const roles = getStoredRoles();
-    const users = getStoredUsers();
-    // Compute live user_count for each role
-    const enriched = roles.map((r) => ({
-      ...r,
-      user_count: users.filter((u) => u.roleId === r.id || u.role === r.code).length,
-    }));
-    return simulateDelay(enriched);
-  }
   const response = await apiClient.get('/roles');
   return response.data;
 };
 
 export const getRoleById = async (roleId: string): Promise<Role> => {
-  if (isMockMode()) {
-    const roles = getStoredRoles();
-    const role = roles.find((r) => r.id === roleId);
-    if (!role) throw new Error('Role not found');
-    const users = getStoredUsers();
-    role.user_count = users.filter((u) => u.roleId === role.id || u.role === role.code).length;
-    return simulateDelay(role);
-  }
   const response = await apiClient.get(`/roles/${roleId}`);
   return response.data;
 };
 
 export const createRole = async (data: { code: string; name: string; description?: string; permission_ids: string[] }): Promise<Role> => {
-  if (isMockMode()) {
-    const roles = getStoredRoles();
-    const perms = getStoredPermissions();
-    const selectedPerms = perms.filter((p) => data.permission_ids.includes(p.id));
-    const cleanCode = data.code.trim().toUpperCase().replace(/\s+/g, '_');
-
-    // Check duplicate code
-    if (roles.some((r) => r.code === cleanCode)) {
-      throw new Error(`Mã vai trò '${cleanCode}' đã tồn tại!`);
-    }
-
-    const newRole: Role = {
-      id: `role-${Date.now().toString().slice(-4)}`,
-      code: cleanCode,
-      name: data.name.trim(),
-      description: data.description || '',
-      is_system: false,
-      permissions_version: 1,
-      permissions: selectedPerms,
-      user_count: 0,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-
-    saveStoredRoles([...roles, newRole]);
-
-    // Record audit log
-    const auditLogs = getStoredAuditLogs();
-    const newAudit: AuditLog = {
-      id: `audit-${Date.now().toString().slice(-6)}`,
-      user_id: 'user-000',
-      user_name: 'Tổng Quản Trị Hệ Thống',
-      action: 'ROLE_CREATE',
-      target_type: 'ROLE',
-      target_id: newRole.id,
-      target_name: newRole.name,
-      changes_summary: `Tạo vai trò mới '${newRole.name}' (${newRole.code}) với ${selectedPerms.length} quyền`,
-      details_json: JSON.stringify({ code: newRole.code, permissions: selectedPerms.map((p) => p.code) }),
-      ip_address: '127.0.0.1',
-      created_at: new Date().toISOString(),
-    };
-    saveStoredAuditLogs([newAudit, ...auditLogs]);
-
-    return simulateDelay(newRole);
-  }
-
   const response = await apiClient.post('/roles', data);
   return response.data;
 };
 
 export const updateRole = async (roleId: string, data: { name?: string; description?: string; permission_ids?: string[] }): Promise<Role> => {
-  if (isMockMode()) {
-    const roles = getStoredRoles();
-    const idx = roles.findIndex((r) => r.id === roleId);
-    if (idx === -1) throw new Error('Role not found');
-
-    const role = roles[idx];
-    const oldPermCodes = role.permissions.map((p) => p.code);
-    let newPerms = role.permissions;
-
-    if (data.permission_ids) {
-      const allPerms = getStoredPermissions();
-      newPerms = allPerms.filter((p) => data.permission_ids!.includes(p.id));
-      role.permissions = newPerms;
-      role.permissions_version = (role.permissions_version || 1) + 1;
-    }
-    if (data.name) role.name = data.name.trim();
-    if (data.description !== undefined) role.description = data.description;
-    role.updatedAt = new Date().toISOString();
-
-    roles[idx] = role;
-    saveStoredRoles(roles);
-
-    // Update active user in localStorage if matching role
-    const curUserStr = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
-    if (curUserStr) {
-      try {
-        const curUser = JSON.parse(curUserStr);
-        if (curUser.roleId === role.id || curUser.role === role.code) {
-          curUser.permissions = newPerms.map((p) => p.code);
-          curUser.permissionsVersion = role.permissions_version;
-          localStorage.setItem('user', JSON.stringify(curUser));
-          document.cookie = `artisan_permissions=${encodeURIComponent(JSON.stringify(curUser.permissions))}; path=/; max-age=604800; SameSite=Lax`;
-          document.cookie = `artisan_perm_version=${encodeURIComponent(String(role.permissions_version))}; path=/; max-age=604800; SameSite=Lax`;
-        }
-      } catch {
-        // ignore
-      }
-    }
-
-    // Record audit log
-    const newPermCodes = newPerms.map((p) => p.code);
-    const diffAdded = newPermCodes.filter((c) => !oldPermCodes.includes(c));
-    const diffRemoved = oldPermCodes.filter((c) => !newPermCodes.includes(c));
-    const auditLogs = getStoredAuditLogs();
-    const newAudit: AuditLog = {
-      id: `audit-${Date.now().toString().slice(-6)}`,
-      user_id: 'user-000',
-      user_name: 'Tổng Quản Trị Hệ Thống',
-      action: 'ROLE_UPDATE_PERMISSIONS',
-      target_type: 'ROLE',
-      target_id: role.id,
-      target_name: role.name,
-      changes_summary: `Cập nhật quyền vai trò '${role.name}' (+${diffAdded.length}/-${diffRemoved.length})`,
-      details_json: JSON.stringify({ before: oldPermCodes, after: newPermCodes, diff_added: diffAdded, diff_removed: diffRemoved, version: role.permissions_version }),
-      ip_address: '127.0.0.1',
-      created_at: new Date().toISOString(),
-    };
-    saveStoredAuditLogs([newAudit, ...auditLogs]);
-
-    return simulateDelay(role);
-  }
-
   const response = await apiClient.put(`/roles/${roleId}`, data);
   return response.data;
 };
 
 export const deleteRole = async (roleId: string): Promise<{ message: string }> => {
-  if (isMockMode()) {
-    const roles = getStoredRoles();
-    const role = roles.find((r) => r.id === roleId);
-    if (!role) throw new Error('Role not found');
-    if (role.is_system) throw new Error('Không thể xóa vai trò hệ thống gốc!');
-
-    const users = getStoredUsers();
-    const count = users.filter((u) => u.roleId === role.id || u.role === role.code).length;
-    if (count > 0) throw new Error(`Không thể xóa vai trò đang có ${count} người dùng trực thuộc!`);
-
-    saveStoredRoles(roles.filter((r) => r.id !== roleId));
-
-    const auditLogs = getStoredAuditLogs();
-    const newAudit: AuditLog = {
-      id: `audit-${Date.now().toString().slice(-6)}`,
-      user_id: 'user-000',
-      user_name: 'Tổng Quản Trị Hệ Thống',
-      action: 'ROLE_DELETE',
-      target_type: 'ROLE',
-      target_id: role.id,
-      target_name: role.name,
-      changes_summary: `Xóa vai trò tùy biến '${role.name}' (${role.code})`,
-      ip_address: '127.0.0.1',
-      created_at: new Date().toISOString(),
-    };
-    saveStoredAuditLogs([newAudit, ...auditLogs]);
-
-    return simulateDelay({ message: `Đã xóa vai trò '${role.name}' thành công!` });
-  }
-
   const response = await apiClient.delete(`/roles/${roleId}`);
   return response.data;
 };
 
 export const getAuditLogs = async (targetType?: string): Promise<AuditLog[]> => {
-  if (isMockMode()) {
-    let logs = getStoredAuditLogs();
-    if (targetType) {
-      logs = logs.filter((l) => l.target_type === targetType);
-    }
-    return simulateDelay(logs);
-  }
-
   const response = await apiClient.get('/audit-logs', { params: { target_type: targetType } });
   return response.data;
 };
-
-
-
-
-

@@ -34,7 +34,7 @@ export default function LoginPage() {
   const fillQuickAccount = (username: string) => {
     form.setFieldsValue({
       username,
-      password: 'password123',
+      password: process.env.NEXT_PUBLIC_DEMO_PASSWORD || '',
     });
     setErrorMessage(null);
   };
@@ -81,7 +81,7 @@ export default function LoginPage() {
             form={form}
             layout="vertical"
             onFinish={handleFinish}
-            initialValues={{ username: 'admin', password: 'password123' }}
+            initialValues={{ username: 'admin', password: process.env.NEXT_PUBLIC_DEMO_PASSWORD || '' }}
             requiredMark={false}
           >
             <Form.Item
