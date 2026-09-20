@@ -277,7 +277,13 @@ export default function POSPage() {
   };
 
   const removeFromCart = (productId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.product.id !== productId));
+    setCart((prevCart) => {
+      const nextCart = prevCart.filter((item) => item.product.id !== productId);
+      if (nextCart.length === 0) {
+        setDiscount(0);
+      }
+      return nextCart;
+    });
   };
 
   const clearCart = () => {
@@ -291,6 +297,15 @@ export default function POSPage() {
   // Calculations
   const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
   const finalTotal = Math.max(0, subtotal - discount);
+
+  // Auto reset or cap discount when cart changes
+  useEffect(() => {
+    if (cart.length === 0) {
+      if (discount !== 0) setDiscount(0);
+    } else if (discount > subtotal) {
+      setDiscount(subtotal);
+    }
+  }, [cart.length, subtotal, discount]);
 
   // Submit Order
   const handleCheckout = async () => {
@@ -829,9 +844,12 @@ export default function POSPage() {
               <span>Giảm giá:</span>
               <Space.Compact size="small" className="w-28">
                 <InputNumber
+                  id="pos-discount-input"
+                  placeholder="0"
                   size="small"
                   min={0}
                   max={subtotal}
+                  disabled={cart.length === 0}
                   step={5000}
                   value={discount}
                   onChange={(val) => setDiscount(val || 0)}

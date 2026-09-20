@@ -100,9 +100,12 @@ export default function SettingsPage() {
       setSavingSettings(true);
       const updated = await updateSystemSettings(values);
       setSettings(updated);
-      message.success('Đã lưu cấu hình hệ thống thành công!');
+      message.success('Đã lưu quy tắc vận hành và cấu hình thành công!');
     } catch (err: any) {
-      if (err?.errorFields) return;
+      if (err?.errorFields && err.errorFields.length > 0) {
+        message.warning('Vui lòng kiểm tra lại các trường thông tin cấu hình chưa hợp lệ!');
+        return;
+      }
       message.error(err.message || 'Lỗi khi lưu cấu hình');
     } finally {
       setSavingSettings(false);
@@ -400,12 +403,17 @@ export default function SettingsPage() {
                   <Form form={settingsForm} layout="vertical" className="max-w-2xl pt-2 space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <Form.Item
-                        name="lowStockThreshold"
                         label={<span className="text-xs font-semibold text-[#111827]">NGƯỠNG CẢNH BÁO TỒN KHO THẤP</span>}
                         help="Khi tồn kho bằng hoặc nhỏ hơn số này, hệ thống sẽ đánh dấu màu cam (Sắp hết)"
                       >
                         <Space.Compact className="w-full">
-                          <InputNumber min={1} max={100} className="w-full text-xs font-mono" />
+                          <Form.Item
+                            name="lowStockThreshold"
+                            noStyle
+                            rules={[{ required: true, message: 'Vui lòng nhập ngưỡng tồn kho' }]}
+                          >
+                            <InputNumber min={1} max={100} className="w-full text-xs font-mono" />
+                          </Form.Item>
                           <Button disabled className="!bg-gray-100 !text-gray-600 font-medium !px-2.5 text-xs">cái</Button>
                         </Space.Compact>
                       </Form.Item>
@@ -513,15 +521,19 @@ export default function SettingsPage() {
           </div>
 
           <Form.Item
-            name="defaultInitialCash"
             label={<span className="text-xs font-semibold text-[#111827]">TIỀN LẺ ĐẦU CA GỢI Ý</span>}
-            rules={[{ required: true, message: 'Nhập số tiền đầu ca' }]}
           >
             <Space.Compact className="w-full">
-              <InputNumber
-                className="w-full font-mono text-xs font-bold"
-                formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-              />
+              <Form.Item
+                name="defaultInitialCash"
+                noStyle
+                rules={[{ required: true, message: 'Nhập số tiền đầu ca' }]}
+              >
+                <InputNumber
+                  className="w-full font-mono text-xs font-bold"
+                  formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                />
+              </Form.Item>
               <Button disabled className="!bg-gray-100 !text-gray-600 font-medium !px-3 text-xs">₫</Button>
             </Space.Compact>
           </Form.Item>

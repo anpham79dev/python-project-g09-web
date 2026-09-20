@@ -38,7 +38,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi" className={`${beVietnamPro.variable} ${inter.variable} h-full scroll-smooth`}>
-      <body className="min-h-full flex flex-col font-sans bg-[#F8F9FA] text-[#111827]">
+      <body suppressHydrationWarning className="min-h-full flex flex-col font-sans bg-[#F8F9FA] text-[#111827]">
         <AntdRegistry>
           <ClientLayout>{children}</ClientLayout>
         </AntdRegistry>

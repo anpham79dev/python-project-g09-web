@@ -442,7 +442,9 @@ export default function DashboardPage() {
 
         {/* Date Filter, Branch Filter & Actions Toolbar */}
         <div className="flex flex-wrap items-center gap-2.5">
-          <div data-testid="dashboard-branch-filter" className="inline-block">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs text-gray-500 font-medium whitespace-nowrap">Phạm vi báo cáo:</span>
+            <div data-testid="dashboard-branch-filter" className="inline-block">
             <Select
               id="dashboard-branch-select"
               value={selectedBranchId}
@@ -503,6 +505,7 @@ export default function DashboardPage() {
               ]}
               optionRender={(option) => (option.data as any)?.children || option.label}
             />
+          </div>
           </div>
 
           <Segmented

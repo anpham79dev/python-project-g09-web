@@ -29,6 +29,9 @@ export default function NewProductPage() {
   const router = useRouter();
   const { message } = App.useApp();
   const [form] = Form.useForm();
+  const watchedName = Form.useWatch('name', form);
+  const watchedCategory = Form.useWatch('category', form);
+  const watchedPrice = Form.useWatch('price', form);
   const [submitting, setSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>(
     'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=600&q=80'
@@ -139,17 +142,21 @@ export default function NewProductPage() {
 
                 <Form.Item
                   label={<span className="font-semibold text-xs uppercase text-secondary">Đơn giá bán (VNĐ)</span>}
-                  name="price"
-                  rules={[{ required: true, message: 'Vui lòng nhập đơn giá!' }]}
                 >
                   <Space.Compact size="large" className="w-full">
-                    <InputNumber
-                      size="large"
-                      min={1000}
-                      step={1000}
-                      formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                      className="w-full rounded-l-lg"
-                    />
+                    <Form.Item
+                      name="price"
+                      noStyle
+                      rules={[{ required: true, message: 'Vui lòng nhập đơn giá!' }]}
+                    >
+                      <InputNumber
+                        size="large"
+                        min={1000}
+                        step={1000}
+                        formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        className="w-full rounded-l-lg"
+                      />
+                    </Form.Item>
                     <Button disabled size="large" className="!bg-gray-100 !text-gray-600 font-medium !px-3">₫</Button>
                   </Space.Compact>
                 </Form.Item>
@@ -217,17 +224,17 @@ export default function NewProductPage() {
                   />
                 </div>
                 <span className="text-[10px] uppercase font-bold text-emerald-700 block">
-                  {form.getFieldValue('category') || 'Bánh Mì Ngọt & Pastry'}
+                  {watchedCategory || 'Bánh Mì Ngọt & Pastry'}
                 </span>
                 <h4 className="font-bold text-sm text-[#111827] mt-0.5 truncate">
-                  {form.getFieldValue('name') || 'Tên bánh mẫu'}
+                  {watchedName || 'Tên bánh mẫu'}
                 </h4>
                 <div className="flex justify-between items-center mt-3 pt-2 border-t border-dashed border-[#E5E7EB]">
                   <span className="text-sm font-bold text-[#006C49] font-mono">
-                    {(form.getFieldValue('price') || 35000).toLocaleString('vi-VN')} ₫
+                    {(Number(watchedPrice) || 35000).toLocaleString('vi-VN')} ₫
                   </span>
                   <span className="text-xs px-2 py-0.5 rounded bg-emerald-50 text-emerald-800 font-medium">
-                    Tồn: {form.getFieldValue('stock') || 20}
+                    Tồn: 0
                   </span>
                 </div>
               </div>

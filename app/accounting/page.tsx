@@ -650,17 +650,21 @@ export default function AccountingPage() {
 
           <div className="grid grid-cols-2 gap-3">
             <Form.Item
-              name="amount"
               label={<span className="text-xs font-semibold text-[#111827]">SỐ TIỀN (VNĐ)</span>}
-              rules={[{ required: true, message: 'Vui lòng nhập số tiền' }]}
             >
               <Space.Compact className="w-full">
-                <InputNumber
-                  min={1000}
-                  step={10000}
-                  formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                  className="w-full font-mono text-xs font-bold"
-                />
+                <Form.Item
+                  name="amount"
+                  noStyle
+                  rules={[{ required: true, message: 'Vui lòng nhập số tiền' }]}
+                >
+                  <InputNumber
+                    min={1000}
+                    step={10000}
+                    formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    className="w-full font-mono text-xs font-bold"
+                  />
+                </Form.Item>
                 <Button disabled className="!bg-gray-100 !text-gray-600 font-medium !px-3 text-xs">₫</Button>
               </Space.Compact>
             </Form.Item>

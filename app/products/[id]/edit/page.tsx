@@ -33,6 +33,8 @@ export default function EditProductPage() {
   const { message } = App.useApp();
 
   const [form] = Form.useForm();
+  const watchedName = Form.useWatch('name', form);
+  const watchedCategory = Form.useWatch('category', form);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [previewImage, setPreviewImage] = useState<string>('');
@@ -153,17 +155,21 @@ export default function EditProductPage() {
 
                 <Form.Item
                   label={<span className="font-semibold text-xs uppercase text-secondary">Đơn giá bán (VNĐ)</span>}
-                  name="price"
-                  rules={[{ required: true, message: 'Vui lòng nhập đơn giá!' }]}
                 >
                   <Space.Compact size="large" className="w-full">
-                    <InputNumber
-                      size="large"
-                      min={1000}
-                      step={1000}
-                      formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                      className="w-full rounded-l-lg"
-                    />
+                    <Form.Item
+                      name="price"
+                      noStyle
+                      rules={[{ required: true, message: 'Vui lòng nhập đơn giá!' }]}
+                    >
+                      <InputNumber
+                        size="large"
+                        min={1000}
+                        step={1000}
+                        formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                        className="w-full rounded-l-lg"
+                      />
+                    </Form.Item>
                     <Button disabled size="large" className="!bg-gray-100 !text-gray-600 font-medium !px-3">₫</Button>
                   </Space.Compact>
                 </Form.Item>
@@ -206,10 +212,10 @@ export default function EditProductPage() {
                   />
                 </div>
                 <span className="text-[10px] uppercase font-bold text-emerald-700 block">
-                  {form.getFieldValue('category')}
+                  {watchedCategory || 'Bánh Mì Ngọt & Pastry'}
                 </span>
                 <h4 className="font-bold text-sm text-[#111827] mt-0.5 truncate">
-                  {form.getFieldValue('name')}
+                  {watchedName || 'Tên bánh'}
                 </h4>
               </div>
             </div>
