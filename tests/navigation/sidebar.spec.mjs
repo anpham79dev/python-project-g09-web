@@ -12,20 +12,17 @@ async function testSidebarNavigation() {
   const page = await context.newPage();
 
   try {
-    // 1. Kiểm tra Landing Page ở route "/" - Giữ nguyên Topbar ngang, không có Sidebar
-    console.log('\n[1/7] 🌐 Kiểm tra Landing Page ("/") - Giữ nguyên Topbar ngang, không có Sidebar...');
+    // 1. Kiểm tra Root Route ("/") khi chưa đăng nhập - Tự động redirect về /login
+    console.log('\n[1/7] 🌐 Kiểm tra Route ("/") khi chưa đăng nhập - Tự động redirect về /login...');
     await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(600);
 
-    const landingHeader = page.locator('header');
-    await landingHeader.waitFor({ state: 'visible' });
-    const siderOnLanding = page.locator('.ant-layout-sider');
-    const siderCountLanding = await siderOnLanding.count();
-    console.log(`  👉 Số lượng Sidebar trên Landing page: ${siderCountLanding} (kỳ vọng: 0)`);
-    if (siderCountLanding !== 0) {
-      throw new Error('Sidebar xuất hiện trên Landing page (phải giữ nguyên topbar ngang)!');
+    const currentUrl = page.url();
+    console.log(`  👉 URL hiện tại sau khi vào /: ${currentUrl}`);
+    if (!currentUrl.includes('/login')) {
+      throw new Error(`Kỳ vọng redirect về /login nhưng URL hiện tại là: ${currentUrl}`);
     }
-    console.log('  ✅ Landing Page giữ nguyên 100% bố cục Topbar ngang ban đầu.');
+    console.log('  ✅ Route "/" tự động chuyển hướng về /login thành công.');
 
     // 2. Đăng nhập Admin và kiểm tra 5 SubMenu Groups có thể đóng/mở
     console.log('\n[2/7] 🏢 Đăng nhập Admin và kiểm tra 5 khối SubMenu Groups...');

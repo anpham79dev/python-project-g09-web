@@ -1,7 +1,7 @@
 # Module 01: Đăng Nhập & Phân Quyền Người Dùng (Authentication & RBAC)
 
 ## Tổng quan
-Module **Đăng nhập & Phân quyền** cung cấp cơ chế định danh an toàn cho nhân viên và quản lý tiệm bánh khi truy cập vào hệ thống SaaS. Tính năng này đảm bảo dữ liệu kinh doanh quan trọng (doanh thu, cấu hình giá, thông tin nhân sự) chỉ dành cho Quản trị viên, đồng thời tối ưu giao diện bán hàng tinh gọn cho Thu ngân tại quầy.
+Module **Đăng nhập & Phân quyền** cung cấp cơ chế định danh an toàn cho nhân viên và quản lý tiệm bánh khi truy cập vào hệ thống phần mềm quản lý tiệm bánh. Tính năng này đảm bảo dữ liệu kinh doanh quan trọng (doanh thu, cấu hình giá, thông tin nhân sự) chỉ dành cho Quản trị viên, đồng thời tối ưu giao diện bán hàng tinh gọn cho Thu ngân tại quầy.
 
 ---
 
@@ -61,32 +61,53 @@ Module **Đăng nhập & Phân quyền** cung cấp cơ chế định danh an to
 #### Kịch bản 1.3.1: Đăng xuất phiên làm việc (Happy Path)
 - **Given** người dùng đang đăng nhập và ở bất kỳ màn hình nào.
 - **When** người dùng bấm vào Avatar/Tên người dùng ở góc trên cùng bên phải và chọn "Đăng xuất".
-- **Then** hệ thống xóa sạch `token` và thông tin `user` khỏi `localStorage`, sau đó điều hướng về trang `/login`.
+- **Then** hệ thống xóa sạch `token` và thông tin `user` khỏi `localStorage`, xóa toàn bộ cookie xác thực, sau đó điều hướng về trang `/login`.
+
+---
+
+### Kịch bản US-01.4: Điều hướng thông minh từ tuyến đường gốc (`/`)
+#### Kịch bản 1.4.1: Chưa đăng nhập hoặc Token đã hết hạn truy cập `/`
+- **Given** người dùng chưa đăng nhập hoặc cookie Token `artisan_token` đã quá thời hạn hiệu lực (`exp < now`).
+- **When** người dùng truy cập vào địa chỉ gốc của ứng dụng (`http://localhost:3000/`).
+- **Then** Edge Middleware và Server Component lập tức dọn dẹp các cookie phiên không hợp lệ và tự động chuyển hướng người dùng thẳng về trang `/login`.
+
+#### Kịch bản 1.4.2: Đã đăng nhập với Token còn hạn truy cập `/`
+- **Given** người dùng đã đăng nhập và Token còn hạn hiệu lực.
+- **When** người dùng truy cập vào địa chỉ gốc (`http://localhost:3000/`).
+- **Then** hệ thống tự động kiểm tra vai trò và quyền hạn:
+  - Nếu là Quản trị viên (`SUPER_ADMIN`, `ADMIN`) hoặc có quyền xem báo cáo: chuyển hướng ngay vào `/dashboard`.
+  - Nếu là Thu ngân (`STAFF`): chuyển hướng ngay vào quầy bán hàng `/pos`.
 
 ---
 
 ## Business Rules (Quy tắc nghiệp vụ)
 
 1. **Phân quyền vai trò (Role Mapping)**:
-   - **`ADMIN` (Quản trị viên)**: Toàn quyền truy cập tất cả các route bao gồm: Báo cáo (`/dashboard`), Sổ quỹ kế toán (`/accounting`), Bán hàng (`/pos`), Quản lý sản phẩm & kho (`/products`, `/products/new`, `/products/[id]/edit`), Đa chi nhánh (`/branches`), Cài đặt (`/settings`), Lịch sử đơn hàng (`/orders`, `/orders/[id]`), Quản lý tài khoản (`/users`, `/users/new`). Có quyền chuyển đổi giữa tất cả các chi nhánh ("Toàn chuỗi" hoặc từng cơ sở).
+   - **`SUPER_ADMIN` / `ADMIN` (Quản trị viên)**: Toàn quyền truy cập tất cả các route bao gồm: Báo cáo (`/dashboard`), Sổ quỹ kế toán (`/accounting`), Bán hàng (`/pos`), Quản lý sản phẩm & kho (`/products`, `/products/new`, `/products/[id]/edit`), Đa chi nhánh (`/branches`), Cài đặt (`/settings`, `/settings/roles`), Lịch sử đơn hàng (`/orders`, `/orders/[id]`), Quản lý tài khoản (`/users`, `/users/new`). Có quyền chuyển đổi giữa tất cả các chi nhánh ("Toàn chuỗi" hoặc từng cơ sở).
    - **`STAFF` (Thu ngân)**: Chỉ được phép truy cập các route nghiệp vụ: Bán hàng tại quầy (`/pos`), Lịch sử đơn hàng (`/orders`), Ca làm việc (`/shifts`). Topbar điều hướng tự động ẩn các menu Admin.
 2. **Khóa chi nhánh làm việc theo nhân viên (Staff Branch Scoping & Locking)**:
    - Khi Admin tạo tài khoản Staff mới (`/users/new`), bắt buộc phải chỉ định **Chi nhánh làm việc** (`defaultBranchId`).
    - Khi Staff đăng nhập, hệ thống tự động nhận diện và khóa cố định phiên làm việc vào đúng chi nhánh được gán (`user.defaultBranchId`).
    - Trên Topbar của Staff hiển thị huy hiệu cố định `🏢 [Tên Chi Nhánh]` và không cho phép đổi sang chi nhánh khác nhằm ngăn ngừa sai lệch doanh thu và tồn kho giữa các cơ sở.
-3. **Cơ chế lưu trữ phiên (Session Persistence)**:
-   - Thông tin phiên được lưu giữ trong `localStorage` (`token` và `user`).
-   - Mọi request gửi tới API backend (khi bật API mode) phải tự động đính kèm header `Authorization: Bearer <token>`.
-   - Nếu API trả về mã lỗi `401 Unauthorized`, hệ thống tự động xóa token và chuyển hướng về `/login`.
+3. **Cơ chế lưu trữ phiên & Kiểm soát thời hạn Token (Session & JWT Expiration Guard)**:
+   - Thông tin phiên được lưu giữ đồng bộ trong `localStorage` và Cookies trình duyệt (`artisan_token`, `artisan_user_role`, `artisan_permissions`).
+   - Hệ thống loại bỏ hoàn toàn Landing Page công khai để tập trung 100% vào nghiệp vụ quản lý tiệm bánh nội bộ.
+   - Tại tầng Edge Middleware, Token JWT được giải mã phần payload để kiểm tra trường thời gian hết hạn (`exp`):
+     - Nếu `exp * 1000 < Date.now()`: Token đã hết hạn, hệ thống tự động xóa sạch các cookie phiên và chuyển hướng về `/login`.
+     - Nếu còn hạn: Cho phép truy cập hoặc điều hướng thông minh vào màn hình làm việc tương ứng (`/dashboard` hoặc `/pos`).
+   - Mọi request gửi tới API backend phải tự động đính kèm header `Authorization: Bearer <token>`. Nếu API trả về mã lỗi `401 Unauthorized`, hệ thống tự động xóa phiên và chuyển hướng về `/login`.
 
 ---
 
 ## Phạm vi kỹ thuật liên quan
 
 - **Routes**:
-  - `/login` ([`app/login/page.tsx`](file:///Users/gnuhh/Project/python/fe/app/login/page.tsx))
-  - Topbar & Route Protection ([`app/client-layout.tsx`](file:///Users/gnuhh/Project/python/fe/app/client-layout.tsx))
+  - `/` ([`app/page.tsx`](file:///Users/gnuhh/Project/cuoimon/python-project-g09-web/app/page.tsx)): Server Component điều hướng gốc thông minh.
+  - `/login` ([`app/login/page.tsx`](file:///Users/gnuhh/Project/cuoimon/python-project-g09-web/app/login/page.tsx)): Giao diện đăng nhập xác thực.
+  - Topbar & Sider Protection ([`app/client-layout.tsx`](file:///Users/gnuhh/Project/cuoimon/python-project-g09-web/app/client-layout.tsx)): Bố cục quản lý tiệm bánh phân quyền động.
+  - Edge Protection ([`middleware.ts`](file:///Users/gnuhh/Project/cuoimon/python-project-g09-web/middleware.ts)): Bộ lọc bảo vệ tuyến đường và kiểm tra hạn JWT.
 - **File dùng chung liên quan**:
-  - `lib/auth.ts`: Định nghĩa helper `getCurrentUser`, `setAuthSession`, `clearAuthSession`, `hasRole`.
+  - `lib/auth.ts`: Định nghĩa helper `getCurrentUser`, `setAuthSession`, `clearAuthSession`, `hasPermission`.
+  - `lib/rbac-config.ts`: Ma trận 20 quyền hạn nguyên tử và cấu hình vai trò hệ thống.
   - `lib/axios.ts`: Request interceptor gắn Bearer Token & Response interceptor xử lý 401.
   - `lib/api.ts`: Hàm `login()`.

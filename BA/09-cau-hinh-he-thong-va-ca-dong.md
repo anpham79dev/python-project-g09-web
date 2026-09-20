@@ -2,7 +2,7 @@
 
 ## 1. TỔNG QUAN NGHIỆP VỤ & BỐI CẢNH (BUSINESS CONTEXT)
 
-Để hệ thống phần mềm SaaS linh hoạt theo từng mô hình vận hành của tiệm bánh mà **không cần can thiệp vào mã nguồn (Hardcode)**, toàn bộ các quy tắc bán hàng, khung giờ ca làm việc, thông tin in phiếu và tài khoản nhận thanh toán QR đều được quản lý tập trung tại module Cài Đặt Hệ Thống.
+Để hệ thống phần mềm quản lý tiệm bánh linh hoạt theo từng mô hình vận hành của cửa hàng mà **không cần can thiệp vào mã nguồn (Hardcode)**, toàn bộ các quy tắc bán hàng, khung giờ ca làm việc, thông tin in phiếu và tài khoản nhận thanh toán QR đều được quản lý tập trung tại module Cài Đặt Hệ Thống.
 
 **Mục tiêu của Module Cài đặt Hệ thống:**
 1. **Cấu hình Ca làm việc động (Dynamic Shift Templates):** Cho phép Quản trị viên tự do định nghĩa các ca làm việc (Ca sáng, Ca chiều tối, Ca gãy tăng cường) kèm khung giờ và số tiền lẻ đầu ca gợi ý.

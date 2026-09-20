@@ -1,15 +1,15 @@
-# Design System: Artisan Logic (Bakery Management SaaS)
+# Design System: Artisan Logic (Bakery Management System)
 
-> **Source:** Extracted from Google Stitch Project **Bakery Management SaaS Dashboard** (`projects/6452069880749017672`)  
+> **Source:** Extracted from Google Stitch Project **Bakery Management Dashboard** (`projects/6452069880749017672`)  
 > **Target Platform:** Desktop B2B Web Application / Point of Sale (POS) & Operational Dashboard  
-> **Design Archetype:** Corporate Modern Minimalist / High-Utility B2B Operations  
+> **Design Archetype:** Corporate Modern Minimalist / High-Utility Operations  
 > **Supported Locales:** English & Vietnamese (Full Vietnamese diacritics support)
 
 ---
 
 ## 1. Executive Summary & Brand Principles
 
-The **Artisan Logic** design system is built specifically for bakery management SaaS and high-velocity point-of-sale operations. It prioritizes data legibility, fast input throughput, and absolute operational reliability.
+The **Artisan Logic** design system is built specifically for bakery management and high-velocity point-of-sale operations. It prioritizes data legibility, fast input throughput, and absolute operational reliability.
 
 ### Core Tenets
 1. **Precision & High Utility**: Optimized for busy counter staff and managers. Dense layouts, clear visual hierarchy, and instant feedback.

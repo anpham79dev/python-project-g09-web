@@ -14,6 +14,36 @@ const PROTECTED_ROUTES = [
   '/orders',
 ];
 
+function isTokenValid(token?: string | null): boolean {
+  if (!token || typeof token !== 'string' || token.trim() === '') {
+    return false;
+  }
+  try {
+    const parts = token.split('.');
+    if (parts.length === 3) {
+      const base64Url = parts[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      const payload = JSON.parse(jsonPayload);
+      if (payload.exp && typeof payload.exp === 'number') {
+        const nowInSeconds = Math.floor(Date.now() / 1000);
+        if (payload.exp < nowInSeconds) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return true;
+  } catch {
+    return true;
+  }
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   if (
@@ -25,7 +55,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get('artisan_token')?.value;
+  const rawToken = request.cookies.get('artisan_token')?.value;
+  const isExpiredOrInvalid = rawToken ? !isTokenValid(rawToken) : false;
+  const token = isExpiredOrInvalid ? null : rawToken;
   const role = request.cookies.get('artisan_user_role')?.value;
   const rawPerms = request.cookies.get('artisan_permissions')?.value;
 
@@ -51,15 +83,40 @@ export function middleware(request: NextRequest) {
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   );
 
-  // 1. Check unauthenticated access to protected routes
+  // Helper to attach cookie cleanup if token was expired
+  const attachCleanupIfNeeded = (res: NextResponse) => {
+    if (isExpiredOrInvalid) {
+      res.cookies.delete('artisan_token');
+      res.cookies.delete('artisan_user_role');
+      res.cookies.delete('artisan_user_name');
+      res.cookies.delete('artisan_user_id');
+      res.cookies.delete('artisan_permissions');
+      res.cookies.delete('artisan_perm_version');
+    }
+    return res;
+  };
+
+  // 1. Root route '/' handling: redirect to ERP if token is valid, otherwise redirect to /login
+  if (pathname === '/') {
+    if (token) {
+      if (role === 'SUPER_ADMIN' || permissions.includes('dashboard:view')) {
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+      }
+      return NextResponse.redirect(new URL('/pos', request.url));
+    }
+    const loginUrl = new URL('/login', request.url);
+    return attachCleanupIfNeeded(NextResponse.redirect(loginUrl));
+  }
+
+  // 2. Check unauthenticated or expired token access to protected routes
   if (isProtectedRoute && !token) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('reason', 'unauthenticated');
     loginUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(loginUrl);
+    return attachCleanupIfNeeded(NextResponse.redirect(loginUrl));
   }
 
-  // 2. Redirect logged-in users away from /login
+  // 3. Redirect logged-in users away from /login
   if (pathname === '/login' && token) {
     if (role === 'SUPER_ADMIN' || permissions.includes('dashboard:view')) {
       return NextResponse.redirect(new URL('/dashboard', request.url));
@@ -67,7 +124,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/pos', request.url));
   }
 
-  // 3. PBAC Route Access Evaluation
+  // 4. PBAC Route Access Evaluation
   if (isProtectedRoute && token) {
     if (role === 'SUPER_ADMIN') {
       return NextResponse.next();

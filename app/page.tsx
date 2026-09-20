@@ -1,51 +1,66 @@
-import React from 'react';
 import { cookies } from 'next/headers';
-import LandingPageView from '@/app/components/landing-page-view';
-import { LandingPageConfig, DEFAULT_LANDING_CONFIG } from '@/lib/landing-config';
-import { AuthUser } from '@/lib/auth';
+import { redirect } from 'next/navigation';
+import { SYSTEM_ROLES, ALL_PERMISSION_CODES } from '@/lib/rbac-config';
 
 export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
-async function getLandingConfig(): Promise<LandingPageConfig> {
-  const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api';
-  try {
-    const res = await fetch(`${apiUrl}/landing-page-config`, {
-      cache: 'no-store',
-      headers: {
-        Accept: 'application/json',
-      },
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data && data.brand) {
-        return data;
-      }
-    }
-  } catch (err) {
-    console.warn('Server fetch landing config failed, using fallback:', err);
+function isTokenValid(token?: string | null): boolean {
+  if (!token || typeof token !== 'string' || token.trim() === '') {
+    return false;
   }
-  return DEFAULT_LANDING_CONFIG;
+  try {
+    const parts = token.split('.');
+    if (parts.length === 3) {
+      const base64Url = parts[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = Buffer.from(base64, 'base64').toString('utf8');
+      const payload = JSON.parse(jsonPayload);
+      if (payload.exp && typeof payload.exp === 'number') {
+        const nowInSeconds = Math.floor(Date.now() / 1000);
+        if (payload.exp < nowInSeconds) {
+          return false;
+        }
+      }
+      return true;
+    }
+    return true;
+  } catch {
+    return true;
+  }
 }
 
-export default async function LandingPage() {
+export default async function RootPage() {
   const cookieStore = await cookies();
-  const token = cookieStore.get('artisan_token')?.value;
+  const rawToken = cookieStore.get('artisan_token')?.value;
   const role = cookieStore.get('artisan_user_role')?.value;
-  const userName = cookieStore.get('artisan_user_name')?.value;
-  const userId = cookieStore.get('artisan_user_id')?.value;
+  const rawPerms = cookieStore.get('artisan_permissions')?.value;
 
-  let initialUser: AuthUser | null = null;
-  if (token && role) {
-    initialUser = {
-      id: userId ? decodeURIComponent(userId) : 'user',
-      username: 'user',
-      fullName: userName ? decodeURIComponent(userName) : 'Quản trị viên',
-      role: decodeURIComponent(role),
-      token: decodeURIComponent(token),
-    };
+  const tokenValid = isTokenValid(rawToken);
+
+  if (!tokenValid) {
+    redirect('/login');
   }
 
-  const config = await getLandingConfig();
-  return <LandingPageView config={config} initialUser={initialUser} isPreview={false} />;
+  let permissions: string[] = [];
+  if (rawPerms) {
+    try {
+      permissions = JSON.parse(decodeURIComponent(rawPerms));
+    } catch {
+      permissions = [];
+    }
+  }
+
+  if (permissions.length === 0 && role) {
+    if (role === 'SUPER_ADMIN') {
+      permissions = ALL_PERMISSION_CODES;
+    } else if (SYSTEM_ROLES[role]) {
+      permissions = SYSTEM_ROLES[role].permissions;
+    }
+  }
+
+  if (role === 'SUPER_ADMIN' || permissions.includes('dashboard:view')) {
+    redirect('/dashboard');
+  }
+
+  redirect('/pos');
 }

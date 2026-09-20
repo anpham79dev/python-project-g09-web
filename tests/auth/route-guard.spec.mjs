@@ -15,6 +15,17 @@ async function runRouteGuardTests() {
     const guestContext = await browser.newContext({ viewport: { width: 1440, height: 900 } });
     const guestPage = await guestContext.newPage();
 
+    // 1.0 Thử vào trực tiếp / khi chưa đăng nhập
+    console.log('  👉 1.0 Truy cập trực tiếp http://localhost:3000/ (root)...');
+    await guestPage.goto('http://localhost:3000/', { waitUntil: 'domcontentloaded' });
+    await guestPage.waitForTimeout(600);
+    const rootRedirectUrl = guestPage.url();
+    console.log(`     URL hiện tại khi vào /: ${rootRedirectUrl}`);
+    if (!rootRedirectUrl.includes('/login')) {
+      throw new Error(`Kỳ vọng redirect về /login nhưng URL hiện tại là: ${rootRedirectUrl}`);
+    }
+    console.log('     ✅ Chặn và điều hướng root "/" về /login thành công.');
+
     // 1.1 Thử vào trực tiếp /pos
     console.log('  👉 1.1 Truy cập trực tiếp http://localhost:3000/pos...');
     await guestPage.goto('http://localhost:3000/pos', { waitUntil: 'domcontentloaded' });
@@ -143,6 +154,14 @@ async function runRouteGuardTests() {
     await adminPage.goto('http://localhost:3000/pos');
     await adminPage.waitForSelector('button:has-text("Thanh toán")');
     console.log('  ✅ Admin truy cập /pos thành công.');
+
+    // 3.4 Admin truy cập root "/" -> Tự động chuyển hướng vào ERP (/dashboard)
+    await adminPage.goto('http://localhost:3000/');
+    await adminPage.waitForTimeout(600);
+    if (!adminPage.url().includes('/dashboard')) {
+      throw new Error(`Kỳ vọng Admin vào / được redirect về /dashboard nhưng URL là: ${adminPage.url()}`);
+    }
+    console.log('  ✅ Admin truy cập root "/" được điều hướng thông minh về /dashboard.');
     await adminContext.close();
 
     console.log('\n' + '=' .repeat(75));

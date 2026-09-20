@@ -1,16 +1,15 @@
-# Artisan Bakery - Hệ Thống Quản Lý Đơn Hàng & Vận Hành Chuỗi Tiệm Bánh (Frontend SaaS)
+# Artisan Bakery - Hệ Thống Quản Lý & Vận Hành Tiệm Bánh
 
-> **Dự án Frontend Web Application** phục vụ toàn diện vận hành chuỗi tiệm bánh thủ công (Artisan Bakery): Bán lẻ tại quầy (POS), Landing Page công khai & CMS, Quản lý thực đơn & tồn kho đa chi nhánh, Sổ quỹ thu chi kế toán, Quản lý ca làm việc kết ca, Phân quyền động PBAC và Báo cáo kinh doanh thời gian thực.
+> **Dự án Frontend Web Application** phục vụ toàn diện vận hành tiệm bánh thủ công (Artisan Bakery): Bán lẻ tại quầy (POS), Quản lý thực đơn & tồn kho đa chi nhánh, Sổ quỹ thu chi kế toán, Quản lý ca làm việc kết ca, Phân quyền động PBAC và Báo cáo kinh doanh thời gian thực.
 
 ---
 
 ## 🌟 Giới Thiệu Dự Án & Các Phân Hệ Chính
 
-**Artisan Bakery SaaS** được thiết kế chuẩn mực, giao diện hiện đại với tông màu Emerald chủ đạo (`#10B981`), tối ưu cho cả trải nghiệm người dùng cuối lẫn nhân viên vận hành:
+**Artisan Bakery** được thiết kế chuẩn mực, giao diện hiện đại với tông màu Emerald chủ đạo (`#10B981`), tối ưu cho cả nhân viên bán hàng lẫn chủ tiệm bánh:
 
-1. **Trang Chủ Công Khai (Landing Page) & CMS:**
-   - Giao diện giới thiệu thương hiệu bánh thủ công cao cấp, menu bánh nổi bật, câu chuyện thương hiệu và đánh giá khách hàng.
-   - Phân hệ CMS (`/settings/landing-page`) cho phép Quản trị viên tùy biến nội dung, banner, khẩu hiệu và chính sách dịch vụ trực tiếp.
+1. **Điều Hướng & Xác Thực An Toàn (Authentication & Smart Redirect):**
+   - Tuyến đường gốc (`/`) tự động điều hướng thông minh: kiểm tra thời hạn token JWT để đưa ngay vào không gian làm việc (`/dashboard` hoặc `/pos`), hoặc đưa về `/login` nếu chưa đăng nhập.
 2. **Điểm Bán Hàng Tại Quầy (POS Bán Lẻ Siêu Tốc):**
    - Bố cục 2 cột chuẩn mực (65% menu chọn món / 35% giỏ hàng), tìm kiếm theo tên hoặc mã bánh, quét đơn tức thì.
    - Hỗ trợ đa hình thức thanh toán (Tiền mặt, Chuyển khoản QR, Thẻ), tự động trừ tồn kho theo chi nhánh và in hóa đơn nhiệt.
@@ -24,7 +23,7 @@
    - Quản lý thu chi tổng thể, lập phiếu thu / phiếu chi có chứng từ đính kèm.
    - Phân hệ đối soát giao dịch ngân hàng: Tự động khớp lệnh chuyển khoản với dữ liệu hóa đơn bán hàng.
 6. **Phân Quyền Động PBAC (Permission-Based Access Control):**
-   - Quản lý ma trận 21 quyền hạn nguyên tử trên 9 phân hệ.
+   - Quản lý ma trận 20 quyền hạn nguyên tử trên 9 phân hệ.
    - Cho phép tạo vai trò tùy biến (Custom Roles) và phân quyền chi tiết cho từng nhóm nhân sự.
 7. **Báo Cáo Doanh Thu & Bảng Điều Khiển (Dashboard KPIs):**
    - Trực quan hóa doanh thu theo từng khung giờ trong ngày (Recharts Area Chart) và Top 5 sản phẩm bán chạy nhất.
@@ -72,15 +71,14 @@ fe/
 │   ├── axios.ts                  # Axios instance với interceptor tự động gắn Bearer Token
 │   ├── mock-data.ts              # Schema TypeScript & bộ dữ liệu mẫu khởi tạo
 │   ├── auth.ts                   # Quản lý phiên đăng nhập và phân quyền PBAC / Role
-│   ├── rbac-config.ts            # Định nghĩa 21 quyền hạn nguyên tử & cấu hình vai trò
-│   ├── landing-config.ts         # Schema & dữ liệu mặc định CMS Landing Page
+│   ├── rbac-config.ts            # Định nghĩa 20 quyền hạn nguyên tử & cấu hình vai trò
 │   └── api.ts                    # CỔNG API DUY NHẤT (Chuyển đổi Mock <-> FastAPI linh hoạt)
 │
 ├── app/                          # CÁC TRANG ỨNG DỤNG (APP ROUTER)
 │   ├── layout.tsx                # Font Be Vietnam Pro + AntdRegistry Wrapper
 │   ├── client-layout.tsx         # ConfigProvider Theme Emerald (#10B981) + Header + Sidebar
 │   ├── globals.css               # Cấu hình Tokens & CSS variables cho Tailwind v4
-│   ├── page.tsx                  # Landing Page công khai / Điều hướng thông minh
+│   ├── page.tsx                  # Điều hướng thông minh (Tự động vào Dashboard/POS hoặc Login)
 │   ├── login/page.tsx            # Trang Đăng nhập & Nút chọn nhanh tài khoản thử nghiệm
 │   ├── pos/page.tsx              # Bán hàng POS 2 cột, giỏ hàng, thanh toán & in hóa đơn
 │   ├── products/
@@ -96,7 +94,6 @@ fe/
 │   ├── dashboard/page.tsx        # Báo cáo doanh thu KPI, biểu đồ Recharts, Top 5 bán chạy
 │   ├── settings/
 │   │   ├── page.tsx              # Cài đặt hệ thống, thông tin tiệm bánh & mẫu ca làm việc
-│   │   ├── landing-page/page.tsx # CMS Tùy biến nội dung Landing Page công khai
 │   │   └── roles/page.tsx        # Ma trận phân quyền PBAC & Quản lý vai trò tùy biến
 │   └── users/
 │       ├── page.tsx              # Quản lý danh sách nhân sự & tài khoản
@@ -109,11 +106,7 @@ fe/
     ├── accounting/accounting-branch-filter.spec.mjs
     ├── accounting/icons-header.spec.mjs
     ├── branch/branch-reload.spec.mjs
-    ├── cms/landing-cms.spec.mjs
     ├── dashboard/branch-filter.spec.mjs
-    ├── landing/landing-page.spec.mjs
-    ├── landing/header-layout.spec.mjs
-    ├── landing/smooth-scroll.spec.mjs
     └── navigation/sidebar.spec.mjs
 ```
 
@@ -123,7 +116,7 @@ fe/
 
 | Tuyến đường | Mục đích sử dụng | Quyền hạn truy cập |
 | :--- | :--- | :--- |
-| `/` | Landing Page giới thiệu tiệm bánh & thực đơn nổi bật | Công khai (Public) |
+| `/` | Điều hướng thông minh (Vào trang làm việc nếu có token hợp lệ, hoặc vào Login) | Công khai (Public) |
 | `/login` | Đăng nhập hệ thống & Chọn nhanh tài khoản demo | Công khai (Public) |
 | `/dashboard` | Thống kê KPI doanh thu, biểu đồ phân bổ giờ, Top 5 | Quyền `dashboard:view` (SUPER_ADMIN, ADMIN) |
 | `/pos` | Giao diện thu ngân bán hàng, giỏ hàng, in hóa đơn | Quyền `orders:create` (Mọi thu ngân/quản lý) |
@@ -136,8 +129,7 @@ fe/
 | `/branches` | Quản lý danh sách chi nhánh & kho lưu trữ | Quyền `branches:view` / `branches:manage` |
 | `/accounting` | Sổ quỹ thu chi, phiếu thu/chi, đối soát ngân hàng | Quyền `accounting:view` / `accounting:manage` |
 | `/settings` | Cấu hình hệ thống, thuế VAT, mẫu ca làm | Quyền `settings:view` / `settings:manage` |
-| `/settings/landing-page`| CMS Quản trị nội dung Trang chủ công khai | Quyền `settings:manage` |
-| `/settings/roles` | Ma trận quản lý vai trò & 21 quyền hạn PBAC | Quyền `roles:view` / `roles:manage` |
+| `/settings/roles` | Ma trận quản lý vai trò & 20 quyền hạn PBAC | Quyền `roles:view` / `roles:manage` |
 | `/users` | Bảng danh sách nhân viên & phân quyền | Quyền `users:view` |
 | `/users/new` | Form thêm nhân viên mới và gán vai trò | Quyền `users:create` |
 

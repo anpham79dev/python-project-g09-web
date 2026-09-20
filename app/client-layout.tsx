@@ -34,7 +34,6 @@ import {
   UserOutlined,
   BranchesOutlined,
   SafetyCertificateOutlined,
-  GlobalOutlined,
   KeyOutlined,
 } from '@ant-design/icons';
 import { getCurrentUser, clearAuthSession, AuthUser, hasPermission, canAccessRoute, hasAdminAccess, isSuperAdmin } from '@/lib/auth';
@@ -55,7 +54,6 @@ const ROUTE_TO_SUBMENU: Record<string, string> = {
   '/users': 'sub_admin',
   '/settings': 'sub_system',
   '/settings/roles': 'sub_system',
-  '/settings/landing-page': 'sub_system',
 };
 
 const ALL_SUBMENU_KEYS = ['sub_sales', 'sub_orders', 'sub_inventory', 'sub_admin', 'sub_system'];
@@ -157,8 +155,7 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
   // SubMenu Collapsible Groups State - Lưu trạng thái các nhóm đang mở
   const [openKeys, setOpenKeys] = useState<string[]>(ALL_SUBMENU_KEYS);
 
-  const isPublicPage = !pathname || pathname === '/' || pathname === '/login' || pathname === '/landing';
-  const isCmsPage = pathname === '/settings/landing-page' || pathname?.startsWith('/settings/landing-page/');
+  const isPublicPage = pathname === '/login';
 
   // Xác định SubMenu cha của route hiện tại
   const currentSubmenu = Object.entries(ROUTE_TO_SUBMENU).find(([route]) =>
@@ -313,7 +310,6 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
   // Xác định Active Menu Key
   const getActiveKey = () => {
     if (!pathname) return '/dashboard';
-    if (pathname.startsWith('/settings/landing-page')) return '/settings/landing-page';
     if (pathname.startsWith('/settings/roles')) return '/settings/roles';
     if (pathname === '/pos') return '/pos';
     if (pathname.startsWith('/products')) return '/products';
@@ -339,7 +335,7 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
           <p className="text-xs text-[#585F6C] m-0">
             @{currentUser?.username} • {
               currentUser?.role === 'SUPER_ADMIN'
-                ? 'Tổng Quản Trị Hệ Thống (SaaS)'
+                ? 'Tổng Quản Trị Hệ Thống'
                 : currentUser?.roleName || (currentUser?.role === 'ADMIN' ? 'Quản trị viên' : 'Thu ngân')
             }
           </p>
@@ -456,11 +452,6 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
       icon: <SafetyCertificateOutlined />,
       label: 'Phân Quyền Vai Trò',
     },
-    hasPermission(currentUser, 'landing_page:edit') && {
-      key: '/settings/landing-page',
-      icon: <GlobalOutlined />,
-      label: 'Quản Lý Landing Page',
-    },
   ].filter(Boolean) as MenuProps['items'];
 
   const siderMenuItems: MenuProps['items'] = [
@@ -496,7 +487,7 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
     },
   ].filter(Boolean) as MenuProps['items'];
 
-  // Nếu là trang Public (Landing page hoặc Login) -> Không hiển thị Sider ERP
+  // Nếu là trang Public (ví dụ Login) -> Không hiển thị Sider ERP
   if (isPublicPage) {
     return (
       <>
@@ -505,26 +496,6 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
         </Suspense>
         <main className="flex-1 flex flex-col">
           {children}
-        </main>
-      </>
-    );
-  }
-
-  // Nếu là trang CMS Studio (/settings/landing-page) -> Không gian làm việc độc lập toàn màn hình (Full-bleed Studio)
-  if (isCmsPage) {
-    return (
-      <>
-        <Suspense fallback={null}>
-          <AuthReasonNotifier />
-        </Suspense>
-        <main className="h-screen w-screen overflow-hidden flex flex-col bg-[#F3F4F6] text-[#111827]">
-          {mounted && isAuthorized ? (
-            children
-          ) : (
-            <div className="h-screen flex flex-col items-center justify-center gap-3">
-              <Spin size="large" description="Đang kiểm tra quyền truy cập CMS..." />
-            </div>
-          )}
         </main>
       </>
     );
@@ -577,7 +548,7 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
                       Artisan Bakery
                     </span>
                     <span className="text-[10px] uppercase font-bold tracking-wider text-[#585F6C] block">
-                      SaaS ERP System
+                      Quản Lý Tiệm Bánh
                     </span>
                   </div>
                 )}

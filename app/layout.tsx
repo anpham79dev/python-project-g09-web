@@ -19,8 +19,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Artisan Bakery - Hệ Thống Quản Lý Đơn Hàng Tiệm Bánh',
-  description: 'SaaS Quản lý đơn hàng, kho bánh, điểm bán hàng (POS) và doanh thu tiệm bánh',
+  title: 'Artisan Bakery - Quản Lý Tiệm Bánh',
+  description: 'Hệ thống quản lý đơn hàng, quầy bán hàng (POS), kho bánh và ca làm việc cho tiệm bánh Artisan Bakery',
   icons: {
     icon: [
       { url: '/emerald_bakery_logo.png', sizes: 'any' },

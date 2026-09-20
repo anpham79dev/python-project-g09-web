@@ -33,7 +33,7 @@ apiClient.interceptors.response.use(
     if (error.response?.status === 401 && typeof window !== 'undefined') {
       clearAuthSession();
       const pathname = window.location.pathname;
-      const isPublic = pathname === '/' || pathname === '/login' || pathname === '/landing';
+      const isPublic = pathname === '/login';
       if (!isPublic) {
         window.location.href = '/login?reason=unauthenticated';
       }
