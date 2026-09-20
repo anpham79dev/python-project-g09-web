@@ -137,6 +137,7 @@ export default function AccountingPage() {
       branchId: selectedBranchId !== 'ALL' ? selectedBranchId : (branches[0]?.id || ''),
       paymentMethod: 'CASH',
       category: type === 'INCOME' ? 'Thu khác / Hoàn tiền' : 'Chi phí Nguyên vật liệu & Nhập hàng',
+      recipientPayer: type === 'INCOME' ? 'Khách hàng' : '',
     });
     setIsVoucherModalOpen(true);
   };
@@ -145,16 +146,35 @@ export default function AccountingPage() {
     try {
       const values = await voucherForm.validateFields();
       setSubmittingVoucher(true);
-      await createTransaction({
-        ...values,
+
+      const rawAmount = values.amount;
+      const cleanAmount = typeof rawAmount === 'string'
+        ? Math.round(Number(rawAmount.replace(/,/g, '').trim()))
+        : Math.round(Number(rawAmount) || 0);
+
+      const payload = {
         transactionType: voucherType,
-      });
+        category: values.category?.trim() || (voucherType === 'INCOME' ? 'Thu khác / Hoàn tiền' : 'Chi phí Khác'),
+        amount: cleanAmount,
+        branchId: values.branchId && values.branchId !== 'ALL' ? values.branchId : undefined,
+        paymentMethod: values.paymentMethod || 'CASH',
+        recipientPayer: values.recipientPayer?.trim() || (voucherType === 'INCOME' ? 'Khách hàng' : 'Nhà cung cấp / Đối tác'),
+        note: values.note?.trim() || undefined,
+      };
+
+      await createTransaction(payload);
       message.success(`Lập ${voucherType === 'INCOME' ? 'Phiếu Thu' : 'Phiếu Chi'} thành công!`);
       setIsVoucherModalOpen(false);
       loadData();
     } catch (err: any) {
       if (err?.errorFields) return;
-      message.error(err.message || 'Lỗi khi lưu phiếu thu/chi');
+      const detail = err?.response?.data?.detail;
+      const serverMsg = detail
+        ? (Array.isArray(detail)
+            ? detail.map((d: any) => `${d.loc?.slice(-1)[0] || 'trường'}: ${d.msg}`).join(', ')
+            : typeof detail === 'string' ? detail : JSON.stringify(detail))
+        : (err.message || 'Lỗi khi lưu phiếu thu/chi');
+      message.error(`Lỗi khi lưu: ${serverMsg}`);
     } finally {
       setSubmittingVoucher(false);
     }
@@ -658,7 +678,18 @@ export default function AccountingPage() {
                   noStyle
                   rules={[
                     { required: true, message: 'Vui lòng nhập số tiền' },
-                    { type: 'number', min: 1, message: 'Số tiền phải từ 1 ₫' }
+                    {
+                      validator: async (_, value) => {
+                        if (value === undefined || value === null || value === '') {
+                          return Promise.reject(new Error('Vui lòng nhập số tiền'));
+                        }
+                        const num = typeof value === 'string' ? Number(value.replace(/,/g, '')) : Number(value);
+                        if (isNaN(num) || num <= 0) {
+                          return Promise.reject(new Error('Số tiền phải lớn hơn 0 ₫'));
+                        }
+                        return Promise.resolve();
+                      },
+                    },
                   ]}
                 >
                   <InputNumber
@@ -666,6 +697,7 @@ export default function AccountingPage() {
                     step={1000}
                     placeholder="Nhập số tiền..."
                     formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                    parser={(val) => (val ? val.replace(/\$\s?|(,*)/g, '') : '') as any}
                     className="w-full font-mono text-xs font-bold"
                   />
                 </Form.Item>
@@ -715,9 +747,16 @@ export default function AccountingPage() {
                   {voucherType === 'INCOME' ? 'NGƯỜI NỘP TIỀN' : 'NGƯỜI NHẬN TIỀN'}
                 </span>
               }
-              rules={[{ required: true, message: 'Vui lòng nhập đối tượng' }]}
+              rules={[{ required: true, message: 'Vui lòng nhập đối tượng', whitespace: true }]}
             >
-              <Input placeholder="Ví dụ: Cty Bơ Sữa Pháp, NV Thu Ngân..." className="text-xs" />
+              <Input
+                placeholder={
+                  voucherType === 'INCOME'
+                    ? 'Ví dụ: Khách lẻ, Anh Tuấn...'
+                    : 'Ví dụ: Cty Bơ Sữa Pháp, NV Thu Ngân...'
+                }
+                className="text-xs"
+              />
             </Form.Item>
           </div>
 
