@@ -250,10 +250,12 @@ export default function ShiftsPage() {
       key: 'action',
       align: 'center',
       width: 90,
+      fixed: 'right',
       render: (_, record) => (
         <Button
           type="link"
           size="small"
+          aria-label={`Xem chi tiết ca làm ${record.shiftName}`}
           onClick={() => handleOpenDetail(record)}
           className="text-xs text-[#006C49] hover:text-[#059669] p-0 font-medium h-auto whitespace-nowrap"
         >
@@ -413,7 +415,7 @@ export default function ShiftsPage() {
               columns={shiftColumns}
               dataSource={shifts}
               rowKey="id"
-              scroll={{ x: 950 }}
+              scroll={{ x: 1200 }}
               pagination={{
                 pageSize: 8,
                 showTotal: (total) => (

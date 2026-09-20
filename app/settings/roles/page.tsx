@@ -316,6 +316,7 @@ export default function RolesManagementPage() {
             <Button
               type="primary"
               size="small"
+              aria-label={`Phân quyền vai trò ${record.name}`}
               icon={<EditOutlined />}
               onClick={() => handleOpenEdit(record)}
               className="bg-emerald-700 hover:bg-emerald-600"
@@ -331,7 +332,7 @@ export default function RolesManagementPage() {
                     : `Không thể xóa vì còn ${record.user_count} nhân viên đang sử dụng vai trò này`
                 }
               >
-                <Button size="small" icon={<DeleteOutlined />} disabled />
+                <Button size="small" aria-label={`Không thể xóa vai trò ${record.name}`} icon={<DeleteOutlined />} disabled />
               </Tooltip>
             ) : (
               <Popconfirm
@@ -342,7 +343,7 @@ export default function RolesManagementPage() {
                 cancelText="Hủy"
                 okButtonProps={{ danger: true }}
               >
-                <Button size="small" danger icon={<DeleteOutlined />} />
+                <Button size="small" danger aria-label={`Xóa vai trò ${record.name}`} icon={<DeleteOutlined />} />
               </Popconfirm>
             )}
           </Space>
@@ -466,14 +467,30 @@ export default function RolesManagementPage() {
         open={editModalVisible}
         forceRender
         onCancel={() => setEditModalVisible(false)}
-        onOk={handleSaveEdit}
         confirmLoading={actionLoading}
         width={850}
-        okText="Lưu Thay Đổi & Xuất Bản"
-        cancelText="Đóng"
-        okButtonProps={{ className: 'bg-emerald-700 hover:bg-emerald-600' }}
+        footer={
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+            <span className="text-xs text-gray-600 font-medium">
+              Đã chọn: <strong className="text-emerald-700">{selectedPermIds.length}/{permissions.length}</strong> quyền
+            </span>
+            <Space>
+              <Button onClick={() => setEditModalVisible(false)}>
+                Hủy
+              </Button>
+              <Button
+                type="primary"
+                loading={actionLoading}
+                onClick={handleSaveEdit}
+                className="bg-emerald-700 hover:bg-emerald-600 font-semibold"
+              >
+                Lưu Thay Đổi &amp; Xuất Bản
+              </Button>
+            </Space>
+          </div>
+        }
       >
-        <div className="space-y-4 my-2">
+        <div className="max-h-[62vh] overflow-y-auto pr-1 space-y-4 my-2">
           {selectedRole?.is_system && (
             <Alert
               type="info"
@@ -602,14 +619,30 @@ export default function RolesManagementPage() {
         open={createModalVisible}
         forceRender
         onCancel={() => setCreateModalVisible(false)}
-        onOk={handleSaveCreate}
         confirmLoading={actionLoading}
         width={850}
-        okText="Tạo Vai Trò"
-        cancelText="Hủy"
-        okButtonProps={{ className: 'bg-emerald-700 hover:bg-emerald-600' }}
+        footer={
+          <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+            <span className="text-xs text-gray-600 font-medium">
+              Đã chọn: <strong className="text-emerald-700">{selectedPermIds.length}/{permissions.length}</strong> quyền
+            </span>
+            <Space>
+              <Button onClick={() => setCreateModalVisible(false)}>
+                Hủy
+              </Button>
+              <Button
+                type="primary"
+                loading={actionLoading}
+                onClick={handleSaveCreate}
+                className="bg-emerald-700 hover:bg-emerald-600 font-semibold"
+              >
+                Tạo Vai Trò
+              </Button>
+            </Space>
+          </div>
+        }
       >
-        <div className="space-y-4 my-2">
+        <div className="max-h-[62vh] overflow-y-auto pr-1 space-y-4 my-2">
           <Form form={createForm} layout="vertical">
             <Row gutter={16}>
               <Col span={8}>

@@ -350,6 +350,7 @@ export default function AccountingPage() {
           <Select
             value={selectedBranchId}
             onChange={handleSelectBranch}
+            aria-label="Lọc theo chi nhánh"
             className="w-64 text-xs"
             options={[
               { label: 'Tất cả chi nhánh (Toàn chuỗi)', value: 'ALL' },
@@ -362,6 +363,7 @@ export default function AccountingPage() {
 
           <Button
             icon={<ReloadOutlined />}
+            aria-label="Làm mới sổ quỹ"
             onClick={loadData}
             className="rounded-lg text-xs font-medium h-9 flex items-center"
           >
@@ -371,6 +373,7 @@ export default function AccountingPage() {
           <Button
             type="primary"
             icon={<PlusOutlined />}
+            aria-label="Lập phiếu thu tiền"
             onClick={() => handleOpenCreateVoucher('INCOME')}
             className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg text-xs shadow-xs h-9 flex items-center"
           >
@@ -381,6 +384,7 @@ export default function AccountingPage() {
             type="primary"
             danger
             icon={<MinusOutlined />}
+            aria-label="Lập phiếu chi tiền"
             onClick={() => handleOpenCreateVoucher('EXPENSE')}
             className="bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg text-xs shadow-xs h-9 flex items-center"
           >
@@ -681,7 +685,7 @@ export default function AccountingPage() {
                     {
                       validator: async (_, value) => {
                         if (value === undefined || value === null || value === '') {
-                          return Promise.reject(new Error('Vui lòng nhập số tiền'));
+                          return Promise.resolve();
                         }
                         const num = typeof value === 'string' ? Number(value.replace(/,/g, '')) : Number(value);
                         if (isNaN(num) || num <= 0) {

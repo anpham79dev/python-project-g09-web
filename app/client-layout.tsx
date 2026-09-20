@@ -17,6 +17,7 @@ import {
   Tag,
   Typography,
 } from 'antd';
+import viVN from 'antd/locale/vi_VN';
 import {
   ShopOutlined,
   AppstoreOutlined,
@@ -632,9 +633,13 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
                     <ShopOutlined className="text-[#006C49] text-xs" />
                     <div>
                       <span className="text-[10px] text-[#585F6C] block leading-none">Chi nhánh làm việc</span>
-                      <span className="text-xs font-semibold text-[#111827] max-w-44 truncate block">
-                        {selectedBranch?.name || 'Chọn chi nhánh'}
-                      </span>
+                      {!mounted || (!selectedBranch && branches.length === 0) ? (
+                        <span className="inline-block w-28 h-3.5 bg-gray-200 animate-pulse rounded my-0.5" />
+                      ) : (
+                        <span className="text-xs font-semibold text-[#111827] max-w-44 truncate block">
+                          {selectedBranch?.name || 'Chọn chi nhánh'}
+                        </span>
+                      )}
                     </div>
                     <DownOutlined className="text-[10px] text-secondary ml-1" />
                   </button>
@@ -644,9 +649,13 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
                   <ShopOutlined className="text-[#006C49] text-xs" />
                   <div>
                     <span className="text-[10px] text-[#585F6C] block leading-none">Chi nhánh phân công</span>
-                    <span className="text-xs font-semibold text-[#111827] max-w-44 truncate block">
-                      {currentUser?.defaultBranchName || selectedBranch?.name || 'Chi nhánh mặc định'}
-                    </span>
+                    {!mounted ? (
+                      <span className="inline-block w-28 h-3.5 bg-emerald-200/60 animate-pulse rounded my-0.5" />
+                    ) : (
+                      <span className="text-xs font-semibold text-[#111827] max-w-44 truncate block">
+                        {currentUser?.defaultBranchName || selectedBranch?.name || 'Chi nhánh mặc định'}
+                      </span>
+                    )}
                   </div>
                 </div>
               )}
@@ -656,7 +665,11 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
             <div className="flex items-center gap-3">
               <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
                 <ClockCircleOutlined className="text-emerald-600" />
-                <span>{currentSchedule?.displayText || 'Đang cập nhật ca'}</span>
+                {!mounted || !currentSchedule ? (
+                  <span className="inline-block w-24 h-3 bg-emerald-200/60 animate-pulse rounded" />
+                ) : (
+                  <span>{currentSchedule?.displayText || 'Đang cập nhật ca'}</span>
+                )}
               </div>
 
               {currentUser && (
@@ -695,7 +708,7 @@ function ClientLayoutInner({ children }: { children: React.ReactNode }) {
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ConfigProvider theme={antdTheme}>
+    <ConfigProvider theme={antdTheme} locale={viVN}>
       <App className="min-h-screen flex flex-col bg-[#F8F9FA] text-[#111827]">
         <ClientLayoutInner>{children}</ClientLayoutInner>
       </App>

@@ -160,9 +160,10 @@ export default function DashboardPage() {
   // 1. Top 5 Best Selling Products
   const topProductColumns: ColumnsType<any> = [
     {
-      title: 'Hạng',
+      title: <span className="whitespace-nowrap">Hạng</span>,
       key: 'rank',
-      width: 50,
+      width: 70,
+      className: 'whitespace-nowrap',
       align: 'center',
       render: (_, __, index) => {
         const bg =
@@ -445,8 +446,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Date Filter, Branch Filter & Actions Toolbar */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <div className="flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-2.5 max-w-full">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-xs text-gray-500 font-medium whitespace-nowrap">Phạm vi báo cáo:</span>
             <div data-testid="dashboard-branch-filter" className="inline-block">
             <Select
@@ -456,8 +457,9 @@ export default function DashboardPage() {
                 setSelectedBranchId(val);
                 loadStats(selectedRange, customDates, val);
               }}
+              aria-label="Phạm vi chi nhánh báo cáo"
               popupMatchSelectWidth={false}
-              className="w-full sm:w-80 min-w-[290px] text-xs h-9"
+              className="w-full sm:w-72 max-w-[290px] text-xs h-9"
               optionLabelProp="label"
               options={[
                 {
@@ -536,6 +538,7 @@ export default function DashboardPage() {
 
           <Button
             icon={<ReloadOutlined />}
+            aria-label="Làm mới báo cáo hoạt động"
             onClick={() => loadStats(selectedRange, customDates, selectedBranchId)}
             className="rounded-lg text-xs font-medium h-9 flex items-center"
           >

@@ -34,7 +34,9 @@ async function runPBACPlaywrightTests() {
     // 1.1 Kiểm tra truy cập /pos không bị toast lỗi hay chặn quyền
     await superPage.goto('http://localhost:3000/pos', { waitUntil: 'domcontentloaded' });
     await superPage.waitForTimeout(1000);
-    const posReady = (await superPage.locator('input[placeholder*="Tìm bánh"]').count()) > 0 || (await superPage.locator('button:has-text("Kết ca / Chốt két")').count()) > 0;
+    const posReady = (await superPage.locator('input[placeholder*="bánh"]').count()) > 0 ||
+                     (await superPage.locator('button:has-text("Kết ca")').count()) > 0 ||
+                     (await superPage.locator('button:has-text("mở ca")').count()) > 0;
     console.log(`  👉 SuperAdmin truy cập /pos: ${posReady ? '✅ Thành công (Không bị lỗi)' : '❌ Thất bại'}`);
     if (!posReady) throw new Error('SuperAdmin không thể vào /pos!');
 

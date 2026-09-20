@@ -13,6 +13,7 @@ import {
   App,
   Typography,
   Tooltip,
+  Empty,
 } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -88,6 +89,16 @@ export default function ProductsPage() {
 
     return matchesCategory && matchesStatus && matchesSearch;
   });
+
+  const hasActiveFilters = Boolean(
+    searchQuery.trim() || selectedCategory !== 'Tất cả' || selectedStatus !== 'ALL'
+  );
+
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setSelectedCategory('Tất cả');
+    setSelectedStatus('ALL');
+  };
 
   const handleDelete = (record: Product) => {
     modal.confirm({
@@ -200,6 +211,7 @@ export default function ProductsPage() {
           <Tooltip title="Chỉnh sửa">
             <Button
               type="text"
+              aria-label={`Chỉnh sửa sản phẩm ${record.name}`}
               icon={<EditOutlined className="text-blue-600" />}
               onClick={() => router.push(`/products/${record.id}/edit`)}
             />
@@ -208,6 +220,7 @@ export default function ProductsPage() {
             <Button
               type="text"
               danger
+              aria-label={`Xóa sản phẩm ${record.name}`}
               icon={<DeleteOutlined />}
               onClick={() => handleDelete(record)}
             />
@@ -234,6 +247,7 @@ export default function ProductsPage() {
           type="primary"
           size="large"
           icon={<PlusOutlined />}
+          aria-label="Thêm sản phẩm mới"
           onClick={() => router.push('/products/new')}
           className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg shadow-xs"
         >
@@ -248,6 +262,7 @@ export default function ProductsPage() {
             <Input
               prefix={<SearchOutlined className="text-gray-400 mr-1" />}
               placeholder="Tìm kiếm sản phẩm theo tên, danh mục hoặc mã SKU..."
+              aria-label="Tìm kiếm sản phẩm theo tên, danh mục hoặc mã SKU"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               allowClear
@@ -259,6 +274,7 @@ export default function ProductsPage() {
             <Select
               value={selectedCategory}
               onChange={setSelectedCategory}
+              aria-label="Lọc theo danh mục"
               className="w-full"
               options={CATEGORIES.map((cat) => ({ label: cat, value: cat }))}
             />
@@ -268,6 +284,7 @@ export default function ProductsPage() {
             <Select
               value={selectedStatus}
               onChange={setSelectedStatus}
+              aria-label="Lọc theo trạng thái tồn kho"
               className="w-full"
               options={[
                 { label: 'Tất cả trạng thái', value: 'ALL' },
@@ -287,6 +304,25 @@ export default function ProductsPage() {
           dataSource={filteredProducts}
           rowKey="id"
           loading={loading}
+          locale={{
+            emptyText: hasActiveFilters ? (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description={<span className="text-secondary text-xs">Không tìm thấy sản phẩm phù hợp</span>}
+              >
+                <Button
+                  type="primary"
+                  size="small"
+                  onClick={handleClearFilters}
+                  className="bg-[#006C49] hover:bg-[#059669] text-xs font-semibold"
+                >
+                  Xóa bộ lọc
+                </Button>
+              </Empty>
+            ) : (
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Chưa có sản phẩm nào" />
+            ),
+          }}
           pagination={{
             pageSize: 8,
             showTotal: (total, range) => `${range[0]}-${range[1]} trong tổng số ${total} sản phẩm`,

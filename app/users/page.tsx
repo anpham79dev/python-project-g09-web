@@ -92,17 +92,6 @@ export default function UsersPage() {
 
   const handleEdit = (user: User) => {
     setSelectedUser(user);
-    const matchedRole = roles.find((r) => r.id === user.roleId || r.code === user.role);
-    form.resetFields();
-    form.setFieldsValue({
-      fullName: user.fullName || '',
-      email: user.email || (user as any).user_email || '',
-      phone: user.phone || (user as any).phone_number || (user as any).hotline || '',
-      role: matchedRole ? matchedRole.id : user.role,
-      defaultBranchId: user.defaultBranchId || null,
-      status: user.status,
-      password: '',
-    });
     setIsEditModalVisible(true);
   };
 
@@ -291,6 +280,7 @@ export default function UsersPage() {
             <Button
               type="text"
               size="small"
+              aria-label={`Chỉnh sửa thông tin nhân viên ${record.fullName}`}
               icon={<EditOutlined className="text-blue-600" />}
               onClick={() => handleEdit(record)}
               className="hover:bg-blue-50"
@@ -313,6 +303,7 @@ export default function UsersPage() {
                 <Button
                   type="text"
                   size="small"
+                  aria-label={record.status === 'ACTIVE' ? `Khóa tài khoản ${record.fullName}` : `Mở khóa tài khoản ${record.fullName}`}
                   icon={
                     record.status === 'ACTIVE' ? (
                       <StopOutlined className="text-red-500" />
@@ -347,6 +338,7 @@ export default function UsersPage() {
         <div className="flex items-center gap-2">
           <Button
             type="default"
+            aria-label="Quản lý vai trò"
             icon={<KeyOutlined />}
             onClick={() => router.push('/settings/roles')}
           >
@@ -354,6 +346,7 @@ export default function UsersPage() {
           </Button>
           <Button
             type="primary"
+            aria-label="Thêm nhân viên mới"
             icon={<PlusOutlined />}
             onClick={() => router.push('/users/new')}
             className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg"
@@ -368,6 +361,7 @@ export default function UsersPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
           <Input
             placeholder="Tìm theo tên, username, email, số điện thoại..."
+            aria-label="Tìm kiếm nhân viên theo tên, username, email hoặc số điện thoại"
             prefix={<SearchOutlined className="text-gray-400 mr-1" />}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}

@@ -77,7 +77,7 @@ async function testBranchReloadSync() {
     // 5. Test reload trên /shifts
     console.log('\n[5/6] ⏰ Kiểm thử Reload Data trên Báo Cáo Ca & Kết Ca (/shifts)...');
     await page.goto('http://localhost:3000/shifts');
-    await page.waitForSelector('text=Quản Lý Ca Làm Việc');
+    await page.waitForSelector('text=Ca làm việc');
     
     await switchBranchOnTopbar('Thảo Điền');
     await page.waitForTimeout(500);

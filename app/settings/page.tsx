@@ -216,6 +216,7 @@ export default function SettingsPage() {
         <Space size="small">
           <Button
             size="small"
+            aria-label={`Chỉnh sửa ca làm mẫu ${record.name}`}
             icon={<EditOutlined />}
             onClick={() => handleOpenEditTemplate(record)}
             className="text-xs"
@@ -230,7 +231,7 @@ export default function SettingsPage() {
             cancelText="Hủy"
             okButtonProps={{ danger: true }}
           >
-            <Button size="small" danger icon={<DeleteOutlined />} className="text-xs" />
+            <Button size="small" danger aria-label={`Xóa ca làm mẫu ${record.name}`} icon={<DeleteOutlined />} className="text-xs" />
           </Popconfirm>
         </Space>
       ),

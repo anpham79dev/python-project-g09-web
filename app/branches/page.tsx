@@ -122,35 +122,29 @@ export default function BranchesPage() {
   // Branch Modal Handlers
   const handleOpenCreateBranch = () => {
     setEditingBranch(null);
-    branchForm.resetFields();
-    branchForm.setFieldsValue({ status: 'ACTIVE' });
     setIsBranchModalOpen(true);
   };
 
   const handleOpenEditBranch = (branch: Branch) => {
     setEditingBranch(branch);
-    branchForm.resetFields();
-    branchForm.setFieldsValue({
-      code: branch.code,
-      name: branch.name,
-      address: branch.address,
-      phone: branch.phone || (branch as any).hotline || '',
-      managerName: branch.managerName,
-      status: branch.status,
-    });
     setIsBranchModalOpen(true);
   };
 
   useEffect(() => {
-    if (isBranchModalOpen && editingBranch) {
-      branchForm.setFieldsValue({
-        code: editingBranch.code,
-        name: editingBranch.name,
-        address: editingBranch.address,
-        phone: editingBranch.phone || (editingBranch as any).hotline || '',
-        managerName: editingBranch.managerName,
-        status: editingBranch.status,
-      });
+    if (isBranchModalOpen) {
+      if (editingBranch) {
+        branchForm.setFieldsValue({
+          code: editingBranch.code,
+          name: editingBranch.name,
+          address: editingBranch.address,
+          phone: editingBranch.phone || (editingBranch as any).hotline || '',
+          managerName: editingBranch.managerName,
+          status: editingBranch.status,
+        });
+      } else {
+        branchForm.resetFields();
+        branchForm.setFieldsValue({ status: 'ACTIVE' });
+      }
     }
   }, [isBranchModalOpen, editingBranch, branchForm]);
 
@@ -281,6 +275,7 @@ export default function BranchesPage() {
         <Tooltip title="Chỉnh sửa chi nhánh">
           <Button
             size="small"
+            aria-label={`Chỉnh sửa chi nhánh ${record.name}`}
             icon={<EditOutlined />}
             onClick={() => handleOpenEditBranch(record)}
             className="text-xs"
@@ -360,6 +355,7 @@ export default function BranchesPage() {
         <Button
           size="small"
           type="primary"
+          aria-label={`Điều chỉnh tồn kho ${record.productName}`}
           icon={<EditOutlined />}
           onClick={() => handleOpenEditStock(record)}
           className="bg-[#10B981] hover:bg-[#059669] text-xs font-medium"
@@ -388,6 +384,7 @@ export default function BranchesPage() {
         <div className="flex items-center gap-2.5">
           <Button
             icon={<ReloadOutlined />}
+            aria-label="Làm mới dữ liệu chi nhánh và tồn kho"
             onClick={loadData}
             className="rounded-lg text-xs font-medium h-9 flex items-center"
           >
@@ -397,6 +394,7 @@ export default function BranchesPage() {
           <Button
             type="primary"
             icon={<PlusOutlined />}
+            aria-label="Thêm chi nhánh mới"
             onClick={handleOpenCreateBranch}
             className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg text-xs shadow-xs h-9 flex items-center"
           >

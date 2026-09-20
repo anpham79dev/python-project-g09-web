@@ -364,7 +364,6 @@ export default function POSPage() {
       fetchProductList();
       fetchShift();
       window.dispatchEvent(new CustomEvent('artisan_shift_changed'));
-      message.success('Thanh toán đơn hàng thành công!');
     } catch (err: any) {
       message.error(err.response?.data?.detail || err.message || 'Lỗi khi tạo đơn hàng');
     } finally {
@@ -419,15 +418,17 @@ export default function POSPage() {
                   Đề xuất: {(currentSchedule?.defaultInitialCash || 500000).toLocaleString('vi-VN')} đ
                 </span>
               </label>
-              <InputNumber
-                size="large"
-                className="w-full font-mono text-base font-bold"
-                value={openShiftCash}
-                onChange={(v) => setOpenShiftCash(v || 0)}
-                formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                addonAfter="đ"
-                min={0}
-              />
+              <Space.Compact size="large" className="w-full">
+                <InputNumber
+                  size="large"
+                  className="w-full font-mono text-base font-bold"
+                  value={openShiftCash}
+                  onChange={(v) => setOpenShiftCash(v || 0)}
+                  formatter={(val) => `${val}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                  min={0}
+                />
+                <Button disabled size="large" className="!bg-gray-100 !text-gray-600 font-bold !px-3">₫</Button>
+              </Space.Compact>
             </div>
 
             <div className="space-y-1.5">
@@ -565,6 +566,7 @@ export default function POSPage() {
             <Input
               prefix={<SearchOutlined className="text-gray-400 mr-1" />}
               placeholder="Tìm kiếm theo tên bánh, danh mục hoặc mã..."
+              aria-label="Tìm kiếm theo tên bánh, danh mục hoặc mã"
               size="middle"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -573,6 +575,7 @@ export default function POSPage() {
             />
             <Button
               icon={<ClockCircleOutlined />}
+              aria-label="Kết ca và chốt két tiền mặt"
               onClick={handleOpenShiftModal}
               className="shrink-0 whitespace-nowrap text-xs font-semibold text-[#006C49] border-[#10B981] hover:bg-emerald-50 h-9 flex items-center"
             >
@@ -706,6 +709,7 @@ export default function POSPage() {
               danger
               size="small"
               icon={<ClearOutlined />}
+              aria-label="Làm mới giỏ hàng"
               onClick={clearCart}
               className="text-xs font-medium hover:bg-red-50"
             >
@@ -749,6 +753,7 @@ export default function POSPage() {
                 <div className="flex items-center gap-1.5 shrink-0">
                   <Button
                     size="small"
+                    aria-label={`Giảm số lượng ${item.product.name}`}
                     icon={<MinusOutlined className="text-[10px]" />}
                     onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
                     className="w-6 h-6 p-0 flex items-center justify-center rounded-md"
@@ -758,6 +763,7 @@ export default function POSPage() {
                   </span>
                   <Button
                     size="small"
+                    aria-label={`Tăng số lượng ${item.product.name}`}
                     icon={<PlusOutlined className="text-[10px]" />}
                     onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                     disabled={item.quantity >= item.product.stock}
@@ -767,6 +773,7 @@ export default function POSPage() {
                     type="text"
                     danger
                     size="small"
+                    aria-label={`Xóa món ${item.product.name} khỏi giỏ hàng`}
                     icon={<DeleteOutlined className="text-xs" />}
                     onClick={() => removeFromCart(item.product.id)}
                     className="w-6 h-6 p-0 flex items-center justify-center text-gray-400 hover:text-red-500 ml-1"
@@ -784,6 +791,7 @@ export default function POSPage() {
             <Input
               prefix={<UserOutlined className="text-gray-400 text-xs" />}
               placeholder="Tên khách hàng"
+              aria-label="Tên khách hàng"
               size="middle"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
@@ -792,6 +800,7 @@ export default function POSPage() {
             <Input
               prefix={<PhoneOutlined className="text-gray-400 text-xs" />}
               placeholder="Số điện thoại"
+              aria-label="Số điện thoại khách hàng"
               size="middle"
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
@@ -802,6 +811,7 @@ export default function POSPage() {
           {/* Note Input */}
           <Input
             placeholder="Ghi chú đơn hàng (ví dụ: ít ngọt, cắt bánh...)"
+            aria-label="Ghi chú đơn hàng"
             size="middle"
             value={orderNote}
             onChange={(e) => setOrderNote(e.target.value)}
@@ -817,6 +827,7 @@ export default function POSPage() {
               <button
                 type="button"
                 onClick={() => setPaymentMethod('CASH')}
+                aria-label="Thanh toán bằng Tiền mặt"
                 className={`w-full py-1.5 px-1 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 border transition-all cursor-pointer ${
                   paymentMethod === 'CASH'
                     ? 'bg-emerald-50 text-[#006C49] border-[#10B981] shadow-2xs'
@@ -828,6 +839,7 @@ export default function POSPage() {
               <button
                 type="button"
                 onClick={() => setPaymentMethod('QR_TRANSFER')}
+                aria-label="Thanh toán bằng Chuyển khoản QR"
                 className={`w-full py-1.5 px-1 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 border transition-all cursor-pointer ${
                   paymentMethod === 'QR_TRANSFER'
                     ? 'bg-emerald-50 text-[#006C49] border-[#10B981] shadow-2xs'
@@ -839,6 +851,7 @@ export default function POSPage() {
               <button
                 type="button"
                 onClick={() => setPaymentMethod('CARD')}
+                aria-label="Thanh toán bằng Quẹt thẻ POS"
                 className={`w-full py-1.5 px-1 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 border transition-all cursor-pointer ${
                   paymentMethod === 'CARD'
                     ? 'bg-emerald-50 text-[#006C49] border-[#10B981] shadow-2xs'
@@ -862,6 +875,7 @@ export default function POSPage() {
                 <InputNumber
                   id="pos-discount-input"
                   placeholder="0"
+                  aria-label="Giảm giá đơn hàng"
                   size="small"
                   min={0}
                   max={subtotal}

@@ -46,7 +46,7 @@ async function runAntdV6DeprecationTest() {
   // 2. Đăng nhập Admin
   console.log('[2/8] 🔐 Đăng nhập tài khoản Admin...');
   await page.goto(`${BASE_URL}/login`, { waitUntil: 'networkidle' });
-  const adminBtn = page.getByRole('button', { name: /Quản lý|admin/i });
+  const adminBtn = page.locator('button:has-text("Quản lý")').first();
   if (await adminBtn.isVisible()) {
     await adminBtn.click();
     await page.locator('button[type="submit"]').click();
@@ -63,7 +63,7 @@ async function runAntdV6DeprecationTest() {
   await page.goto(`${BASE_URL}/pos`, { waitUntil: 'networkidle' });
   await page.waitForTimeout(1000);
   // Bấm thử sản phẩm vào giỏ để kích hoạt state
-  const firstItem = page.locator('div.group').first();
+  const firstItem = page.locator('div.group.cursor-pointer').first();
   if (await firstItem.isVisible()) {
     await firstItem.click();
   }

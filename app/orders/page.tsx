@@ -204,6 +204,7 @@ export default function OrdersPage() {
         <Tooltip title="Xem chi tiết hóa đơn">
           <Button
             type="text"
+            aria-label={`Xem chi tiết hóa đơn ${record.code}`}
             icon={<EyeOutlined className="text-[#10B981]" />}
             onClick={() => router.push(`/orders/${record.id}`)}
           />
@@ -229,6 +230,7 @@ export default function OrdersPage() {
           type="primary"
           size="large"
           icon={<ShoppingOutlined />}
+          aria-label="Tới quầy thu ngân POS"
           onClick={() => router.push('/pos')}
           className="bg-[#10B981] hover:bg-[#059669] text-white font-semibold rounded-lg shadow-xs"
         >
@@ -243,6 +245,7 @@ export default function OrdersPage() {
             <Input
               prefix={<SearchOutlined className="text-gray-400 mr-1" />}
               placeholder="Tìm theo mã đơn (HD-...), tên khách hàng hoặc thu ngân..."
+              aria-label="Tìm kiếm theo mã đơn, tên khách hàng hoặc thu ngân"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               allowClear
@@ -254,6 +257,7 @@ export default function OrdersPage() {
             <Select
               value={selectedStatus}
               onChange={setSelectedStatus}
+              aria-label="Lọc theo trạng thái đơn hàng"
               className="w-full"
               options={[
                 { label: 'Tất cả trạng thái', value: 'ALL' },
@@ -268,6 +272,7 @@ export default function OrdersPage() {
             <Select
               value={selectedPayment}
               onChange={setSelectedPayment}
+              aria-label="Lọc theo hình thức thanh toán"
               className="w-full"
               options={[
                 { label: 'Tất cả hình thức thanh toán', value: 'ALL' },
